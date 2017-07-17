@@ -6,4 +6,4 @@ ssh-version
 ===========
 shows version of the SSH server which you are connecting to
 
-ssh-tools.gif
+![Screencast](https://raw.githubusercontent.com/vaporup/ssh-tools/master/ssh-tools.gif)
