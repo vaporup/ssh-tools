@@ -1,0 +1,36 @@
+#!/bin/bash
+
+ssh_opts=(
+    -o BatchMode=yes
+    -o CheckHostIP=no
+    -o StrictHostKeyChecking=no
+    -o HashKnownHosts=no
+    -o ConnectTimeout=16
+)
+
+if [[ $1 == *"@"* ]]; then
+  SERVER=$( echo ${1##*@} )
+else
+  SERVER=${1}
+fi
+
+ssh_seq=1
+
+echo "SSHPING ${SERVER}"
+
+while true
+  do
+    status=$(/usr/bin/ssh "${ssh_opts[@]}" "$@" echo pong 2>&1)
+
+    if [[ $status == pong ]] ; then
+      echo "Pong from ${SERVER}: ssh_seq=${ssh_seq}"
+    elif [[ $status == "Permission denied"* ]] ; then
+      echo "Reply from ${SERVER}: ssh_seq=${ssh_seq}"
+    else
+      echo "${status}"
+    fi
+
+    ssh_seq=$((ssh_seq+1))
+    sleep 1
+
+done

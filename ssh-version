@@ -1,0 +1,18 @@
+#!/bin/bash
+
+ssh_opts=(
+    -o BatchMode=yes
+    -o CheckHostIP=no
+    -o StrictHostKeyChecking=no
+    -o HashKnownHosts=no
+    -o ConnectTimeout=16
+)
+
+if [[ $1 == *"@"* ]]; then
+  SERVER=$( echo ${1##*@} )
+else
+  SERVER=${1}
+fi
+
+ssh -vN "${ssh_opts[@]}" "ForceLoginFail@${SERVER}" 2>&1 | grep "remote software version"
+
