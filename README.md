@@ -8,4 +8,3 @@ check if host is reachable using ssh_config
 ssh-version
 ===========
 shows version of the SSH server which you are connecting to
-
