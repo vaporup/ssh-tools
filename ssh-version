@@ -14,5 +14,4 @@ else
   SERVER=${1}
 fi
 
-ssh -vN "${ssh_opts[@]}" "ForceLoginFail@${SERVER}" 2>&1 | grep "remote software version"
-
+ssh -vN "${ssh_opts[@]}" "$@" -l ForceLogin2Fail 2>&1 | grep "remote software version"
