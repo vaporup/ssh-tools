@@ -1,5 +1,16 @@
 #!/bin/bash
 
+BLACK=$(tput setaf 1)
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+BOLD=$(tput bold)
+RESET=$(tput sgr0)
+
 ssh_opts=(
     -o BatchMode=yes
     -o CheckHostIP=no
@@ -16,16 +27,16 @@ fi
 
 ssh_seq=1
 
-echo "SSHPING ${SERVER}"
+echo "${BOLD}SSHPING${RESET} ${YELLOW}${SERVER}${RESET}"
 
 while true
   do
-    status=$(/usr/bin/ssh "${ssh_opts[@]}" "$@" echo pong 2>&1)
+    status=$(/usr/bin/ssh "${ssh_opts[@]}" "$@" echo pong)
 
     if [[ $status == pong ]] ; then
-      echo "Pong from ${SERVER}: ssh_seq=${ssh_seq}"
+      echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${SERVER}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
     elif [[ $status == "Permission denied"* ]] ; then
-      echo "Reply from ${SERVER}: ssh_seq=${ssh_seq}"
+      echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${SERVER}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
     else
       echo "${status}"
     fi
