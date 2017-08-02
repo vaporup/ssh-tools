@@ -31,11 +31,11 @@ echo "${BOLD}SSHPING${RESET} ${YELLOW}${SERVER}${RESET}"
 
 while true
   do
-    status=$(/usr/bin/ssh "${ssh_opts[@]}" "$@" echo pong 2>&1)
+    status=$(/usr/bin/ssh "${ssh_opts[@]}" "$@" echo pong 2>&1 | grep -oE 'pong|denied')
 
     if [[ $status == pong ]] ; then
       echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${SERVER}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
-    elif [[ $status == "Permission denied"* ]] ; then
+    elif [[ $status == denied ]] ; then
       echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${SERVER}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
     else
       echo "${status}"
