@@ -4,10 +4,7 @@
 # TODO
 #
 # -F like ssh -F <config>
-# -W for timeout (see man ping) -> change ConnectTimeout in SSH_OPTS
-# -n ?
 # -q ?
-# -w deadline ? (see man ping)
 # stats at last line
 #
 
@@ -27,7 +24,6 @@ SSH_OPTS=(
     -o CheckHostIP=no
     -o StrictHostKeyChecking=no
     -o HashKnownHosts=no
-    -o ConnectTimeout=16
 )
 
 SSH_FLAGS=()
@@ -35,6 +31,7 @@ SSH_FLAGS=()
 ping_count=0
 ping_interval=1
 username="${USER}"
+connect_timeout=16
 
 function usage() {
 
@@ -52,13 +49,14 @@ cat << EOF
      -l user      Try login in with <user> as username.
                   The default is \$USER
      -D           Print timestamp (unix time + microseconds as in gettimeofday) before each line
+     -W timeout   Time to wait for a response, in seconds
      -v           Verbose output
 
 EOF
 
 }
 
-while getopts ":46c:hi:l:Dp:v" opt; do
+while getopts ":46c:hi:l:Dp:vW:" opt; do
   case ${opt} in
      4 )
        SSH_FLAGS+=("-4")
@@ -88,6 +86,9 @@ while getopts ":46c:hi:l:Dp:v" opt; do
      v )
        verbose="yes"
        ;;
+     W )
+       [[ $OPTARG =~ ^[0-9]+$ ]] && connect_timeout=$OPTARG
+       ;;
     \? )
        echo "Invalid option: $OPTARG" 1>&2
        usage
@@ -97,6 +98,8 @@ while getopts ":46c:hi:l:Dp:v" opt; do
 done
 
 shift $((OPTIND - 1))
+
+SSH_OPTS+=( -o ConnectTimeout=$connect_timeout )
 
 if [[ $1 == *"@"* ]]; then
   host=$( echo ${1##*@} )
