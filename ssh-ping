@@ -1,5 +1,17 @@
 #!/bin/bash
 
+#
+# TODO
+#
+# -F like ssh -F <config>
+# -W for timeout (see man ping) -> changed ConnectTimeout in SSH_OPTS
+# -4 and -6
+# -n ?
+# -q ?
+# -w deadline ? (see man ping)
+# -p port ?
+#
+
   BLACK=$(tput setaf 1)
     RED=$(tput setaf 1)
   GREEN=$(tput setaf 2)
@@ -36,12 +48,13 @@ cat << EOF
                   The default is to wait for 1 second between each request
      -l user      Try login in with this user.
                   The default is \$USER
+     -D           Print timestamp (unix time + microseconds as in gettimeofday) before each line.
 
 EOF
 
 }
 
-while getopts ":hc:i:l:" opt; do
+while getopts ":hc:i:l:D" opt; do
   case ${opt} in
      h )
        usage
@@ -49,6 +62,9 @@ while getopts ":hc:i:l:" opt; do
        ;;
      c )
        [[ $OPTARG =~ ^[0-9]+$ ]] && ping_count=$OPTARG
+       ;;
+     D )
+       print_timestamp="yes"
        ;;
      i )
        ping_interval=$OPTARG
@@ -88,14 +104,17 @@ while true
 
     [[ ${ping_count} -gt 0 ]] && [[ ${ssh_seq} -gt ${ping_count} ]] && break
 
+    timestamp=$(date +%s.%6N)
     start_request=$(date +%s%3N)
     status=$(ssh "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
     end_request=$(date +%s%3N)
     time_request=$((end_request-start_request))
 
     if [[ $status == pong ]] ; then
+      [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
       echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
     elif [[ $status == denied ]] ; then
+      [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
       echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
     fi
 
