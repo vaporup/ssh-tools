@@ -19,11 +19,54 @@ ssh_opts=(
     -o ConnectTimeout=16
 )
 
+ping_count=0
+ping_interval=1
+
+function usage() {
+
+cat << EOF
+
+  Usage: $0 options [user@]server
+
+  OPTIONS:
+     -h          Show this message
+     -c count    Stop after sending _count_ request packets
+     -i interval Wait interval seconds between sending each request.
+                 The default is to wait for 1 second between each request
+
+EOF
+
+}
+
+while getopts ":hc:i:" opt; do
+  case ${opt} in
+     h )
+       usage
+       exit 1
+       ;;
+     c )
+       [[ $OPTARG =~ ^[0-9]+$ ]] && ping_count=$OPTARG
+       ;;
+     i )
+       ping_interval=$OPTARG
+       ;;
+    \? )
+       echo "Invalid option: $OPTARG" 1>&2
+       usage
+       exit 1
+      ;;
+  esac
+done
+
+shift $((OPTIND - 1))
+
 if [[ $1 == *"@"* ]]; then
   SERVER=$( echo ${1##*@} )
 else
   SERVER=${1}
 fi
+
+[[ -z "${SERVER}" ]] && { echo "No server mentioned" ; usage; exit 1; }
 
 ssh_seq=1
 
@@ -31,6 +74,12 @@ echo "${BOLD}SSHPING${RESET} ${YELLOW}${SERVER}${RESET}"
 
 while true
   do
+
+    #
+    # ping only $count times or forever if $count = 0
+    #
+    [[ ${ping_count} -gt 0 ]] && [[ ${ssh_seq} -gt ${ping_count} ]] && break
+
     status=$(ssh "${ssh_opts[@]}" "$@" echo pong 2>&1 | grep -oE 'pong|denied')
 
     if [[ $status == pong ]] ; then
@@ -40,6 +89,6 @@ while true
     fi
 
     ssh_seq=$((ssh_seq+1))
-    sleep 1
+    sleep ${ping_interval}
 
 done
