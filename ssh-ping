@@ -32,6 +32,8 @@ SSH_OPTS=(
     -o ConnectTimeout=16
 )
 
+SSH_FLAGS=()
+
 ping_count=0
 ping_interval=1
 username="${USER}"
@@ -43,20 +45,29 @@ cat << EOF
   Usage: $0 options [user@]host
 
   OPTIONS:
+     -4           Use IPv4 only
+     -6           Use IPv6 only
      -c count     Stop after sending _count_ request packets
      -h           Show this message
      -i interval  Wait interval seconds between sending each request.
-                  The default is to wait for 1 second between each request
+                  The default is to wait for 1 second between each request.
      -l user      Try login in with this user.
                   The default is \$USER
-     -D           Print timestamp (unix time + microseconds as in gettimeofday) before each line.
+     -D           Print timestamp (unix time + microseconds as in gettimeofday) before each line
+     -v           Verbose output
 
 EOF
 
 }
 
-while getopts ":c:hi:l:D" opt; do
+while getopts ":46c:hi:l:Dv" opt; do
   case ${opt} in
+     4 )
+       SSH_FLAGS+=("-4")
+       ;;
+     6 )
+       SSH_FLAGS+=("-6")
+       ;;
      c )
        [[ $OPTARG =~ ^[0-9]+$ ]] && ping_count=$OPTARG
        ;;
@@ -72,6 +83,9 @@ while getopts ":c:hi:l:D" opt; do
        ;;
      D )
        print_timestamp="yes"
+       ;;
+     v )
+       verbose="yes"
        ;;
     \? )
        echo "Invalid option: $OPTARG" 1>&2
@@ -107,7 +121,15 @@ while true
 
     timestamp=$(date +%s.%6N)
     start_request=$(date +%s%3N)
-    status=$(ssh "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
+
+    if [[ ${verbose} == yes ]]
+      then
+        echo "Debug: SSH_FLAGS ${SSH_FLAGS[@]}"
+        echo "Debug: SSH_OPTS ${SSH_OPTS[@]}"
+    fi
+
+    status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
+
     end_request=$(date +%s%3N)
     time_request=$((end_request-start_request))
 
