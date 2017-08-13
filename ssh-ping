@@ -21,6 +21,7 @@ ssh_opts=(
 
 ping_count=0
 ping_interval=1
+username="SSHPING"
 
 function usage() {
 
@@ -33,12 +34,14 @@ cat << EOF
      -c count    Stop after sending _count_ request packets
      -i interval Wait interval seconds between sending each request.
                  The default is to wait for 1 second between each request
+     -l username Try login in with this username
+                 The default is SSHPING
 
 EOF
 
 }
 
-while getopts ":hc:i:" opt; do
+while getopts ":hc:i:l:" opt; do
   case ${opt} in
      h )
        usage
@@ -49,6 +52,9 @@ while getopts ":hc:i:" opt; do
        ;;
      i )
        ping_interval=$OPTARG
+       ;;
+     l )
+       username=$OPTARG
        ;;
     \? )
        echo "Invalid option: $OPTARG" 1>&2
@@ -62,6 +68,7 @@ shift $((OPTIND - 1))
 
 if [[ $1 == *"@"* ]]; then
   SERVER=$( echo ${1##*@} )
+  username=$( echo ${1%%@*} )
 else
   SERVER=${1}
 fi
@@ -80,7 +87,7 @@ while true
     #
     [[ ${ping_count} -gt 0 ]] && [[ ${ssh_seq} -gt ${ping_count} ]] && break
 
-    status=$(ssh "${ssh_opts[@]}" "$@" echo pong 2>&1 | grep -oE 'pong|denied')
+    status=$(ssh "${ssh_opts[@]}" "${username}@${SERVER}" echo pong 2>&1 | grep -oE 'pong|denied')
 
     if [[ $status == pong ]] ; then
       echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${SERVER}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
