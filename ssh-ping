@@ -42,8 +42,8 @@ cat << EOF
   Usage: $0 options [user@]host
 
   OPTIONS:
-     -h           Show this message
      -c count     Stop after sending _count_ request packets
+     -h           Show this message
      -i interval  Wait interval seconds between sending each request.
                   The default is to wait for 1 second between each request
      -l user      Try login in with this user.
@@ -54,23 +54,23 @@ EOF
 
 }
 
-while getopts ":hc:i:l:D" opt; do
+while getopts ":c:hi:l:D" opt; do
   case ${opt} in
-     h )
-       usage
-       exit 1
-       ;;
      c )
        [[ $OPTARG =~ ^[0-9]+$ ]] && ping_count=$OPTARG
        ;;
-     D )
-       print_timestamp="yes"
+     h )
+       usage
+       exit 1
        ;;
      i )
        ping_interval=$OPTARG
        ;;
      l )
        username=$OPTARG
+       ;;
+     D )
+       print_timestamp="yes"
        ;;
     \? )
        echo "Invalid option: $OPTARG" 1>&2
