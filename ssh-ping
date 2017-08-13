@@ -119,6 +119,11 @@ while true
     fi
 
     ssh_seq=$((ssh_seq+1))
-    sleep ${ping_interval}
+
+    #
+    # Don't sleep if we do just 1 request
+    #
+
+    [[ ${ping_count} -eq 1 ]] || sleep ${ping_interval}
 
 done
