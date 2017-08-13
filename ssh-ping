@@ -5,7 +5,6 @@
 #
 # -F like ssh -F <config>
 # -W for timeout (see man ping) -> change ConnectTimeout in SSH_OPTS
-# -4 and -6
 # -n ?
 # -q ?
 # -w deadline ? (see man ping)
