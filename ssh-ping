@@ -11,7 +11,7 @@ MAGENTA=$(tput setaf 5)
    BOLD=$(tput bold   )
   RESET=$(tput sgr0   )
 
-ssh_opts=(
+SSH_OPTS=(
     -o BatchMode=yes
     -o CheckHostIP=no
     -o StrictHostKeyChecking=no
@@ -27,7 +27,7 @@ function usage() {
 
 cat << EOF
 
-  Usage: $0 options [user@]server
+  Usage: $0 options [user@]host
 
   OPTIONS:
      -h          Show this message
@@ -67,17 +67,17 @@ done
 shift $((OPTIND - 1))
 
 if [[ $1 == *"@"* ]]; then
-  SERVER=$( echo ${1##*@} )
+  host=$( echo ${1##*@} )
   username=$( echo ${1%%@*} )
 else
-  SERVER=${1}
+  host=${1}
 fi
 
-[[ -z "${SERVER}" ]] && { echo "No server mentioned" ; usage; exit 1; }
+[[ -z "${host}" ]] && { echo "No host mentioned" ; usage; exit 1; }
 
 ssh_seq=1
 
-echo "${BOLD}SSHPING${RESET} ${YELLOW}${SERVER}${RESET}"
+echo "${BOLD}SSHPING${RESET} ${YELLOW}${host}${RESET}"
 
 while true
   do
@@ -87,12 +87,12 @@ while true
     #
     [[ ${ping_count} -gt 0 ]] && [[ ${ssh_seq} -gt ${ping_count} ]] && break
 
-    status=$(ssh "${ssh_opts[@]}" "${username}@${SERVER}" echo pong 2>&1 | grep -oE 'pong|denied')
+    status=$(ssh "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
 
     if [[ $status == pong ]] ; then
-      echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${SERVER}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
+      echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
     elif [[ $status == denied ]] ; then
-      echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${SERVER}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
+      echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET}"
     fi
 
     ssh_seq=$((ssh_seq+1))
