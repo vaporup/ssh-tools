@@ -8,7 +8,6 @@
 # -n ?
 # -q ?
 # -w deadline ? (see man ping)
-# -p port ?
 # stats at last line
 #
 
@@ -46,11 +45,11 @@ cat << EOF
   OPTIONS:
      -4           Use IPv4 only
      -6           Use IPv6 only
-     -c count     Stop after sending _count_ request packets
+     -c count     Stop after sending <count> request packets
      -h           Show this message
-     -i interval  Wait interval seconds between sending each request.
+     -i interval  Wait <interval> seconds between sending each request.
                   The default is to wait for 1 second between each request.
-     -l user      Try login in with this user.
+     -l user      Try login in with <user> as username.
                   The default is \$USER
      -D           Print timestamp (unix time + microseconds as in gettimeofday) before each line
      -v           Verbose output
@@ -59,7 +58,7 @@ EOF
 
 }
 
-while getopts ":46c:hi:l:Dv" opt; do
+while getopts ":46c:hi:l:Dp:v" opt; do
   case ${opt} in
      4 )
        SSH_FLAGS+=("-4")
@@ -82,6 +81,9 @@ while getopts ":46c:hi:l:Dv" opt; do
        ;;
      D )
        print_timestamp="yes"
+       ;;
+     p )
+       [[ $OPTARG =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p $OPTARG")
        ;;
      v )
        verbose="yes"
