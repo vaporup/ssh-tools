@@ -4,12 +4,13 @@
 # TODO
 #
 # -F like ssh -F <config>
-# -W for timeout (see man ping) -> changed ConnectTimeout in SSH_OPTS
+# -W for timeout (see man ping) -> change ConnectTimeout in SSH_OPTS
 # -4 and -6
 # -n ?
 # -q ?
 # -w deadline ? (see man ping)
 # -p port ?
+# stats at last line
 #
 
   BLACK=$(tput setaf 1)
