@@ -123,6 +123,12 @@ ssh_seq=1
 
 echo "${BOLD}SSHPING${RESET} ${YELLOW}${host}${RESET}"
 
+if [[ ${verbose} == yes ]]
+  then
+    echo "Debug: SSH_FLAGS ${SSH_FLAGS[@]}"
+    echo "Debug: SSH_OPTS ${SSH_OPTS[@]}"
+fi
+
 while true
   do
 
@@ -134,12 +140,6 @@ while true
 
     timestamp=$(date +%s.%6N)
     start_request=$(date +%s%3N)
-
-    if [[ ${verbose} == yes ]]
-      then
-        echo "Debug: SSH_FLAGS ${SSH_FLAGS[@]}"
-        echo "Debug: SSH_OPTS ${SSH_OPTS[@]}"
-    fi
 
     status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
 
