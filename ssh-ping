@@ -3,7 +3,6 @@
 #
 # TODO
 #
-# improve username handling. currently User from ssh_config get's ignored
 # -q ?
 # stats at last line
 # license and header
@@ -47,7 +46,6 @@ SSH_FLAGS=()
 
 ping_count=0         # How many requests to do
 ping_interval=1      # Seconds to wait between sending each request
-username="${USER}"   # Username for login in
 connect_timeout=16   # Seconds to wait for a response
 ssh_seq=1            # Request Counter
 
@@ -110,7 +108,7 @@ while getopts ":46c:F:hi:l:Dp:vW:" opt; do
        ping_interval=$OPTARG
        ;;
      l )
-       username=$OPTARG
+       SSH_FLAGS+=("-l") && SSH_FLAGS+=("$OPTARG")
        ;;
      D )
        print_timestamp="yes"
@@ -189,7 +187,12 @@ while true
 
     start_request=$(date +%s%3N)
 
-    status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
+    if [[ -z "${username}" ]]
+      then
+        status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied')
+      else
+        status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
+    fi
 
     end_request=$(date +%s%3N)
 
