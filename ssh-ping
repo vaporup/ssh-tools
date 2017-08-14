@@ -94,7 +94,6 @@ function print_statistics() {
   echo
   echo "--- $host ping statistics ---"
   echo "$requests_transmitted requests transmitted, $requests_received requests received, $requests_loss% request loss"
-  #printf "%i requests transmitted, %i requests received, %i%% request loss\n" "$requests_transmitted" "$requests_received" "$requests_loss"
   exit
 
 }
