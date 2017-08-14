@@ -4,8 +4,9 @@
 # TODO
 #
 # -q ?
-# stats at last line
-# license and header
+# ping statistics:
+#--- 192.168.1.10 ping statistics ---
+#4 packets transmitted, 4 received, 0% packet loss, time 3032ms
 #
 
 #
