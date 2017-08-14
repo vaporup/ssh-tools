@@ -71,13 +71,11 @@ cat << EOF
      -c count       Stop after sending <count> request packets
      -F configfile  Specifies an alternative per-user configuration file.
                     If a configuration file is given on the command line,
-                    the system-wide configuration file (/etc/ssh/ssh_config) will be ignored.
+                    the system-wide configuration file ( /etc/ssh/ssh_config ) will be ignored.
                     The default for the per-user configuration file is ~/.ssh/config.
      -h             Show this message
-     -i interval    Wait <interval> seconds between sending each request.
-                    The default is to wait for 1 second between each request.
-     -l user        Try login in with <user> as username.
-                    The default is \$USER
+     -i interval    Wait <interval> seconds between sending each request. The default 1 second.
+     -l user        Try login with <user> as username. The default is \$USER.
      -D             Print timestamp (unix time + microseconds as in gettimeofday) before each line
      -W timeout     Time to wait for a response, in seconds
      -q             Quiet output.  Nothing is displayed except the summary lines at startup time and when finished
