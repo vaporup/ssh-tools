@@ -44,10 +44,11 @@ SSH_FLAGS=()
 # Defaults
 #
 
-ping_count=0
-ping_interval=1
-username="${USER}"
-connect_timeout=16
+ping_count=0         # How many requests to do
+ping_interval=1      # Seconds to wait between sending each request
+username="${USER}"   # Username for login in
+connect_timeout=16   # Seconds to wait for a response
+ssh_seq=1            # Request Counter
 
 #
 # Usage/Help message
@@ -153,10 +154,9 @@ fi
 
 [[ -z "${host}" ]] && { echo "No host mentioned" ; usage; exit 1; }
 
-ssh_seq=1
 
 #
-# Output header
+# Output header with optional debugging output
 #
 
 echo "${BOLD}SSHPING${RESET} ${YELLOW}${host}${RESET}"
