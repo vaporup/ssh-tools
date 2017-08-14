@@ -62,7 +62,7 @@ function usage() {
 
 cat << EOF
 
-  Usage: $0 options [user@]host
+  Usage: ${0##*/} options [user@]host
 
   OPTIONS:
      -4             Use IPv4 only
