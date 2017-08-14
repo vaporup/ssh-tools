@@ -172,7 +172,6 @@ fi
 
 [[ -z "${host}" ]] && { echo -e "\n  ${RED}Error: No target host given${RESET}" ; usage; exit 1; }
 
-
 #
 # Output header with optional debugging output
 #
