@@ -4,6 +4,7 @@
 # TODO
 #
 # gif for github
+# colors in statistics
 #
 
 # trap ctrl-c and call print_statistics()
