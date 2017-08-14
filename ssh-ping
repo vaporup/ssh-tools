@@ -3,7 +3,6 @@
 #
 # TODO
 #
-# -q ?
 # gif for github
 #
 
@@ -53,6 +52,7 @@ ssh_seq=1               # Request Counter
 requests_transmitted=0  # Count how often we sent a request
 requests_received=0     # Count how often we got an answer
 requests_lost=0         # Count how often we lost an answer
+quiet="no"              # Do not suppress output
 
 #
 # Usage/Help message
@@ -80,6 +80,7 @@ cat << EOF
                     The default is \$USER
      -D             Print timestamp (unix time + microseconds as in gettimeofday) before each line
      -W timeout     Time to wait for a response, in seconds
+     -q             Quiet output.  Nothing is displayed except the summary lines at startup time and when finished
      -v             Verbose output
 
 EOF
@@ -102,7 +103,7 @@ function print_statistics() {
 # Command line Options
 #
 
-while getopts ":46c:F:hi:l:Dp:vW:" opt; do
+while getopts ":46c:F:hi:l:Dp:vW:q" opt; do
   case ${opt} in
      4 )
        SSH_FLAGS+=("-4")
@@ -138,6 +139,9 @@ while getopts ":46c:F:hi:l:Dp:vW:" opt; do
        ;;
      W )
        [[ $OPTARG =~ ^[0-9]+$ ]] && connect_timeout=$OPTARG
+       ;;
+     q )
+       quiet="yes"
        ;;
     \? )
        echo "Invalid option: $OPTARG" 1>&2
@@ -224,12 +228,12 @@ while true
 
     if [[ $status == pong ]] ; then
       requests_received=$(( requests_received + 1 ))
-      [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
-      echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+      [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
+      [[ ${quiet} == no ]] && echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
     elif [[ $status == denied ]] ; then
       requests_received=$(( requests_received + 1 ))
-      [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
-      echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+      [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
+      [[ ${quiet} == no ]] && echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
     else
       requests_lost=$(( requests_lost + 1 ))
     fi
