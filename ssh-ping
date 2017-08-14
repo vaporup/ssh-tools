@@ -6,6 +6,7 @@
 # improve username handling. currently User from ssh_config get's ignored
 # -q ?
 # stats at last line
+# license and header
 #
 
 #
@@ -196,7 +197,7 @@ while true
 
     #
     # Output "Pong"  if request succeeded by login in and echoing back our string
-    # Output "Reply" if at least some SSH server is talking to us
+    # Output "Reply" if the SSH server is at least talking to us but login was denied
     #
 
     if [[ $status == pong ]] ; then
