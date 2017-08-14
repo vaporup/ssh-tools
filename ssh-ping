@@ -65,6 +65,7 @@ cat << EOF
   Usage: ${0##*/} options [user@]host
 
   OPTIONS:
+
      -4             Use IPv4 only
      -6             Use IPv6 only
      -c count       Stop after sending <count> request packets
