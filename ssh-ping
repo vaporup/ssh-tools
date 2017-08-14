@@ -72,7 +72,6 @@ cat << EOF
                     If a configuration file is given on the command line,
                     the system-wide configuration file (/etc/ssh/ssh_config) will be ignored.
                     The default for the per-user configuration file is ~/.ssh/config.
-
      -h             Show this message
      -i interval    Wait <interval> seconds between sending each request.
                     The default is to wait for 1 second between each request.
