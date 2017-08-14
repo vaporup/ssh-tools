@@ -8,6 +8,10 @@
 # stats at last line
 #
 
+#
+# Some colors for better output
+#
+
   BLACK=$(tput setaf 1)
     RED=$(tput setaf 1)
   GREEN=$(tput setaf 2)
@@ -19,6 +23,10 @@ MAGENTA=$(tput setaf 5)
    BOLD=$(tput bold   )
   RESET=$(tput sgr0   )
 
+#
+# Default SSH Options
+#
+
 SSH_OPTS=(
     -o BatchMode=yes
     -o CheckHostIP=no
@@ -26,12 +34,24 @@ SSH_OPTS=(
     -o HashKnownHosts=no
 )
 
+#
+# SSH Flags which get populated later
+#
+
 SSH_FLAGS=()
+
+#
+# Defaults
+#
 
 ping_count=0
 ping_interval=1
 username="${USER}"
 connect_timeout=16
+
+#
+# Usage/Help message
+#
 
 function usage() {
 
@@ -60,6 +80,10 @@ cat << EOF
 EOF
 
 }
+
+#
+# Command line Options
+#
 
 while getopts ":46c:F:hi:l:Dp:vW:" opt; do
   case ${opt} in
@@ -110,6 +134,16 @@ shift $((OPTIND - 1))
 
 SSH_OPTS+=( -o ConnectTimeout=$connect_timeout )
 
+#
+# Getting username and host from command line without using grep and awk
+#
+# user@host -> user gets stored in $username
+#           -> host gets stored in $host
+#
+# If no user@ was given on the command line
+# we just store the last argument as hostname
+#
+
 if [[ $1 == *"@"* ]]; then
   host=$( echo ${1##*@} )
   username=$( echo ${1%%@*} )
@@ -120,6 +154,10 @@ fi
 [[ -z "${host}" ]] && { echo "No host mentioned" ; usage; exit 1; }
 
 ssh_seq=1
+
+#
+# Output header
+#
 
 echo "${BOLD}SSHPING${RESET} ${YELLOW}${host}${RESET}"
 
@@ -138,13 +176,28 @@ while true
 
     [[ ${ping_count} -gt 0 ]] && [[ ${ssh_seq} -gt ${ping_count} ]] && break
 
+    #
+    # unix time + microseconds as in gettimeofday - used for -D option
+    # 
+
     timestamp=$(date +%s.%6N)
+
+    #
+    # Doing the actual request and measure its execution time
+    #
+
     start_request=$(date +%s%3N)
 
     status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
 
     end_request=$(date +%s%3N)
+
     time_request=$((end_request-start_request))
+
+    #
+    # Output "Pong"  if request succeeded by login in and echoing back our string
+    # Output "Reply" if at least some SSH server is talking to us
+    #
 
     if [[ $status == pong ]] ; then
       [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
