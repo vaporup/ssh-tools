@@ -3,7 +3,7 @@
 #
 # TODO
 #
-# -F like ssh -F <config>
+# improve username handling. currently User from ssh_config get's ignored
 # -q ?
 # stats at last line
 #
@@ -40,23 +40,28 @@ cat << EOF
   Usage: $0 options [user@]host
 
   OPTIONS:
-     -4           Use IPv4 only
-     -6           Use IPv6 only
-     -c count     Stop after sending <count> request packets
-     -h           Show this message
-     -i interval  Wait <interval> seconds between sending each request.
-                  The default is to wait for 1 second between each request.
-     -l user      Try login in with <user> as username.
-                  The default is \$USER
-     -D           Print timestamp (unix time + microseconds as in gettimeofday) before each line
-     -W timeout   Time to wait for a response, in seconds
-     -v           Verbose output
+     -4             Use IPv4 only
+     -6             Use IPv6 only
+     -c count       Stop after sending <count> request packets
+     -F configfile  Specifies an alternative per-user configuration file.
+                    If a configuration file is given on the command line,
+                    the system-wide configuration file (/etc/ssh/ssh_config) will be ignored.
+                    The default for the per-user configuration file is ~/.ssh/config.
+
+     -h             Show this message
+     -i interval    Wait <interval> seconds between sending each request.
+                    The default is to wait for 1 second between each request.
+     -l user        Try login in with <user> as username.
+                    The default is \$USER
+     -D             Print timestamp (unix time + microseconds as in gettimeofday) before each line
+     -W timeout     Time to wait for a response, in seconds
+     -v             Verbose output
 
 EOF
 
 }
 
-while getopts ":46c:hi:l:Dp:vW:" opt; do
+while getopts ":46c:F:hi:l:Dp:vW:" opt; do
   case ${opt} in
      4 )
        SSH_FLAGS+=("-4")
@@ -66,6 +71,10 @@ while getopts ":46c:hi:l:Dp:vW:" opt; do
        ;;
      c )
        [[ $OPTARG =~ ^[0-9]+$ ]] && ping_count=$OPTARG
+       ;;
+     F )
+       SSH_FLAGS+=("-F")
+       SSH_FLAGS+=("$OPTARG")
        ;;
      h )
        usage
@@ -81,7 +90,7 @@ while getopts ":46c:hi:l:Dp:vW:" opt; do
        print_timestamp="yes"
        ;;
      p )
-       [[ $OPTARG =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p $OPTARG")
+       [[ $OPTARG =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p") && SSH_FLAGS+=("$OPTARG")
        ;;
      v )
        verbose="yes"
