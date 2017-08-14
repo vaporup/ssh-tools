@@ -170,7 +170,7 @@ else
   host=${1}
 fi
 
-[[ -z "${host}" ]] && { echo -e "\nError: No target host given" ; usage; exit 1; }
+[[ -z "${host}" ]] && { echo -e "\n  ${RED}Error: No target host given${RESET}" ; usage; exit 1; }
 
 
 #
