@@ -4,11 +4,11 @@
 # TODO
 #
 # -q ?
-# ping statistics:
-#--- 192.168.1.10 ping statistics ---
-#4 packets transmitted, 4 received, 0% packet loss, time 3032ms
 # gif for github
 #
+
+# trap ctrl-c and call print_statistics()
+trap print_statistics SIGINT
 
 #
 # Some colors for better output
@@ -46,10 +46,13 @@ SSH_FLAGS=()
 # Defaults
 #
 
-ping_count=0         # How many requests to do
-ping_interval=1      # Seconds to wait between sending each request
-connect_timeout=16   # Seconds to wait for a response
-ssh_seq=1            # Request Counter
+ping_count=0            # How many requests to do
+ping_interval=1         # Seconds to wait between sending each request
+connect_timeout=16      # Seconds to wait for a response
+ssh_seq=1               # Request Counter
+requests_transmitted=0  # Count how often we sent a request
+requests_received=0     # Count how often we got an answer
+requests_lost=0         # Count how often we lost an answer
 
 #
 # Usage/Help message
@@ -80,6 +83,18 @@ cat << EOF
      -v             Verbose output
 
 EOF
+
+}
+
+function print_statistics() {
+
+  requests_loss=$(( 100 * requests_lost / requests_transmitted ))
+
+  echo
+  echo "--- $host ping statistics ---"
+  echo "$requests_transmitted requests transmitted, $requests_received requests received, $requests_loss% request loss"
+  #printf "%i requests transmitted, %i requests received, %i%% request loss\n" "$requests_transmitted" "$requests_received" "$requests_loss"
+  exit
 
 }
 
@@ -208,14 +223,19 @@ while true
     #
 
     if [[ $status == pong ]] ; then
+      requests_received=$(( requests_received + 1 ))
       [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
       echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
     elif [[ $status == denied ]] ; then
+      requests_received=$(( requests_received + 1 ))
       [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
       echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+    else
+      requests_lost=$(( requests_lost + 1 ))
     fi
 
-    ssh_seq=$((ssh_seq+1))
+    requests_transmitted=$ssh_seq
+    ssh_seq=$(( ssh_seq + 1))
 
     #
     # Don't sleep if we do just 1 request
@@ -224,3 +244,5 @@ while true
     [[ ${ping_count} -eq 1 ]] || sleep ${ping_interval}
 
 done
+
+print_statistics
