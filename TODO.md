@@ -1,0 +1,4 @@
+
+# TODO
+
+- colors in statistics
