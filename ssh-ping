@@ -1,13 +1,6 @@
 #!/usr/bin/env bash
 
-#
-# TODO
-#
-# gif for github
-# colors in statistics
-#
-
-# trap ctrl-c and call print_statistics()
+# trap CTRL-C and call print_statistics()
 trap print_statistics SIGINT
 
 #
