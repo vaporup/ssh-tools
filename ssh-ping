@@ -85,9 +85,23 @@ function print_statistics() {
   requests_loss=$(( 100 * requests_lost / requests_transmitted ))
 
   echo
-  echo "--- $host ping statistics ---"
-  echo "$requests_transmitted requests transmitted, $requests_received requests received, $requests_loss% request loss"
-  exit
+  echo "${WHITE}---${RESET} ${YELLOW}$host${RESET} ${WHITE}ping statistics${RESET} ${WHITE}---${RESET}"
+
+  statistics_ok="${GREEN}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
+  statistics_ok+="${GREEN}$requests_received${RESET} ${WHITE}requests received${RESET}, "
+  statistics_ok+="${GREEN}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+
+  statistics_warn="${YELLOW}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
+  statistics_warn+="${YELLOW}$requests_received${RESET} ${WHITE}requests received${RESET}, "
+  statistics_warn+="${YELLOW}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+
+  statistics_crit="${RED}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
+  statistics_crit+="${RED}$requests_received${RESET} ${WHITE}requests received${RESET}, "
+  statistics_crit+="${RED}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+
+  [[ $requests_loss -eq 100 ]] &&  echo "$statistics_crit" && exit
+  [[ $requests_loss -gt   1 ]] &&  echo "$statistics_warn" && exit
+  [[ $requests_loss -eq   0 ]] &&  echo "$statistics_ok"   && exit
 
 }
 
