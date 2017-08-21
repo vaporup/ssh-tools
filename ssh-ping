@@ -68,12 +68,15 @@ cat << EOF
                     the system-wide configuration file ( /etc/ssh/ssh_config ) will be ignored.
                     The default for the per-user configuration file is ~/.ssh/config.
      -h             Show this message
-     -i interval    Wait <interval> seconds between sending each request. The default 1 second.
+     -i interval    Wait <interval> seconds between sending each request.
+                    The default is 1 second.
      -l user        Try login with <user> as username. The default is \$USER.
      -D             Print timestamp (unix time + microseconds as in gettimeofday) before each line
      -W timeout     Time to wait for a response, in seconds
-     -p port        Port to connect to on the remote host. This can be specified on a per-host basis in the configuration file.
-     -q             Quiet output.  Nothing is displayed except the summary lines at startup time and when finished
+     -p port        Port to connect to on the remote host.
+                    This can be specified on a per-host basis in the configuration file.
+     -q             Quiet output.
+                    Nothing is displayed except the summary lines at startup time and when finished
      -v             Verbose output
 
 EOF
