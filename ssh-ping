@@ -80,6 +80,28 @@ EOF
 
 }
 
+function get_timestamp() {
+
+  if [[ "$OSTYPE" == "linux-gnu" ]]
+    then
+      date +%s.%6N
+    else
+      python -c 'import time; ms = time.time() ; print "%.6f" % ms'
+  fi
+
+}
+
+function get_request_timestamp() {
+
+  if [[ "$OSTYPE" == "linux-gnu" ]]
+    then
+      date +%s%3N
+    else
+      python -c 'import time; ms = int(round(time.time() * 1000)) ; print ms'
+  fi
+
+}
+
 function print_statistics() {
 
   requests_loss=$(( 100 * requests_lost / requests_transmitted ))
@@ -207,13 +229,13 @@ while true
     # unix time + microseconds as in gettimeofday - used for -D option
     # 
 
-    timestamp=$(date +%s.%6N)
+    timestamp=$( get_timestamp )
 
     #
     # Doing the actual request and measure its execution time
     #
 
-    start_request=$(date +%s%3N)
+    start_request=$( get_request_timestamp )
 
     if [[ -z "${username}" ]]
       then
@@ -222,7 +244,7 @@ while true
         status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
     fi
 
-    end_request=$(date +%s%3N)
+    end_request=$( get_request_timestamp )
 
     time_request=$((end_request-start_request))
 
