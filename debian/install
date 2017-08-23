@@ -1,0 +1,2 @@
+ssh-ping usr/bin
+ssh-version usr/bin
