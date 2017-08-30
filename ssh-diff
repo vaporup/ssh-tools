@@ -1,0 +1,125 @@
+#!/usr/bin/env bash
+
+#
+# Based on:
+#
+# - https://gist.github.com/jhqv/dbd59f5838ae8c83f736bfe951bd80ff
+# - https://serverfault.com/questions/59140/how-do-diff-over-ssh#comment1027981_216496
+#
+
+#
+# Some colors for better output
+#
+
+  BLACK=$(tput setaf 1)
+    RED=$(tput setaf 1)
+  GREEN=$(tput setaf 2)
+ YELLOW=$(tput setaf 3)
+   BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+   CYAN=$(tput setaf 6)
+  WHITE=$(tput setaf 7)
+   BOLD=$(tput bold   )
+  RESET=$(tput sgr0   )
+
+#
+# Usage/Help message
+#
+
+function usage() {
+
+cat << EOF
+
+  Usage: ${0##*/} [options] filename [user@]host[:filename]
+
+  Options: All options your local diff command supports.
+           See 'man diff' and 'diff --help' for more information.
+
+  Examples:
+
+   ${0##*/} /etc/hosts 192.168.1.10
+   ${0##*/} /etc/hosts root@192.168.1.10
+   ${0##*/} /etc/hosts root@192.168.1.10:/etc/hosts.old
+   
+   Side-by-Side
+
+   ${0##*/} -y /etc/hosts 192.168.1.10
+   ${0##*/} -y /etc/hosts root@192.168.1.10
+   ${0##*/} -y /etc/hosts root@192.168.1.10:/etc/hosts.old
+
+EOF
+
+}
+
+if [ -z $1 ]; then
+    usage
+    exit 1;
+fi
+
+function diff_command() {
+
+ if type colordiff &> /dev/null
+   then
+     colordiff "$@"
+ else
+     diff "$@"
+ fi
+
+}
+
+params=( "$@" ) 
+
+remote_params="${params[-1]}" && unset params[-1]
+local_filename="${params[-1]}" && unset params[-1]
+
+diff_params=( "${params[@]}" )
+
+#
+# Getting username, hostname and filename from command line without using grep and awk
+#
+# user@host:filename -> user gets stored in $username
+#                    -> host gets stored in $host
+#                    -> filename gets stored in $filename
+#
+
+if [[ $remote_params == *"@"* ]]; then
+  remote_part=$( echo ${remote_params##*@} )
+  username=$( echo ${remote_params%%@*} )
+else
+  remote_part=${remote_params}
+fi
+
+if [[ $remote_part == *":"* ]]; then
+  remote_file=$( echo ${remote_part##*:} )
+  remote_host=$( echo ${remote_part%%:*} )
+else
+  remote_host=${remote_part}
+fi
+
+if [[ -z "$remote_file" ]]
+  then
+    remote_file=$local_filename
+fi
+
+local_file=`readlink -f $local_filename` # get absolute path to file in case it was relative
+
+if [ ! -f $local_file ]; then
+    echo "Local file $local_file not found!"
+    exit
+fi
+
+#
+# Output header
+#
+
+echo
+echo "Comparing ${BOLD}$local_file${RESET} (>) with ${BOLD}$username@$remote_host:$remote_file${RESET} (<)"
+echo
+
+if [[ -z "${username}" ]]
+  then
+    ssh $remote_host "cat $remote_file" | diff_command "${diff_params[@]}" --label "$username@$remote_host:$remote_file" - $local_file
+  else
+    ssh $username@$remote_host "cat $remote_file" | diff_command "${diff_params[@]}" --label "$username@$remote_host:$remote_file" - $local_file
+fi
+
