@@ -113,7 +113,7 @@ fi
 #
 
 echo
-echo "Comparing ${BOLD}$local_file${RESET} (>) with ${BOLD}$username@$remote_host:$remote_file${RESET} (<)"
+echo "Comparing ${BOLD}$username@$remote_host:$remote_file${RESET} (<) with ${BOLD}$local_file${RESET} (>)"
 echo
 
 if [[ -z "${username}" ]]
