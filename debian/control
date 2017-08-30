@@ -9,6 +9,7 @@ Homepage: https://github.com/vaporup/ssh-tools/
 Package: ssh-tools
 Architecture: all
 Depends: ${misc:Depends}
+Recommends: colordiff
 Description: ssh-ping, ssh-version
  * ssh-ping: check if host is reachable using ssh_config
  .
