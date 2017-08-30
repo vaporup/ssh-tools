@@ -11,3 +11,11 @@ check if host is reachable using ssh_config
 ssh-version
 ===========
 shows version of the SSH server you are connecting to
+
+ssh-diff
+=========
+Diff a file over SSH
+
+ssh-facts
+=========
+Get some facts about the remote system
