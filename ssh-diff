@@ -32,7 +32,7 @@ cat << EOF
 
   Usage: ${0##*/} [options] filename [user@]host[:filename]
 
-  Options: All options your local diff command supports.
+  Options: All options ( except '-r' ) your local diff command supports.
            See 'man diff' and 'diff --help' for more information.
 
   Examples:
@@ -78,8 +78,8 @@ diff_params=( "${params[@]}" )
 # Getting username, hostname and filename from command line without using grep and awk
 #
 # user@host:filename -> user gets stored in $username
-#                    -> host gets stored in $host
-#                    -> filename gets stored in $filename
+#                    -> host gets stored in $remote_host
+#                    -> filename gets stored in $remote_file
 #
 
 if [[ $remote_params == *"@"* ]]; then
