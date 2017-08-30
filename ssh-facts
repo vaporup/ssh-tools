@@ -1,7 +1,11 @@
 #!/usr/bin/env bash
 
 #
-# Based on: https://github.com/ungleich/cdist/tree/master/cdist/conf/explorer
+# Based on:
+#
+# - https://github.com/ungleich/cdist/tree/master/cdist/conf/explorer
+# - https://serverfault.com/a/343678
+# - https://stackoverflow.com/a/8057052
 #
 
 #
