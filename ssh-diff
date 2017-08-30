@@ -57,7 +57,8 @@ EOF
 
 }
 
-if [ -z $1 ]; then
+if [[ -z $1 ]]
+  then
     usage
     exit 1;
 fi
@@ -124,8 +125,10 @@ echo
 
 if [[ -z "${username}" ]]
   then
-    ssh $remote_host "cat $remote_file" | diff_command "${diff_params[@]}" --label "$username@$remote_host:$remote_file" - $local_file
+    ssh $remote_host "cat $remote_file" \
+    | diff_command "${diff_params[@]}" --label "$username@$remote_host:$remote_file" - $local_file
   else
-    ssh $username@$remote_host "cat $remote_file" | diff_command "${diff_params[@]}" --label "$username@$remote_host:$remote_file" - $local_file
+    ssh $username@$remote_host "cat $remote_file" \
+    | diff_command "${diff_params[@]}" --label "$username@$remote_host:$remote_file" - $local_file
 fi
 
