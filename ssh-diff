@@ -47,6 +47,12 @@ cat << EOF
    ${0##*/} -y /etc/hosts root@192.168.1.10
    ${0##*/} -y /etc/hosts root@192.168.1.10:/etc/hosts.old
 
+   Unified
+
+   ${0##*/} -u /etc/hosts 192.168.1.10
+   ${0##*/} -u /etc/hosts root@192.168.1.10
+   ${0##*/} -u /etc/hosts root@192.168.1.10:/etc/hosts.old
+
 EOF
 
 }
