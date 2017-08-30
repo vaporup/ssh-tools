@@ -17,5 +17,5 @@ Description: ssh-ping, ssh-version
    - Outputs *Pong from* when server is reachable and login was successful
  .
  * ssh-version: shows version of the SSH server you are connecting to
-
-
+ * ssh-diff: Diff a file over SSH 
+ * ssh-facts: Get some facts about the remote system
