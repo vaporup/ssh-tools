@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 
 #
-# TODO: make it possible to select which facts should be returned
+# TODO:
+#
+# - make it possible to select which facts should be returned
+# - ssh options like -P
 #
 
 #
