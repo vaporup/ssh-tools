@@ -16,6 +16,10 @@ ssh-diff
 =========
 Diff a file over SSH
 
+![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/demos/ssh-diff.gif)
+
 ssh-facts
 =========
 Get some facts about the remote system
+
+![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/demos/ssh-facts.gif)
