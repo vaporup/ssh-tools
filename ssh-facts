@@ -365,6 +365,21 @@ function _machine_type() {
 			    exit 
 			fi
 		    fi
+
+                    if [ -r /sys/class/dmi/id/sys_vendor ]; then
+                        if grep -q -i 'qemu' /sys/class/dmi/id/sys_vendor; then
+                            echo "virtual_by_kvm"
+                            exit
+                        fi
+                    fi
+
+                    if [ -r /sys/class/dmi/id/chassis_vendor ]; then
+                        if grep -q -i 'qemu' /sys/class/dmi/id/chassis_vendor; then
+                            echo "virtual_by_kvm"
+                            exit
+                        fi
+                    fi
+
 		fi
 		echo "virtual_by_unknown"
 	    else
