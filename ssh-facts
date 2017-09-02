@@ -4,7 +4,6 @@
 # TODO:
 #
 # - make it possible to select which facts should be returned
-# - ssh options like -P
 #
 
 #
@@ -36,7 +35,7 @@ if [[ -z $1 ]]
 fi
 
 
-ssh $1 'bash -s' 2>/dev/null <<'END'
+ssh "$@" 'bash -s' 2>/dev/null <<'END'
 
 function _os() {
 
