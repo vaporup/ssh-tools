@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
 #
+# TODO: some ssh options like -p -4 etc..
+#
+
+#
 # Based on:
 #
 # - https://gist.github.com/jhqv/dbd59f5838ae8c83f736bfe951bd80ff
