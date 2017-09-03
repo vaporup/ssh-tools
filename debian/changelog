@@ -1,3 +1,15 @@
+ssh-tools (1.2-1) unstable; urgency=medium
+
+  * New Upstream Release
+  * New Tools
+
+     ssh-diff - Diff a file over SSH
+     ssh-facts - Get some facts about the remote system
+
+  * ssh-ping works now under OSX
+
+ -- Sven Wick <sven.wick@gmx.de>  Sun, 03 Sep 2017 21:27:22 +0200
+
 ssh-tools (1.1-1) unstable; urgency=medium
 
   * Initial release.
