@@ -29,7 +29,7 @@ if [[ -z $1 ]]
 fi
 
 
-ssh "$@" 'bash -s' 2>/dev/null <<'END'
+ssh "$@" 'bash -s' 2>/dev/null <<'END' | sed 's/\s=\s/=/'
 
 function _os() {
 
@@ -171,47 +171,47 @@ function _os_version() {
 
 	case "$(_os)" in
 	   amazon)
-	      cat /etc/system-release | sed 's/\s=\s/=/'
+	      cat /etc/system-release
 	   ;;
 	   archlinux)
 	      # empty, but well...
-	      cat /etc/arch-release   | sed 's/\s=\s/=/'
+	      cat /etc/arch-release
 	   ;;
 	   debian)
-	      cat /etc/debian_version | sed 's/\s=\s/=/'
+	      cat /etc/debian_version
 	   ;;
 	   devuan)
-	      cat /etc/devuan_version | sed 's/\s=\s/=/'
+	      cat /etc/devuan_version
 	   ;;
 	   fedora)
-	      cat /etc/fedora-release | sed 's/\s=\s/=/'
+	      cat /etc/fedora-release
 	   ;;
 	   gentoo)
-	      cat /etc/gentoo-release | sed 's/\s=\s/=/'
+	      cat /etc/gentoo-release
 	   ;;
 	   macosx)
-	      sw_vers -productVersion | sed 's/\s=\s/=/'
+	      sw_vers -productVersion
 	   ;;
 	   *bsd|solaris)
 	      uname -r
 	   ;;
 	   openwrt)
-	      cat /etc/openwrt_version | sed 's/\s=\s/=/'
+	      cat /etc/openwrt_version
 	   ;;
 	   owl)
-	      cat /etc/owl-release | sed 's/\s=\s/=/'
+	      cat /etc/owl-release
 	   ;;
 	   redhat|centos|mitel|scientific)
-	      cat /etc/redhat-release | sed 's/\s=\s/=/'
+	      cat /etc/redhat-release
 	   ;;
 	   slackware)
-	      cat /etc/slackware-version | sed 's/\s=\s/=/'
+	      cat /etc/slackware-version
 	   ;;
 	   suse)
 	      if [ -f /etc/os-release ]; then
-		cat /etc/os-release | sed 's/\s=\s/=/'
+		cat /etc/os-release
 	      else
-		cat /etc/SuSE-release | sed 's/\s=\s/=/'
+		cat /etc/SuSE-release
 	      fi
 	   ;;
 	   ubuntu)
