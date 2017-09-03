@@ -29,7 +29,7 @@ if [[ -z $1 ]]
 fi
 
 
-ssh "$@" 'bash -s' 2>/dev/null <<'END' | sed 's/\s=\s/=/'
+ssh "$@" 'bash -s' 2>/dev/null <<'END' | sed 's/\s*=\s*/=/'
 
 function _os() {
 
