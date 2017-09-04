@@ -1,14 +1,17 @@
 #!/usr/bin/env bash
 
-#  +----------------------------------------------------------------------+
-#  | Title        : ssh-version                                           |
-#  |                                                                      |
-#  | Description  : Shows version of the SSH server you are connecting to |
-#  |                                                                      |
-#  | Author       : Sven Wick                                             |
-#  | Email        : sven.wick@gmx.de                                      |
-#  | URL          : https://github.com/vaporup/ssh-tools                  |
-#  +----------------------------------------------------------------------+
+#  +-----------------------------------------------------------------------------------------------------------+
+#  | Title        : ssh-version                                                                                |
+#  |                                                                                                           |
+#  | Description  : Shows version of the SSH server you are connecting to                                      |
+#  |                                                                                                           |
+#  | Author       : Sven Wick                                                                                  |
+#  | Email        : sven.wick@gmx.de                                                                           |
+#  | URL          : https://github.com/vaporup/ssh-tools                                                       |
+#  |                                                                                                           |
+#  | Based On     : http://www.commandlinefu.com/commands/view/1809/get-the-version-of-sshd-on-a-remote-system |
+#  +-----------------------------------------------------------------------------------------------------------+
+
 
 ssh_opts=(
     -o BatchMode=yes
