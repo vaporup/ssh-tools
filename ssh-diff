@@ -68,7 +68,7 @@ EOF
 
 if ! [[ $# -ge 2 ]]
   then
-    echo -e "\n  ${RED}Error: Not all filenames given${RESET}" 
+    echo -e "\n  ${RED}Error: Not all filenames given${RESET}" >&2
     usage
     exit 1
 fi
@@ -98,8 +98,8 @@ function login_successful_and_remote_file_exists() {
 
   RETVAL=$?
 
-  [[ ${RETVAL} -eq 255 ]] && { echo -e "\n  ${RED}Error: Could not connect to remote server${RESET}\n" ; exit ${RETVAL}; }
-  [[ ${RETVAL} -ge   1 ]] && { echo -e "\n  ${RED}Error: Remote file $remote_file not found${RESET}\n" ; exit ${RETVAL}; }
+  [[ ${RETVAL} -eq 255 ]] && { echo -e "\n  ${RED}Error: Could not connect to remote server${RESET}\n" >&2 ; exit ${RETVAL}; }
+  [[ ${RETVAL} -ge   1 ]] && { echo -e "\n  ${RED}Error: Remote file $remote_file not found${RESET}\n" >&2 ; exit ${RETVAL}; }
   [[ ${RETVAL} -eq   0 ]] && true
 
 }
@@ -228,13 +228,13 @@ local_file=`readlink -f $local_filename` # get absolute path to file in case it 
 
 if [[ -z "$local_file" ]]
   then
-    echo -e "\n  ${RED}Error: Given file not found${RESET}\n"
+    echo -e "\n  ${RED}Error: Given file not found${RESET}\n" >&2
     exit 1
 fi
 
 if [[ ! -f $local_file ]]
   then
-    echo -e "\n  ${RED}Error: Local file $local_file not found${RESET}\n"
+    echo -e "\n  ${RED}Error: Local file $local_file not found${RESET}\n" >&2
     exit 1
 fi
 
