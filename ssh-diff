@@ -72,11 +72,10 @@ EOF
 
 }
 
-if ! [[ $# -ge 2 ]]
-  then
-    echo -e "\n  ${RED}Error: Not all filenames given${RESET}" >&2
-    usage
-    exit 1
+if ! [[ $# -ge 2 ]]; then
+  echo -e "\n  ${RED}Error: Not all filenames given${RESET}" >&2
+  usage
+  exit 1
 fi
 
 function supports_colordiff() {
@@ -95,11 +94,10 @@ function show_header() {
 
 function login_successful_and_remote_file_exists() {
 
-  if [[ -z "${username}" ]]
-    then
-      ssh "${ssh_params[@]}" $remote_host "test -e $remote_file" &> /dev/null
-    else
-      ssh "${ssh_params[@]}" $username@$remote_host "test -e $remote_file"  &> /dev/null
+  if [[ -z "${username}" ]]; then
+    ssh "${ssh_params[@]}" $remote_host "test -e $remote_file" &> /dev/null
+  else
+    ssh "${ssh_params[@]}" $username@$remote_host "test -e $remote_file"  &> /dev/null
   fi
 
   RETVAL=$?
@@ -112,34 +110,24 @@ function login_successful_and_remote_file_exists() {
 
 function diff_files() {
 
-  if [[ -z "${username}" ]]
-    then
-      if login_successful_and_remote_file_exists
-        then
-
-          show_header
-
-          if supports_colordiff
-            then
-              ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
-            else
-              ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
-          fi
+  if [[ -z "${username}" ]]; then
+    if login_successful_and_remote_file_exists; then
+      show_header
+      if supports_colordiff; then
+        ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
+      else
+        ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
       fi
-
-    else
-      if login_successful_and_remote_file_exists
-        then
-
-          show_header
-
-          if supports_colordiff
-            then
-              ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
-            else
-              ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
-          fi
+    fi
+  else
+    if login_successful_and_remote_file_exists; then
+      show_header
+      if supports_colordiff; then
+        ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
+      else
+        ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
       fi
+    fi
   fi
 
 }
@@ -172,31 +160,29 @@ diff_params_index=0
 ssh_params=()
 ssh_params_indices=()
 
-for param in ${diff_params[@]}
-  do
-    next_diff_params_index=$(( diff_params_index +1 ))
+for param in ${diff_params[@]}; do
 
-    #
-    # find -p <port>
-    #
+  next_diff_params_index=$(( diff_params_index +1 ))
 
-    if [[ ${param} == "-p" ]] && [[ -z "${diff_params[${next_diff_params_index}]//[0-9]}" ]]
-      then
-        ssh_params_indices+=( ${diff_params_index} ${next_diff_params_index} )
-        ssh_params+=( ${param} ${diff_params[${next_diff_params_index}]} )
-    fi
+  #
+  # find -p <port>
+  #
 
-    #
-    # find -4 or -6
-    #
+  if [[ ${param} == "-p" ]] && [[ -z "${diff_params[${next_diff_params_index}]//[0-9]}" ]]; then
+    ssh_params_indices+=( ${diff_params_index} ${next_diff_params_index} )
+    ssh_params+=( ${param} ${diff_params[${next_diff_params_index}]} )
+  fi
 
-    if [[ ${param} == "-4" ]] || [[ ${param} == "-6" ]]
-      then
-        ssh_params_indices+=( ${diff_params_index} )
-        ssh_params+=( ${param} )
-    fi
+  #
+  # find -4 or -6
+  #
 
-    diff_params_index=$(( diff_params_index +1 ))
+  if [[ ${param} == "-4" ]] || [[ ${param} == "-6" ]]; then
+    ssh_params_indices+=( ${diff_params_index} )
+    ssh_params+=( ${param} )
+  fi
+
+  diff_params_index=$(( diff_params_index +1 ))
 
 done
 
@@ -214,39 +200,34 @@ done
 #                    -> filename gets stored in $remote_file
 #
 
-if [[ $remote_params == *"@"* ]]
-  then
-    remote_part=$( echo ${remote_params##*@} )
-    username=$( echo ${remote_params%%@*} )
-  else
-    remote_part=${remote_params}
+if [[ $remote_params == *"@"* ]]; then
+  remote_part=$( echo ${remote_params##*@} )
+  username=$( echo ${remote_params%%@*} )
+else
+  remote_part=${remote_params}
 fi
 
-if [[ $remote_part == *":"* ]]
-  then
-    remote_file=$( echo ${remote_part##*:} )
-    remote_host=$( echo ${remote_part%%:*} )
-  else
-    remote_host=${remote_part}
+if [[ $remote_part == *":"* ]]; then
+  remote_file=$( echo ${remote_part##*:} )
+  remote_host=$( echo ${remote_part%%:*} )
+else
+  remote_host=${remote_part}
 fi
 
 local_file=`readlink -f $local_filename` # get absolute path to file in case it was relative
 
-if [[ -z "$local_file" ]]
-  then
-    echo -e "\n  ${RED}Error: Given file not found${RESET}\n" >&2
-    exit 1
+if [[ -z "$local_file" ]]; then
+  echo -e "\n  ${RED}Error: Given file not found${RESET}\n" >&2
+  exit 1
 fi
 
-if [[ ! -f $local_file ]]
-  then
-    echo -e "\n  ${RED}Error: Local file $local_file not found${RESET}\n" >&2
-    exit 1
+if [[ ! -f $local_file ]]; then
+  echo -e "\n  ${RED}Error: Local file $local_file not found${RESET}\n" >&2
+  exit 1
 fi
 
-if [[ -z "$remote_file" ]]
-  then
-    remote_file=$local_file
+if [[ -z "$remote_file" ]]; then
+  remote_file=$local_file
 fi
 
 #
