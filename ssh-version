@@ -1,5 +1,15 @@
 #!/usr/bin/env bash
 
+#  +----------------------------------------------------------------------+
+#  | Title        : ssh-version                                           |
+#  |                                                                      |
+#  | Description  : Shows version of the SSH server you are connecting to |
+#  |                                                                      |
+#  | Author       : Sven Wick                                             |
+#  | Email        : sven.wick@gmx.de                                      |
+#  | URL          : https://github.com/vaporup/ssh-tools                  |
+#  +----------------------------------------------------------------------+
+
 ssh_opts=(
     -o BatchMode=yes
     -o CheckHostIP=no
