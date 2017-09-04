@@ -6,6 +6,8 @@ ssh_opts=(
     -o StrictHostKeyChecking=no
     -o HashKnownHosts=no
     -o ConnectTimeout=16
+    -o PasswordAuthentication=no
+    -o PubkeyAuthentication=no
 )
 
 if [[ $1 == *"@"* ]]
