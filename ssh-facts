@@ -452,31 +452,31 @@ function _lsb_release() {
 
 }
 
-function get_data() {
+function get_facts() {
 
   local function_name=${1}
   local label=$( echo "${function_name/_/}" | tr '[:lower:]' '[:upper:]' )
 
-  data="$( ${function_name} )"
+  fact="$( ${function_name} )"
 
-  [[ -n "${data// }" ]] && echo "${label}=${data}"
+  [[ -n "${fact// }" ]] && echo "${label}=${fact}"
 
 }
 
-get_data _os
-get_data _os_version
-get_data _cpu_cores
-get_data _cpu_sockets
-get_data _hostname
-get_data _kernel_name
-get_data _machine
-get_data _machine_type
-get_data _memory
-get_data _init
-get_data _lsb_codename
-get_data _lsb_description
-get_data _lsb_id
-get_data _lsb_release
+get_facts _os
+get_facts _os_version
+get_facts _cpu_cores
+get_facts _cpu_sockets
+get_facts _hostname
+get_facts _kernel_name
+get_facts _machine
+get_facts _machine_type
+get_facts _memory
+get_facts _init
+get_facts _lsb_codename
+get_facts _lsb_description
+get_facts _lsb_id
+get_facts _lsb_release
 
 END
 
