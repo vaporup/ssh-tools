@@ -166,6 +166,12 @@ fi
 
 local_file=`readlink -f $local_filename` # get absolute path to file in case it was relative
 
+if [[ -z "$local_file" ]]
+  then
+    echo "Local file not found!"
+    exit
+fi
+
 if [ ! -f $local_file ]; then
     echo "Local file $local_file not found!"
     exit
