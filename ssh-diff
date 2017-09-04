@@ -66,10 +66,11 @@ EOF
 
 }
 
-if [[ -z $1 ]]
+if ! [[ $# -ge 2 ]]
   then
+    echo -e "\n  ${RED}Error: Not all filenames given${RESET}" 
     usage
-    exit 1;
+    exit 1
 fi
 
 function supports_colordiff() {
@@ -93,8 +94,8 @@ params=( "$@" )
 # Get last 2 params, store them away and remove them so only diff params are left
 #
 
-remote_params="${params[-1]}"  && unset 'params[ ${#params[@]}-1 ]'
-local_filename="${params[-1]}" && unset 'params[ ${#params[@]}-1 ]'
+remote_params="${params[ ${#params[@]}-1 ]}"  && unset 'params[ ${#params[@]}-1 ]'
+local_filename="${params[ ${#params[@]}-1 ]}" && unset 'params[ ${#params[@]}-1 ]'
 
 diff_params=( "${params[@]}" )
 
