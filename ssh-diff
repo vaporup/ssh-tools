@@ -93,8 +93,8 @@ params=( "$@" )
 # Get last 2 params, store them away and remove them so only diff params are left
 #
 
-remote_params="${params[-1]}" && unset params[-1]
-local_filename="${params[-1]}" && unset params[-1]
+remote_params="${params[-1]}"  && unset 'params[ ${#params[@]}-1 ]'
+local_filename="${params[-1]}" && unset 'params[ ${#params[@]}-1 ]'
 
 diff_params=( "${params[@]}" )
 
