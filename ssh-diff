@@ -72,13 +72,13 @@ if [[ -z $1 ]]
     exit 1;
 fi
 
-function diff_command() {
+function supports_colordiff() {
 
  if type colordiff &> /dev/null
    then
-     colordiff "$@"
+     true
  else
-     diff "$@"
+     false
  fi
 
 }
@@ -163,16 +163,16 @@ else
   remote_host=${remote_part}
 fi
 
-if [[ -z "$remote_file" ]]
-  then
-    remote_file=$local_filename
-fi
-
 local_file=`readlink -f $local_filename` # get absolute path to file in case it was relative
 
 if [ ! -f $local_file ]; then
     echo "Local file $local_file not found!"
     exit
+fi
+
+if [[ -z "$remote_file" ]]
+  then
+    remote_file=$local_file
 fi
 
 #
@@ -185,10 +185,10 @@ echo
 
 if [[ -z "${username}" ]]
   then
-    ssh "${ssh_params[@]}" $remote_host "cat $remote_file" \
-    | diff_command "${diff_params[@]}" --label "$username@$remote_host:$remote_file" - $local_file
+    supports_colordiff && ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
+    supports_colordiff || ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
   else
-    ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file" \
-    | diff_command "${diff_params[@]}" --label "$username@$remote_host:$remote_file" - $local_file
+    supports_colordiff && ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
+    supports_colordiff || ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
 fi
 
