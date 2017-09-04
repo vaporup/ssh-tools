@@ -161,12 +161,6 @@ function _os() {
 
 }
 
-function get_os() {
-
-	echo "OS=$(_os)"
-
-}
-
 function _os_version() {
 
 	case "$(_os)" in
@@ -221,12 +215,6 @@ function _os_version() {
 
 }
 
-function get_os_version() {
-
-	echo "OS_VERSION=$(_os_version)"
-
-}
-
 function _cpu_cores() {
 
 	os=$(_os)
@@ -246,12 +234,6 @@ function _cpu_cores() {
 	    ;;
 	esac
 
-
-}
-
-function get_cpu_cores() {
-
-	echo "CPU_CORES=$(_cpu_cores)"
 
 }
 
@@ -276,23 +258,11 @@ function _cpu_sockets() {
 
 }
 
-function get_cpu_sockets() {
-
-	echo "CPU_SOCKETS=$(_cpu_sockets)"
-
-}
-
 function _hostname() {
 
 	if command -v uname >/dev/null; then
 	   uname -n
 	fi
-
-}
-
-function get_hostname() {
-
-	echo "HOSTNAME=$(_hostname)"
 
 }
 
@@ -302,23 +272,11 @@ function _kernel_name() {
 
 }
 
-function get_kernel_name() {
-
-	echo "KERNEL_NAME=$(_kernel_name)"
-
-}
-
 function _machine() {
 
 	if command -v uname 2>&1 >/dev/null; then
 	   uname -m
 	fi
-
-}
-
-function get_machine() {
-
-	echo "MACHINE=$(_machine)"
 
 }
 
@@ -384,12 +342,6 @@ function _machine_type() {
 
 }
 
-function get_machine_type() {
-
-	echo "MACHINE_TYPE=$(_machine_type)"
-
-}
-
 function _memory() {
 
 	os=$(_os)
@@ -404,12 +356,6 @@ function _memory() {
 	    fi
 	    ;;
 	esac
-
-}
-
-function get_memory() {
-
-	echo "MEMORY=$(_memory)"
 
 }
 
@@ -433,12 +379,6 @@ function _init() {
 
 }
 
-function get_init() {
-
-	echo "INIT=$(_init)"
-
-}
-
 function _lsb_codename() {
 
 	set +e
@@ -453,12 +393,6 @@ function _lsb_codename() {
 	      fi
 	   ;;
 	esac
-
-}
-
-function get_lsb_codename() {
-
-	echo "LSB_CODENAME=$(_lsb_codename)"
 
 }
 
@@ -479,12 +413,6 @@ function _lsb_description() {
 
 }
 
-function get_lsb_description() {
-
-	echo "LSB_DESCRIPTION=$(_lsb_description)"
-
-}
-
 function _lsb_id() {
 
 	set +e
@@ -499,12 +427,6 @@ function _lsb_id() {
 	      fi
 	   ;;
 	esac
-
-}
-
-function get_lsb_id() {
-
-	echo "LSB_ID=$(_lsb_id)"
 
 }
 
@@ -525,26 +447,31 @@ function _lsb_release() {
 
 }
 
-function get_lsb_release() {
+function get_data() {
 
-	echo "LSB_RELEASE=$(_lsb_release)"
+  local function_name=${1}
+  local label=$( echo "${function_name/_/}" | tr '[:lower:]' '[:upper:]' )
+
+  data="$( ${function_name} )"
+
+  [[ -n "${data// }" ]] && echo "${label}=${data}"
 
 }
 
-get_os
-get_os_version
-get_cpu_cores
-get_cpu_sockets
-get_hostname
-get_kernel_name
-get_machine
-get_machine_type
-get_memory
-get_init
-get_lsb_codename
-get_lsb_description
-get_lsb_id
-get_lsb_release
+get_data _os
+get_data _os_version
+get_data _cpu_cores
+get_data _cpu_sockets
+get_data _hostname
+get_data _kernel_name
+get_data _machine
+get_data _machine_type
+get_data _memory
+get_data _init
+get_data _lsb_codename
+get_data _lsb_description
+get_data _lsb_id
+get_data _lsb_release
 
 END
 
