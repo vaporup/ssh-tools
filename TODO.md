@@ -15,3 +15,4 @@ ssh-diff
 ========
 
 - don't diff if SSH connection was not successful
+- don't diff if local file not found
