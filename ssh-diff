@@ -103,10 +103,9 @@ function login_successful_and_remote_file_exists() {
 
   RETVAL=$?
 
-  [[ ${RETVAL} -eq 255 ]] && echo "Could not connect to remote server" && exit ${RETVAL}
-  [[ ${RETVAL} -ge   1 ]] && echo "Remote file $remote_file not found" && exit ${RETVAL}
+  [[ ${RETVAL} -eq 255 ]] && { echo -e "\n  ${RED}Error: Could not connect to remote server${RESET}\n" ; exit ${RETVAL}; }
+  [[ ${RETVAL} -ge   1 ]] && { echo -e "\n  ${RED}Error: Remote file $remote_file not found${RESET}\n" ; exit ${RETVAL}; }
   [[ ${RETVAL} -eq   0 ]] && true
-
 
 }
 
@@ -234,21 +233,20 @@ local_file=`readlink -f $local_filename` # get absolute path to file in case it 
 
 if [[ -z "$local_file" ]]
   then
-    echo "Local file not found!"
-    exit
+    echo -e "\n  ${RED}Error: Given file not found${RESET}\n"
+    exit 1
 fi
 
-if [ ! -f $local_file ]
+if [[ ! -f $local_file ]]
   then
-    echo "Local file $local_file not found!"
-    exit
+    echo -e "\n  ${RED}Error: Local file $local_file not found${RESET}\n"
+    exit 1
 fi
 
 if [[ -z "$remote_file" ]]
   then
     remote_file=$local_file
 fi
-
 
 #
 # Finally diff them !
