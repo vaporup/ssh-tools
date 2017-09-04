@@ -75,12 +75,12 @@ fi
 
 function supports_colordiff() {
 
- if type colordiff &> /dev/null
-   then
-     true
- else
-     false
- fi
+  if type colordiff &> /dev/null
+    then
+      true
+    else
+      false
+  fi
 
 }
 
@@ -214,18 +214,20 @@ done
 #                    -> filename gets stored in $remote_file
 #
 
-if [[ $remote_params == *"@"* ]]; then
-  remote_part=$( echo ${remote_params##*@} )
-  username=$( echo ${remote_params%%@*} )
-else
-  remote_part=${remote_params}
+if [[ $remote_params == *"@"* ]]
+  then
+    remote_part=$( echo ${remote_params##*@} )
+    username=$( echo ${remote_params%%@*} )
+  else
+    remote_part=${remote_params}
 fi
 
-if [[ $remote_part == *":"* ]]; then
-  remote_file=$( echo ${remote_part##*:} )
-  remote_host=$( echo ${remote_part%%:*} )
-else
-  remote_host=${remote_part}
+if [[ $remote_part == *":"* ]]
+  then
+    remote_file=$( echo ${remote_part##*:} )
+    remote_host=$( echo ${remote_part%%:*} )
+  else
+    remote_host=${remote_part}
 fi
 
 local_file=`readlink -f $local_filename` # get absolute path to file in case it was relative
@@ -236,7 +238,8 @@ if [[ -z "$local_file" ]]
     exit
 fi
 
-if [ ! -f $local_file ]; then
+if [ ! -f $local_file ]
+  then
     echo "Local file $local_file not found!"
     exit
 fi

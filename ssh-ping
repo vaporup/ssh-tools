@@ -196,11 +196,12 @@ SSH_OPTS+=( -o ConnectTimeout=$connect_timeout )
 # we just store the last argument as hostname
 #
 
-if [[ $1 == *"@"* ]]; then
-  host=$( echo ${1##*@} )
-  username=$( echo ${1%%@*} )
-else
-  host=${1}
+if [[ $1 == *"@"* ]]
+  then
+    host=$( echo ${1##*@} )
+    username=$( echo ${1%%@*} )
+  else
+    host=${1}
 fi
 
 [[ -z "${host}" ]] && { echo -e "\n  ${RED}Error: No target host given${RESET}" ; usage; exit 1; }
@@ -256,16 +257,18 @@ while true
     # Output "Reply" if the SSH server is at least talking to us but login was denied
     #
 
-    if [[ $status == pong ]] ; then
-      requests_received=$(( requests_received + 1 ))
-      [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
-      [[ ${quiet} == no ]] && echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
-    elif [[ $status == denied ]] ; then
-      requests_received=$(( requests_received + 1 ))
-      [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
-      [[ ${quiet} == no ]] && echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
-    else
-      requests_lost=$(( requests_lost + 1 ))
+    if [[ $status == pong ]]
+      then
+        requests_received=$(( requests_received + 1 ))
+        [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
+        [[ ${quiet} == no ]] && echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+    elif [[ $status == denied ]]
+      then
+        requests_received=$(( requests_received + 1 ))
+        [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
+        [[ ${quiet} == no ]] && echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+      else
+        requests_lost=$(( requests_lost + 1 ))
     fi
 
     requests_transmitted=$ssh_seq
