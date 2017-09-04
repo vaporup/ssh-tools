@@ -12,7 +12,6 @@
 #  | Based On     : http://www.commandlinefu.com/commands/view/1809/get-the-version-of-sshd-on-a-remote-system |
 #  +-----------------------------------------------------------------------------------------------------------+
 
-
 ssh_opts=(
     -o BatchMode=yes
     -o CheckHostIP=no
@@ -23,11 +22,10 @@ ssh_opts=(
     -o PubkeyAuthentication=no
 )
 
-if [[ $1 == *"@"* ]]
-  then
-    SERVER=$( echo ${1##*@} )
-  else
-    SERVER=${1}
+if [[ $1 == *"@"* ]]; then
+  SERVER=$( echo ${1##*@} )
+else
+  SERVER=${1}
 fi
 
 SSH_VERSION=$(ssh -vN "${ssh_opts[@]}" "$@" -l ForceLogin2Fail 2>&1 | grep "remote software version")
