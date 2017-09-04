@@ -11,7 +11,3 @@ ssh-facts
 
 - make it possible to select which facts should be returned
 
-ssh-diff
-========
-
-- don't diff if SSH connection was not successful

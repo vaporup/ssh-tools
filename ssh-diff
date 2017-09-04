@@ -84,6 +84,70 @@ function supports_colordiff() {
 
 }
 
+function show_header() {
+
+  echo
+  echo "Comparing ${BOLD}$remote_host:$remote_file${RESET} (<) with ${BOLD}$local_file${RESET} (>)"
+  echo
+
+}
+
+function login_successful_and_remote_file_exists() {
+
+  if [[ -z "${username}" ]]
+    then
+      ssh "${ssh_params[@]}" $remote_host "test -e $remote_file" &> /dev/null
+    else
+      ssh "${ssh_params[@]}" $username@$remote_host "test -e $remote_file"  &> /dev/null
+  fi
+
+  RETVAL=$?
+
+  [[ ${RETVAL} -eq 255 ]] && echo "Could not connect to remote server" && exit ${RETVAL}
+  [[ ${RETVAL} -ge   1 ]] && echo "Remote file $remote_file not found" && exit ${RETVAL}
+  [[ ${RETVAL} -eq   0 ]] && true
+
+
+}
+
+function diff_files() {
+
+  if [[ -z "${username}" ]]
+    then
+      if login_successful_and_remote_file_exists
+        then
+
+          show_header
+
+          if supports_colordiff
+            then
+              ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
+            else
+              ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
+          fi
+      fi
+
+    else
+      if login_successful_and_remote_file_exists
+        then
+
+          show_header
+
+          if supports_colordiff
+            then
+              ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
+            else
+              ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
+          fi
+      fi
+  fi
+
+}
+
+#
+# MAIN
+#
+
 #
 # Get all params from command line
 #
@@ -182,20 +246,9 @@ if [[ -z "$remote_file" ]]
     remote_file=$local_file
 fi
 
+
 #
-# Output header
+# Finally diff them !
 #
 
-echo
-echo "Comparing ${BOLD}$remote_host:$remote_file${RESET} (<) with ${BOLD}$local_file${RESET} (>)"
-echo
-
-if [[ -z "${username}" ]]
-  then
-    supports_colordiff && ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
-    supports_colordiff || ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
-  else
-    supports_colordiff && ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
-    supports_colordiff || ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
-fi
-
+diff_files
