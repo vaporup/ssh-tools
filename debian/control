@@ -10,7 +10,7 @@ Package: ssh-tools
 Architecture: all
 Depends: ${misc:Depends}
 Recommends: colordiff
-Description: ssh-ping, ssh-version
+Description: ssh-ping, ssh-version, ssh-diff, ssh-facts
  * ssh-ping: check if host is reachable using ssh_config
  .
    - Outputs *Reply from* when server is reachable but login failed
