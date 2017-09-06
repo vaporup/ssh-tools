@@ -1,5 +1,10 @@
 finish Debian packaging
 
+ssh-ping
+========
+
+check if python is available ( OpenBSD )
+
 ssh-diff
 ========
 
