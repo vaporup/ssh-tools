@@ -34,7 +34,3 @@ diff -u --label remote --label local <(ssh root@remote find /etc -printf '"%P\n"
 
 Check if folders exist on both systems before diffing...
 
-ssh-version
-===========
-
-Usage

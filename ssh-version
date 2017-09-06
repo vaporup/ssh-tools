@@ -22,6 +22,26 @@ ssh_opts=(
     -o PubkeyAuthentication=no
 )
 
+#
+# Usage/Help message
+#
+
+function usage() {
+
+cat << EOF
+
+  Usage: ${0##*/} host
+
+EOF
+
+}
+
+if [[ -z $1 ]]; then
+  usage
+  exit 1;
+fi
+
+
 if [[ $1 == *"@"* ]]; then
   SERVER=$( echo ${1##*@} )
 else
