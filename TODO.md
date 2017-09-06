@@ -7,8 +7,8 @@ Implement diffing directories (without file contents)
 
 see 
 
-https://stackoverflow.com/questions/21844242/diff-between-two-remote-folders-through-ssh
-https://stackoverflow.com/questions/20969124/how-to-diff-directories-over-ssh
+- https://stackoverflow.com/questions/21844242/diff-between-two-remote-folders-through-ssh
+- https://stackoverflow.com/questions/20969124/how-to-diff-directories-over-ssh
 
 e.g.
 
