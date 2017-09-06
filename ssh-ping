@@ -23,6 +23,10 @@ trap print_statistics SIGINT
 # Some colors for better output
 #
 
+if [[ "$OSTYPE" == openbsd* ]]; then
+  TERM=linux    # https://github.com/rvm/rvm/issues/727
+fi
+
   BLACK=$(tput setaf 1)
     RED=$(tput setaf 1)
   GREEN=$(tput setaf 2)
