@@ -257,9 +257,9 @@ while true; do
   start_request=$( get_request_timestamp )
 
   if [[ -z "${username}" ]]; then
-    status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied')
+    status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
   else
-    status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied')
+    status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
   fi
 
   end_request=$( get_request_timestamp )
@@ -275,7 +275,7 @@ while true; do
     requests_received=$(( requests_received + 1 ))
     [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
     [[ ${quiet} == no ]] && echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
-  elif [[ $status == denied ]]; then
+  elif [[ $status == denied || $status == sftp ]]; then
     requests_received=$(( requests_received + 1 ))
     [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
     [[ ${quiet} == no ]] && echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
