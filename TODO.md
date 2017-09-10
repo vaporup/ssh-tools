@@ -3,12 +3,12 @@ finish Debian packaging
 ssh-ping
 ========
 
-check if python is available ( OpenBSD )
+- [ ] check if python is available ( OpenBSD )
 
 ssh-diff
 ========
 
-Implement diffing directories (without file contents)
+- [ ] Implement diffing directories (without file contents)
 
 see 
 
