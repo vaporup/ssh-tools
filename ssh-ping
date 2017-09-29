@@ -125,6 +125,8 @@ function get_request_timestamp() {
 
 function print_statistics() {
 
+  [[ $requests_transmitted -eq 0 ]] && exit
+
   requests_loss=$(( 100 * requests_lost / requests_transmitted ))
 
   echo
