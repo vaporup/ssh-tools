@@ -1,3 +1,25 @@
+ssh-tools (1.3-1) unstable; urgency=medium
+
+  * New Upstream Release
+    - better OpenBSD support
+    - consistent code formatting and better output
+    - more robustness
+    - portable to older Bash versions
+    - manpages
+    - changed license from AGPL-3 to GPL-3 and added debian/copyright
+  * debian/control
+    - changed Section from 'net' to 'utils'
+    - changed Priority from 'extra' to 'optional'
+    - added 'help2man' to Build-Depends to create the manpages
+    - added 'openssh-client' to Depends because without ssh client nothing works
+    - added 'ssh-diff' and 'ssh-facts' to Description
+  * debian/rules
+    - override_dh_builddeb to build data.tar.gz instead of data.tar.xz
+      for older systems like like Debian Lenny etc...
+    - override_dh_auto_build to create manpages via help2man
+
+ -- Sven Wick <sven.wick@gmx.de>  Tue, 03 Oct 2017 22:46:31 +0200
+
 ssh-tools (1.2-1) unstable; urgency=medium
 
   * New Upstream Release
