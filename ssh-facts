@@ -28,11 +28,10 @@ EOF
 
 }
 
-if [[ -z $1 ]]; then
+if [[ -z $1 || $1 == "--help" ]]; then
   usage
   exit 1;
 fi
-
 
 ssh "$@" 'bash -s' 2>/dev/null <<'END' | sed 's/\s*=\s*/=/'
 

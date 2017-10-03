@@ -2,7 +2,7 @@ Source: ssh-tools
 Section: net
 Priority: extra
 Maintainer: Sven Wick <sven.wick@gmx.de>
-Build-Depends: debhelper (>= 9)
+Build-Depends: debhelper (>= 9), help2man
 Standards-Version: 4.0.1
 Homepage: https://github.com/vaporup/ssh-tools/
 

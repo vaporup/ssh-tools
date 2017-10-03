@@ -5,3 +5,9 @@
 
 override_dh_builddeb:
 	dh_builddeb -- -Zgzip
+
+override_dh_auto_build:
+	help2man -n "check if host is reachable using ssh_config"           -S SSH-TOOLS -N --version-string " " -o    ssh-ping.1 ssh-ping
+	help2man -n "shows version of the SSH server you are connecting to" -S SSH-TOOLS -N --version-string " " -o ssh-version.1 ssh-version
+	help2man -n "diff a file over SSH"                                  -S SSH-TOOLS -N --version-string " " -o    ssh-diff.1 ssh-diff
+	help2man -n "get some facts about the remote system"                -S SSH-TOOLS -N --version-string " " -o   ssh-facts.1 ssh-facts

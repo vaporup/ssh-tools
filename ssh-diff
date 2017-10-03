@@ -56,25 +56,38 @@ cat << EOF
 
   Examples:
 
-  ${0##*/} /etc/hosts 192.168.1.10
-  ${0##*/} /etc/hosts root@192.168.1.10
-  ${0##*/} /etc/hosts root@192.168.1.10:/etc/hosts.old
+  Default
+
+    ${0##*/} /etc/hosts 192.168.1.10
+
+    ${0##*/} /etc/hosts root@192.168.1.10
+
+    ${0##*/} /etc/hosts root@192.168.1.10:/etc/hosts.old
    
   Side-by-Side
 
-  ${0##*/} -y /etc/hosts 192.168.1.10
-  ${0##*/} -y /etc/hosts root@192.168.1.10
-  ${0##*/} -y /etc/hosts root@192.168.1.10:/etc/hosts.old
+    ${0##*/} -y /etc/hosts 192.168.1.10
+
+    ${0##*/} -y /etc/hosts root@192.168.1.10
+
+    ${0##*/} -y /etc/hosts root@192.168.1.10:/etc/hosts.old
 
   Unified
 
-  ${0##*/} -u /etc/hosts 192.168.1.10
-  ${0##*/} -u /etc/hosts root@192.168.1.10
-  ${0##*/} -u /etc/hosts root@192.168.1.10:/etc/hosts.old
+    ${0##*/} -u /etc/hosts 192.168.1.10
+
+    ${0##*/} -u /etc/hosts root@192.168.1.10
+
+    ${0##*/} -u /etc/hosts root@192.168.1.10:/etc/hosts.old
 
 EOF
 
 }
+
+if [[ -z $1 || $1 == "--help" ]]; then
+  usage
+  exit 1;
+fi
 
 if ! [[ $# -ge 2 ]]; then
   echo -e "\n  ${RED}Error: Not all filenames given${RESET}" >&2
