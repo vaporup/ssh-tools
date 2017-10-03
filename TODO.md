@@ -3,7 +3,7 @@
 ssh-ping
 ========
 
-- [ ] check if python is available ( OpenBSD )
+- [X] check if python is available ( OpenBSD )
 
 ssh-diff
 ========

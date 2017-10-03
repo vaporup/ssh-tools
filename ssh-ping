@@ -108,12 +108,18 @@ if [[ -z $1 || $1 == "--help" ]]; then
   exit 1;
 fi
 
+function command_exists() {
+
+  command -v ${1} >/dev/null 2>&1
+
+}
+
 function get_timestamp() {
 
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     date +%s.%6N
   else
-    python -c 'import time; ms = time.time() ; print "%.6f" % ms'
+    command_exists python && python -c 'import time; ms = time.time() ; print "%.6f" % ms'
   fi
 
 }
@@ -123,7 +129,7 @@ function get_request_timestamp() {
   if [[ "$OSTYPE" == "linux-gnu" ]]; then
     date +%s%3N
   else
-    python -c 'import time; ms = int(round(time.time() * 1000)) ; print ms'
+    command_exists python && python -c 'import time; ms = int(round(time.time() * 1000)) ; print ms'
   fi
 
 }
@@ -242,6 +248,8 @@ if [[ ${verbose} == yes ]]; then
   echo "SSH_OPTS: ${SSH_OPTS[@]}"
   echo -n "${RESET}"
 fi
+
+command_exists python || echo "${YELLOW}WARNING:${RESET} No python found. Unable to measure time (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
 
 while true; do
 
