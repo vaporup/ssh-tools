@@ -1,4 +1,4 @@
-- [ ] finish Debian packaging
+- [X] finish Debian packaging
 
 ssh-ping
 ========
