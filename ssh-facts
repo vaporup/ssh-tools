@@ -32,7 +32,7 @@ cat << EOF
 
     ${0##*/} 127.0.0.1
 
-    ${0##*/} 127.0.0.1 | grep ^OS_VERSION |  awk -F'=' '{ print \$2 }'
+    ${0##*/} 127.0.0.1 | grep ^OS_VERSION | awk -F'=' '{ print \$2 }'
 
     ${0##*/} 127.0.0.1 | jo -p
 
