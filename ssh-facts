@@ -24,6 +24,22 @@ cat << EOF
 
   Usage: ${0##*/} [user@]host
 
+  For further processing of the data you can use standard shell tools like awk, grep, sed
+  or convert it to JSON with 'jo' (command-line processor to output JSON from a shell)
+  and feed it to 'jq' (lightweight and flexible command-line JSON processor)
+
+  Examples:
+
+  ${0##*/} 127.0.0.1
+
+  ${0##*/} 127.0.0.1 | grep ^OS_VERSION |  awk -F'=' '{ print \$2 }'
+
+  ${0##*/} 127.0.0.1 | jo -p
+
+  ${0##*/} 127.0.0.1 | jo | jq .
+
+  ${0##*/} 127.0.0.1 | jo | jq .OS_VERSION
+
 EOF
 
 }

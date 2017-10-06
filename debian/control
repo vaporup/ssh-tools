@@ -12,6 +12,7 @@ Package: ssh-tools
 Architecture: all
 Depends: ${misc:Depends}, openssh-client
 Recommends: colordiff
+Suggests: jo, jq
 Description: ssh-ping, ssh-version, ssh-diff, ssh-facts
  * ssh-ping: check if host is reachable using ssh_config
  .
