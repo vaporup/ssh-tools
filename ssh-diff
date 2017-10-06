@@ -42,6 +42,11 @@ cat << EOF
 
   Usage: ${0##*/} [options] filename [user@]host[:filename]
 
+  There is an extra roundtrip to the remote system
+  to check for the existence of the file to be diffed.
+  So if you are not using SSH Keys
+  you may get prompted twice for a password.
+
   Diff Options:
 
   All options your local diff command supports ( except '-r' ).
