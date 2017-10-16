@@ -25,7 +25,7 @@ Get some facts about the remote system
 
 ![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/demos/ssh-facts.gif)
 
-### Creating and Installing the Debian Package
+### Building and Installing the Debian Package
   ~~~~
   # apt-get install build-essential debhelper help2man
 
