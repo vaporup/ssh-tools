@@ -235,6 +235,22 @@ function _os_version() {
 
 }
 
+function _uptime() {
+
+	if command -v uptime >/dev/null; then
+	   uptime | awk -F'( |,|:)+' '{if ($7=="min") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,"days,",h+0,"hours,",m+0,"minutes"}'
+	fi
+
+}
+
+function _last_reboot() {
+
+	if command -v last >/dev/null; then
+	   last reboot -F | head -1 | awk '{print $6,$7,$8,$9}'
+	fi
+
+}
+
 function _cpu_cores() {
 
 	os=$(_os)
@@ -321,7 +337,7 @@ function _machine_type() {
 		if [ -r /sys/hypervisor/type ]; then
 		    if grep -q -i "xen" /sys/hypervisor/type; then
 			echo virtual_by_xen
-			exit 
+			exit
 		    fi
 		else
 		    if [ -r /sys/class/dmi/id/product_name ]; then
@@ -330,10 +346,10 @@ function _machine_type() {
 			    exit
 			elif grep -q -i 'bochs' /sys/class/dmi/id/product_name; then
 			    echo "virtual_by_kvm"
-			    exit 
+			    exit
 			elif grep -q -i 'virtualbox' /sys/class/dmi/id/product_name; then
 			    echo "virtual_by_virtualbox"
-			    exit 
+			    exit
 			fi
 		    fi
 
@@ -480,6 +496,8 @@ function get_facts() {
 
 get_facts _os
 get_facts _os_version
+get_facts _uptime
+get_facts _last_reboot
 get_facts _cpu_cores
 get_facts _cpu_sockets
 get_facts _hostname
@@ -494,4 +512,3 @@ get_facts _lsb_id
 get_facts _lsb_release
 
 END
-
