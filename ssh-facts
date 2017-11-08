@@ -15,482 +15,473 @@
 #  +----------------------------------------------------------------------------------+
 
 #
-# Usage/Help message
+#  Usage/Help message
 #
 
 function usage() {
 
 cat << EOF
+    Usage: ${0##*/} [user@]host
 
-  Usage: ${0##*/} [user@]host
+    For further processing of the data you can use standard shell tools like awk, grep, sed
+    or convert it to JSON with 'jo' (command-line processor to output JSON from a shell)
+    and feed it to 'jq' (lightweight and flexible command-line JSON processor)
 
-  For further processing of the data you can use standard shell tools like awk, grep, sed
-  or convert it to JSON with 'jo' (command-line processor to output JSON from a shell)
-  and feed it to 'jq' (lightweight and flexible command-line JSON processor)
+    Examples:
 
-  Examples:
+        ${0##*/} 127.0.0.1
 
-    ${0##*/} 127.0.0.1
+        ${0##*/} 127.0.0.1 | grep ^OS_VERSION | awk -F'=' '{ print \$2 }'
 
-    ${0##*/} 127.0.0.1 | grep ^OS_VERSION | awk -F'=' '{ print \$2 }'
+        ${0##*/} 127.0.0.1 | jo -p
 
-    ${0##*/} 127.0.0.1 | jo -p
+        ${0##*/} 127.0.0.1 | jo | jq
 
-    ${0##*/} 127.0.0.1 | jo | jq
-
-    ${0##*/} 127.0.0.1 | jo | jq .OS_VERSION
+        ${0##*/} 127.0.0.1 | jo | jq .OS_VERSION
 
 EOF
 
 }
 
 if [[ -z $1 || $1 == "--help" ]]; then
-  usage
-  exit 1;
+    usage
+    exit 1
 fi
 
 ssh "$@" 'bash -s' 2>/dev/null <<'END' | sed 's/\s*=\s*/=/'
 
 function _os() {
 
-	if grep -q ^Amazon /etc/system-release 2>/dev/null; then
-	   echo amazon
-	   exit 0
-	fi
+    if grep -q ^Amazon /etc/system-release 2>/dev/null; then
+        echo amazon
+        exit 0
+    fi
 
-	if [ -f /etc/arch-release ]; then
-	   echo archlinux
-	   exit 0
-	fi
+    if [ -f /etc/arch-release ]; then
+       echo archlinux
+       exit 0
+    fi
 
-	if [ -f /etc/cdist-preos ]; then
-	   echo cdist-preos
-	   exit 0
-	fi
+    if [ -f /etc/cdist-preos ]; then
+       echo cdist-preos
+       exit 0
+    fi
 
-	if [ -d /gnu/store ]; then
-	   echo guixsd
-	   exit 0
-	fi
+    if [ -d /gnu/store ]; then
+       echo guixsd
+       exit 0
+    fi
 
-	### Debian and derivatives
-	if grep -q ^DISTRIB_ID=Ubuntu /etc/lsb-release 2>/dev/null; then
-	   echo ubuntu
-	   exit 0
-	fi
+    ### Debian and derivatives
+    if grep -q ^DISTRIB_ID=Ubuntu /etc/lsb-release 2>/dev/null; then
+       echo ubuntu
+       exit 0
+    fi
 
-	if [ -f /etc/debian_version ]; then
-	   echo debian
-	   exit 0
-	fi
+    if [ -f /etc/debian_version ]; then
+       echo debian
+       exit 0
+    fi
 
-	if [ -f /etc/devuan_version ]; then
-	   echo devuan
-	   exit 0
-	fi
-	###
+    if [ -f /etc/devuan_version ]; then
+       echo devuan
+       exit 0
+    fi
+    ###
 
-	if [ -f /etc/gentoo-release ]; then
-	   echo gentoo
-	   exit 0
-	fi
+    if [ -f /etc/gentoo-release ]; then
+       echo gentoo
+       exit 0
+    fi
 
-	if [ -f /etc/openwrt_version ]; then
-	    echo openwrt
-	    exit 0
-	fi
+    if [ -f /etc/openwrt_version ]; then
+        echo openwrt
+        exit 0
+    fi
 
-	if [ -f /etc/owl-release ]; then
-	   echo owl
-	   exit 0
-	fi
+    if [ -f /etc/owl-release ]; then
+       echo owl
+       exit 0
+    fi
 
-	### Redhat and derivatives
-	if grep -q ^Scientific /etc/redhat-release 2>/dev/null; then
-	    echo scientific
-	    exit 0
-	fi
+    ### Redhat and derivatives
+    if grep -q ^Scientific /etc/redhat-release 2>/dev/null; then
+        echo scientific
+        exit 0
+    fi
 
-	if grep -q ^CentOS /etc/redhat-release 2>/dev/null; then
-	    echo centos
-	    exit 0
-	fi
+    if grep -q ^CentOS /etc/redhat-release 2>/dev/null; then
+        echo centos
+        exit 0
+    fi
 
-	if grep -q ^Fedora /etc/redhat-release 2>/dev/null; then
-	   echo fedora
-	   exit 0
-	fi
+    if grep -q ^Fedora /etc/redhat-release 2>/dev/null; then
+       echo fedora
+       exit 0
+    fi
 
-	if grep -q ^Mitel /etc/redhat-release 2>/dev/null; then
-	   echo mitel
-	   exit 0
-	fi
+    if grep -q ^Mitel /etc/redhat-release 2>/dev/null; then
+       echo mitel
+       exit 0
+    fi
 
-	if [ -f /etc/redhat-release ]; then
-	   echo redhat
-	   exit 0
-	fi
-	###
+    if [ -f /etc/redhat-release ]; then
+       echo redhat
+       exit 0
+    fi
+    ###
 
-	if [ -f /etc/SuSE-release ]; then
-	   echo suse
-	   exit 0
-	fi
+    if [ -f /etc/SuSE-release ]; then
+       echo suse
+       exit 0
+    fi
 
-	if [ -f /etc/slackware-version ]; then
-	   echo slackware
-	   exit 0
-	fi
+    if [ -f /etc/slackware-version ]; then
+       echo slackware
+       exit 0
+    fi
 
-	uname_s="$(uname -s)"
+    uname_s="$(uname -s)"
 
-	# Assume there is no tr on the client -> do lower case ourselves
-	case "$uname_s" in
-	   Darwin)
-	      echo macosx
-	      exit 0
-	   ;;
-	   NetBSD)
-	      echo netbsd
-	      exit 0
-	   ;;
-	   FreeBSD)
-	      echo freebsd
-	      exit 0
-	   ;;
-	   OpenBSD)
-	      echo openbsd
-	      exit 0
-	   ;;
-	   SunOS)
-	      echo solaris
-	      exit 0
-	   ;;
-	esac
+    # Assume there is no tr on the client -> do lower case ourselves
+    case "$uname_s" in
+        Darwin)
+            echo macosx
+            exit 0
+        ;;
+        NetBSD)
+            echo netbsd
+            exit 0
+        ;;
+        FreeBSD)
+            echo freebsd
+            exit 0
+        ;;
+        OpenBSD)
+            echo openbsd
+            exit 0
+        ;;
+        SunOS)
+            echo solaris
+            exit 0
+        ;;
+    esac
 
-	if [ -f /etc/os-release ]; then
-	   # already lowercase, according to:
-	   # https://www.freedesktop.org/software/systemd/man/os-release.html
-	   awk -F= '/^ID=/ {print $2;}' /etc/os-release
-	   exit 0
-	fi
+    if [ -f /etc/os-release ]; then
+        # already lowercase, according to:
+        # https://www.freedesktop.org/software/systemd/man/os-release.html
+        awk -F= '/^ID=/ {print $2;}' /etc/os-release
+        exit 0
+    fi
 
-	echo "Unknown OS" >&2
-	exit 1
-
+    echo "Unknown OS" >&2
+    exit 1
 
 }
 
 function _os_version() {
 
-	case "$(_os)" in
-	   amazon)
-	      cat /etc/system-release
-	   ;;
-	   archlinux)
-	      # empty, but well...
-	      cat /etc/arch-release
-	   ;;
-	   debian)
-	      cat /etc/debian_version
-	   ;;
-	   devuan)
-	      cat /etc/devuan_version
-	   ;;
-	   fedora)
-	      cat /etc/fedora-release
-	   ;;
-	   gentoo)
-	      cat /etc/gentoo-release
-	   ;;
-	   macosx)
-	      sw_vers -productVersion
-	   ;;
-	   *bsd|solaris)
-	      uname -r
-	   ;;
-	   openwrt)
-	      cat /etc/openwrt_version
-	   ;;
-	   owl)
-	      cat /etc/owl-release
-	   ;;
-	   redhat|centos|mitel|scientific)
-	      cat /etc/redhat-release
-	   ;;
-	   slackware)
-	      cat /etc/slackware-version
-	   ;;
-	   suse)
-	      if [ -f /etc/os-release ]; then
-		cat /etc/os-release
-	      else
-		cat /etc/SuSE-release
-	      fi
-	   ;;
-	   ubuntu)
-	      lsb_release -sr
-	   ;;
-	esac
+    case "$(_os)" in
+        amazon)
+            cat /etc/system-release
+        ;;
+        archlinux)
+            # empty, but well...
+            cat /etc/arch-release
+        ;;
+        debian)
+            cat /etc/debian_version
+        ;;
+        devuan)
+            cat /etc/devuan_version
+        ;;
+        fedora)
+            cat /etc/fedora-release
+        ;;
+        gentoo)
+            cat /etc/gentoo-release
+        ;;
+        macosx)
+            sw_vers -productVersion
+        ;;
+        *bsd|solaris)
+            uname -r
+        ;;
+        openwrt)
+            cat /etc/openwrt_version
+        ;;
+        owl)
+            cat /etc/owl-release
+        ;;
+        redhat|centos|mitel|scientific)
+            cat /etc/redhat-release
+        ;;
+        slackware)
+            cat /etc/slackware-version
+        ;;
+        suse)
+            if [ -f /etc/os-release ]; then
+                cat /etc/os-release
+            else
+                cat /etc/SuSE-release
+            fi
+        ;;
+        ubuntu)
+             lsb_release -sr
+        ;;
+    esac
 
 }
 
 function _uptime() {
 
-	if command -v uptime >/dev/null; then
-	   uptime | awk -F'( |,|:)+' '{if ($7=="min") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,"days,",h+0,"hours,",m+0,"minutes"}'
-	fi
+    if command -v uptime >/dev/null; then
+        uptime | awk -F'( |,|:)+' '{if ($7=="min") m=$6; else {if ($7~/^day/) {d=$6;h=$8;m=$9} else {h=$6;m=$7}}} {print d+0,"days,",h+0,"hours,",m+0,"minutes."}'
+    fi
 
 }
 
 function _last_reboot() {
 
-	if command -v last >/dev/null; then
-	   last reboot -F | head -1 | awk '{print $6,$7,$8,$9}'
-	fi
+    if command -v last >/dev/null; then
+        last reboot -F | head -1 | awk '{print $6,$7,$8,$9}'
+    fi
 
 }
 
 function _cpu_cores() {
 
-	os=$(_os)
-	case "$os" in
-	    "macosx")
-		echo "$(sysctl -n hw.physicalcpu)"
-	    ;;
-
-	    *)
-		if [ -r /proc/cpuinfo ]; then
-		    cores="$(grep "core id" /proc/cpuinfo | sort | uniq | wc -l)"
-		    if [ ${cores} -eq 0 ]; then
-			cores="1"
-		    fi
-		    echo "$cores"
-		fi
-	    ;;
-	esac
-
+    os=$(_os)
+    case "$os" in
+        "macosx")
+              echo "$(sysctl -n hw.physicalcpu)"
+        ;;
+        *)
+            if [ -r /proc/cpuinfo ]; then
+                cores="$(grep "core id" /proc/cpuinfo | sort | uniq | wc -l)"
+                if [ ${cores} -eq 0 ]; then
+                    cores="1"
+                fi
+                echo "$cores"
+            fi
+        ;;
+    esac
 
 }
 
 function _cpu_sockets() {
 
-	os=$(_os)
-	case "$os" in
-	    "macosx")
-		echo "$(system_profiler SPHardwareDataType | grep "Number of Processors" | awk -F': ' '{print $2}')"
-	    ;;
-
-	    *)
-	    if [ -r /proc/cpuinfo ]; then
-		sockets="$(grep "physical id" /proc/cpuinfo | sort | uniq | wc -l)"
-		if [ ${sockets} -eq 0 ]; then
-		    sockets="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
-		fi
-		echo "${sockets}"
-	    fi
-	    ;;
-	esac
+    os=$(_os)
+    case "$os" in
+        "macosx")
+              echo "$(system_profiler SPHardwareDataType | grep "Number of Processors" | awk -F': ' '{print $2}')"
+        ;;
+        *)
+            if [ -r /proc/cpuinfo ]; then
+                sockets="$(grep "physical id" /proc/cpuinfo | sort | uniq | wc -l)"
+                if [ ${sockets} -eq 0 ]; then
+                    sockets="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
+                fi
+                echo "${sockets}"
+            fi
+        ;;
+    esac
 
 }
 
 function _hostname() {
 
-	if command -v uname >/dev/null; then
-	   uname -n
-	fi
+    if command -v uname >/dev/null; then
+        uname -n
+    fi
 
 }
 
 function _kernel_name() {
 
-	uname -s
+    uname -s
 
 }
 
 function _machine() {
 
-	if command -v uname 2>&1 >/dev/null; then
-	   uname -m
-	fi
+    if command -v uname 2>&1 >/dev/null; then
+        uname -m
+    fi
 
 }
 
 function _machine_type() {
 
-	if [ -d "/proc/vz" -a ! -d "/proc/bc" ]; then
-	    echo openvz
-	    exit
-	fi
+    if [ -d "/proc/vz" -a ! -d "/proc/bc" ]; then
+        echo openvz
+        exit
+    fi
 
-	if [ -r "/proc/1/environ" ] &&
-	    cat "/proc/1/environ" | tr '\000' '\n' | grep -Eiq '^container='; then
-	    echo lxc
-	    exit
-	fi
+    if [ -r "/proc/1/environ" ] &&
+        cat "/proc/1/environ" | tr '\000' '\n' | grep -Eiq '^container='; then
+        echo lxc
+        exit
+    fi
 
-	if [ -r /proc/cpuinfo ]; then
-	    # this should only exist on virtual guest machines,
-	    # tested on vmware, xen, kvm
-	    if grep -q "hypervisor" /proc/cpuinfo; then
-		# this file is aviable in xen guest systems
-		if [ -r /sys/hypervisor/type ]; then
-		    if grep -q -i "xen" /sys/hypervisor/type; then
-			echo virtual_by_xen
-			exit
-		    fi
-		else
-		    if [ -r /sys/class/dmi/id/product_name ]; then
-			if grep -q -i 'vmware' /sys/class/dmi/id/product_name; then
-			    echo "virtual_by_vmware"
-			    exit
-			elif grep -q -i 'bochs' /sys/class/dmi/id/product_name; then
-			    echo "virtual_by_kvm"
-			    exit
-			elif grep -q -i 'virtualbox' /sys/class/dmi/id/product_name; then
-			    echo "virtual_by_virtualbox"
-			    exit
-			fi
-		    fi
-
-                    if [ -r /sys/class/dmi/id/sys_vendor ]; then
-                        if grep -q -i 'qemu' /sys/class/dmi/id/sys_vendor; then
-                            echo "virtual_by_kvm"
-                            exit
-                        fi
+    if [ -r /proc/cpuinfo ]; then
+        # this should only exist on virtual guest machines,
+        # tested on vmware, xen, kvm
+        if grep -q "hypervisor" /proc/cpuinfo; then
+            # this file is aviable in xen guest systems
+            if [ -r /sys/hypervisor/type ]; then
+                if grep -q -i "xen" /sys/hypervisor/type; then
+                    echo virtual_by_xen
+                    exit
+                fi
+            else
+                if [ -r /sys/class/dmi/id/product_name ]; then
+                    if grep -q -i 'vmware' /sys/class/dmi/id/product_name; then
+                        echo "virtual_by_vmware"
+                        exit
+                    elif grep -q -i 'bochs' /sys/class/dmi/id/product_name; then
+                        echo "virtual_by_kvm"
+                        exit
+                    elif grep -q -i 'virtualbox' /sys/class/dmi/id/product_name; then
+                        echo "virtual_by_virtualbox"
+                        exit
                     fi
+                fi
 
-                    if [ -r /sys/class/dmi/id/chassis_vendor ]; then
-                        if grep -q -i 'qemu' /sys/class/dmi/id/chassis_vendor; then
-                            echo "virtual_by_kvm"
-                            exit
-                        fi
+                if [ -r /sys/class/dmi/id/sys_vendor ]; then
+                    if grep -q -i 'qemu' /sys/class/dmi/id/sys_vendor; then
+                        echo "virtual_by_kvm"
+                        exit
                     fi
+                fi
 
-		fi
-		echo "virtual_by_unknown"
-	    else
-		echo "physical"
-	    fi
-	else
-	    echo "unknown"
-	fi
+                if [ -r /sys/class/dmi/id/chassis_vendor ]; then
+                    if grep -q -i 'qemu' /sys/class/dmi/id/chassis_vendor; then
+                        echo "virtual_by_kvm"
+                        exit
+                    fi
+                fi
+            fi
+
+            echo "virtual_by_unknown"
+        else
+            echo "physical"
+        fi
+    else
+        echo "unknown"
+    fi
 
 }
 
 function _memory() {
 
-	os=$(_os)
-	case "$os" in
-	    "macosx")
-		echo "$(sysctl -n hw.memsize)/1024" | bc
-	    ;;
-
-	    *)
-	    if [ -r /proc/meminfo ]; then
-		grep "MemTotal:" /proc/meminfo | awk '{print $2}'
-	    fi
-	    ;;
-	esac
+    os=$(_os)
+    case "$os" in
+        "macosx")
+            echo "$(sysctl -n hw.memsize)/1024" | bc
+        ;;
+        *)
+            if [ -r /proc/meminfo ]; then
+                grep "MemTotal:" /proc/meminfo | awk '{print $2}'
+            fi
+        ;;
+    esac
 
 }
 
 function _init() {
 
-	uname_s="$(uname -s)"
-
-	case "$uname_s" in
-	    Linux)
-		(pgrep -P0 -l | awk '/^1[ \t]/ {print $2;}') || true
-	    ;;
-	    FreeBSD)
-		ps -o comm= -p 1 || true
-	    ;;
-	    *)
-		# return a empty string as unknown value
-		echo ""
-	    ;;
-	esac
-
+    uname_s="$(uname -s)"
+    case "$uname_s" in
+        Linux)
+            (pgrep -P0 -l | awk '/^1[ \t]/ {print $2;}') || true
+        ;;
+        FreeBSD)
+            ps -o comm= -p 1 || true
+        ;;
+        *)
+            # return a empty string as unknown value
+            echo ""
+        ;;
+    esac
 
 }
 
 function _lsb_codename() {
 
-	set +e
-	case "$(_os)" in
-	   openwrt)
-	      (. /etc/openwrt_release && echo "$DISTRIB_CODENAME")
-	   ;;
-	   *)
-	      lsb_release=$(command -v lsb_release)
-	      if [ -x "$lsb_release" ]; then
-		 $lsb_release --short --codename
-	      fi
-	   ;;
-	esac
+    set +e
+    case "$(_os)" in
+        openwrt)
+            (. /etc/openwrt_release && echo "$DISTRIB_CODENAME")
+        ;;
+        *)
+            lsb_release=$(command -v lsb_release)
+            if [ -x "$lsb_release" ]; then
+                $lsb_release --short --codename
+            fi
+        ;;
+    esac
 
 }
 
 function _lsb_description() {
 
-	set +e
-	case "$(_os)" in
-	   openwrt)
-	      (. /etc/openwrt_release && echo "$DISTRIB_DESCRIPTION")
-	   ;;
-	   *)
-	      lsb_release=$(command -v lsb_release)
-	      if [ -x "$lsb_release" ]; then
-		 $lsb_release --short --description
-	      fi
-	   ;;
-	esac
+    set +e
+    case "$(_os)" in
+        openwrt)
+            (. /etc/openwrt_release && echo "$DISTRIB_DESCRIPTION")
+        ;;
+        *)
+            lsb_release=$(command -v lsb_release)
+            if [ -x "$lsb_release" ]; then
+                $lsb_release --short --description
+            fi
+        ;;
+    esac
 
 }
 
 function _lsb_id() {
 
-	set +e
-	case "$(_os)" in
-	   openwrt)
-	      (. /etc/openwrt_release && echo "$DISTRIB_ID")
-	   ;;
-	   *)
-	      lsb_release=$(command -v lsb_release)
-	      if [ -x "$lsb_release" ]; then
-		 $lsb_release --short --id
-	      fi
-	   ;;
-	esac
+    set +e
+    case "$(_os)" in
+        openwrt)
+            (. /etc/openwrt_release && echo "$DISTRIB_ID")
+        ;;
+        *)
+            lsb_release=$(command -v lsb_release)
+            if [ -x "$lsb_release" ]; then
+                $lsb_release --short --id
+            fi
+        ;;
+    esac
 
 }
 
 function _lsb_release() {
 
-	set +e
-	case "$(_os)" in
-	   openwrt)
-	      (. /etc/openwrt_release && echo "$DISTRIB_RELEASE")
-	   ;;
-	   *)
-	      lsb_release=$(command -v lsb_release)
-	      if [ -x "$lsb_release" ]; then
-		 $lsb_release --short --release
-	      fi
-	   ;;
-	esac
+    set +e
+    case "$(_os)" in
+        openwrt)
+            (. /etc/openwrt_release && echo "$DISTRIB_RELEASE")
+        ;;
+        *)
+            lsb_release=$(command -v lsb_release)
+            if [ -x "$lsb_release" ]; then
+                $lsb_release --short --release
+            fi
+        ;;
+    esac
 
 }
 
 function get_facts() {
 
-  local function_name=${1}
-  local label=$( echo "${function_name/_/}" | tr '[:lower:]' '[:upper:]' )
+    local function_name=${1}
+    local label=$( echo "${function_name/_/}" | tr '[:lower:]' '[:upper:]' )
+    fact="$( ${function_name} )"
 
-  fact="$( ${function_name} )"
-
-  [[ -n "${fact// }" ]] && echo "${label}=${fact}"
+    [[ -n "${fact// }" ]] && echo "${label}=${fact}"
 
 }
 
