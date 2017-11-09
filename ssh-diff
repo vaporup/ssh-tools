@@ -40,7 +40,7 @@ function usage() {
 
 cat << EOF
 
-    Usage: ${0##*/} [OPTIONS] FILE [user@]hostname[:FILE]
+  Usage: ${0##*/} [OPTIONS] FILE [user@]hostname[:FILE]
 
     There is an extra roundtrip to the remote system
     to check for the existence of the file to be diffed.
@@ -90,8 +90,8 @@ EOF
 }
 
 if [[ -z $1 || $1 == "--help" ]]; then
-    usage
-    exit 1
+  usage
+  exit 1
 fi
 
 if ! [[ $# -ge 2 ]]; then
@@ -116,11 +116,11 @@ function show_header() {
 
 function login_successful_and_remote_file_exists() {
 
-    if [[ -z "${username}" ]]; then
-        ssh "${ssh_params[@]}" $remote_host "test -e $remote_file" &> /dev/null
-    else
-        ssh "${ssh_params[@]}" $username@$remote_host "test -e $remote_file"  &> /dev/null
-    fi
+  if [[ -z "${username}" ]]; then
+    ssh "${ssh_params[@]}" $remote_host "test -e $remote_file" &> /dev/null
+  else
+    ssh "${ssh_params[@]}" $username@$remote_host "test -e $remote_file" &> /dev/null
+  fi
 
     RETVAL=$?
 
