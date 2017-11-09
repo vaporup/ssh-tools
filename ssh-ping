@@ -9,6 +9,7 @@
 #  |                Outputs 'Pong from' when server is reachable and login was successful |
 #  |                                                                                      |
 #  | Author       : Sven Wick <sven.wick@gmx.de>                                          |
+#  | Contributors : Denis Meiswinkel                                                      |
 #  | URL          : https://github.com/vaporup/ssh-tools                                  |
 #  |                                                                                      |
 #  | Based On     : https://unix.stackexchange.com/a/30146/247383                         |
