@@ -6,6 +6,7 @@
 #  | Description  : Diff a file over SSH                                                               |
 #  |                                                                                                   |
 #  | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
+#  | Contributors : Denis Meiswinkel                                                                   |
 #  | URL          : https://github.com/vaporup/ssh-tools                                               |
 #  |                                                                                                   |
 #  | Based On     : https://gist.github.com/jhqv/dbd59f5838ae8c83f736bfe951bd80ff                      |
@@ -235,7 +236,7 @@ else
   remote_host=${remote_part}
 fi
 
-local_file=`readlink -f $local_filename` # get absolute path to file in case it was relative
+local_file=$(readlink -f $local_filename) # get absolute path to file in case it was relative
 
 if [[ -z "$local_file" ]]; then
   echo -e "\n  ${RED}Error: Given file not found${RESET}\n" >&2
