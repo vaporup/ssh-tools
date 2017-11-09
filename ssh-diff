@@ -40,7 +40,7 @@ function usage() {
 
 cat << EOF
 
-  Usage: ${0##*/} [options] filename [user@]host[:filename]
+  Usage: ${0##*/} [OPTIONS] FILE [user@]hostname[:FILE]
 
   There is an extra roundtrip to the remote system
   to check for the existence of the file to be diffed.

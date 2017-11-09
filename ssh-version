@@ -29,7 +29,7 @@ function usage() {
 
 cat << EOF
 
-  Usage: ${0##*/} host
+  Usage: ${0##*/} hostname
 
 EOF
 

@@ -75,7 +75,7 @@ function usage() {
 
 cat << EOF
 
-  Usage: ${0##*/} options [user@]host
+  Usage: ${0##*/} [OPTIONS] [user@]hostname
 
   OPTIONS:
 
