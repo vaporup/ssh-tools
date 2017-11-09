@@ -1,6 +1,7 @@
 
 ![](https://img.shields.io/badge/uses-ssh-blue.svg?style=flat-square)
 ![](https://img.shields.io/badge/license-gpl--3-brightgreen.svg?style=flat-square)
+![](https://img.shields.io/badge/status-stable-ff69b4.svg?style=flat-square)
 
 ssh-ping
 ========
