@@ -5,8 +5,8 @@
 #  |                                                                                  |
 #  | Description  : Get some facts about the remote system                            |
 #  |                                                                                  |
-#  | Author       : Sven Wick                                                         |
-#  | Email        : sven.wick@gmx.de                                                  |
+#  | Author       : Sven Wick <sven.wick@gmx.de>                                      |
+#  | Contributors : Denis Meiswinkel                                                  |
 #  | URL          : https://github.com/vaporup/ssh-tools                              |
 #  |                                                                                  |
 #  | Based On     : https://github.com/ungleich/cdist/tree/master/cdist/conf/explorer |
@@ -21,6 +21,7 @@
 function usage() {
 
 cat << EOF
+
     Usage: ${0##*/} [user@]host
 
     For further processing of the data you can use standard shell tools like awk, grep, sed

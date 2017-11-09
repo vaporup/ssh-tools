@@ -5,8 +5,7 @@
 #  |                                                                                                   |
 #  | Description  : Diff a file over SSH                                                               |
 #  |                                                                                                   |
-#  | Author       : Sven Wick                                                                          |
-#  | Email        : sven.wick@gmx.de                                                                   |
+#  | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
 #  | URL          : https://github.com/vaporup/ssh-tools                                               |
 #  |                                                                                                   |
 #  | Based On     : https://gist.github.com/jhqv/dbd59f5838ae8c83f736bfe951bd80ff                      |
