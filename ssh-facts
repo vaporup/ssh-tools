@@ -21,6 +21,7 @@
 function usage() {
 
 cat << EOF
+
     Usage: ${0##*/} [user@]host
 
     For further processing of the data you can use standard shell tools like awk, grep, sed

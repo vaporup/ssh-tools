@@ -24,7 +24,7 @@ trap print_statistics SIGINT
 #
 
 if [[ "$OSTYPE" == openbsd* ]]; then
-  TERM=linux    # https://github.com/rvm/rvm/issues/727
+    TERM=linux # https://github.com/rvm/rvm/issues/727
 fi
 
   BLACK=$(tput setaf 0)
@@ -76,88 +76,87 @@ function usage() {
 
 cat << EOF
 
-  Usage: ${0##*/} options [user@]host
+    Usage: ${0##*/} options [user@]host
 
-  OPTIONS:
-
-  -4             Use IPv4 only
-  -6             Use IPv6 only
-  -c count       Stop after sending <count> request packets
-  -F configfile  Specifies an alternative per-user configuration file.
-                 If a configuration file is given on the command line,
-                 the system-wide configuration file ( /etc/ssh/ssh_config ) will be ignored.
-                 The default for the per-user configuration file is ~/.ssh/config.
-  -h             Show this message
-  -i interval    Wait <interval> seconds between sending each request.
-                 The default is 1 second.
-  -l user        Try login with <user> as username. The default is \$USER.
-  -D             Print timestamp (unix time + microseconds as in gettimeofday) before each line
-  -W timeout     Time to wait for a response, in seconds
-  -p port        Port to connect to on the remote host.
-                 This can be specified on a per-host basis in the configuration file.
-  -q             Quiet output.
-                 Nothing is displayed except the summary lines at startup time and when finished
-  -v             Verbose output
+    OPTIONS:
+        -4             Use IPv4 only
+        -6             Use IPv6 only
+        -c count       Stop after sending <count> request packets
+        -F configfile  Specifies an alternative per-user configuration file.
+                       If a configuration file is given on the command line,
+                       the system-wide configuration file ( /etc/ssh/ssh_config ) will be ignored.
+                       The default for the per-user configuration file is ~/.ssh/config.
+        -h             Show this message
+        -i interval    Wait <interval> seconds between sending each request.
+                       The default is 1 second.
+        -l user        Try login with <user> as username. The default is \$USER.
+        -D             Print timestamp (unix time + microseconds as in gettimeofday) before each line
+        -W timeout     Time to wait for a response, in seconds
+        -p port        Port to connect to on the remote host.
+                       This can be specified on a per-host basis in the configuration file.
+        -q             Quiet output.
+                       Nothing is displayed except the summary lines at startup time and when finished
+        -v             Verbose output
 
 EOF
 
 }
 
 if [[ -z $1 || $1 == "--help" ]]; then
-  usage
-  exit 1;
+    usage
+    exit 1;
 fi
 
 function command_exists() {
 
-  command -v ${1} >/dev/null 2>&1
+    command -v ${1} >/dev/null 2>&1
 
 }
 
 function get_timestamp() {
 
-  if [[ "$OSTYPE" == "linux-gnu" ]]; then
-    date +%s.%6N
-  else
-    command_exists python && python -c 'import time; ms = time.time() ; print "%.6f" % ms'
-  fi
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        date +%s.%6N
+    else
+        command_exists python && python -c 'import time; ms = time.time() ; print "%.6f" % ms'
+    fi
 
 }
 
 function get_request_timestamp() {
 
-  if [[ "$OSTYPE" == "linux-gnu" ]]; then
-    date +%s%3N
-  else
-    command_exists python && python -c 'import time; ms = int(round(time.time() * 1000)) ; print ms'
-  fi
+    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        date +%s%3N
+    else
+        command_exists python && python -c 'import time; ms = int(round(time.time() * 1000)) ; print ms'
+    fi
 
 }
 
 function print_statistics() {
 
-  [[ $requests_transmitted -eq 0 ]] && exit
+    [[ $requests_transmitted -eq 0 ]] && exit
 
-  requests_loss=$(( 100 * requests_lost / requests_transmitted ))
+    requests_loss=$(( 100 * requests_lost / requests_transmitted ))
 
-  echo
-  echo "${WHITE}---${RESET} ${YELLOW}$host${RESET} ${WHITE}ping statistics${RESET} ${WHITE}---${RESET}"
+    echo ""
+    echo "${WHITE}---${RESET} ${YELLOW}$host${RESET} ${WHITE}ping statistics${RESET} ${WHITE}---${RESET}"
 
-  statistics_ok="${GREEN}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
-  statistics_ok+="${GREEN}$requests_received${RESET} ${WHITE}requests received${RESET}, "
-  statistics_ok+="${GREEN}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+    statistics_ok="${GREEN}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
+    statistics_ok+="${GREEN}$requests_received${RESET} ${WHITE}requests received${RESET}, "
+    statistics_ok+="${GREEN}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
 
-  statistics_warn="${YELLOW}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
-  statistics_warn+="${YELLOW}$requests_received${RESET} ${WHITE}requests received${RESET}, "
-  statistics_warn+="${YELLOW}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+    statistics_warn="${YELLOW}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
+    statistics_warn+="${YELLOW}$requests_received${RESET} ${WHITE}requests received${RESET}, "
+    statistics_warn+="${YELLOW}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
 
-  statistics_crit="${RED}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
-  statistics_crit+="${RED}$requests_received${RESET} ${WHITE}requests received${RESET}, "
-  statistics_crit+="${RED}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+    statistics_crit="${RED}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
+    statistics_crit+="${RED}$requests_received${RESET} ${WHITE}requests received${RESET}, "
+    statistics_crit+="${RED}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
 
-  [[ $requests_loss -eq 100 ]] &&  echo "$statistics_crit" && exit
-  [[ $requests_loss -gt   1 ]] &&  echo "$statistics_warn" && exit
-  [[ $requests_loss -eq   0 ]] &&  echo "$statistics_ok"   && exit
+    [[ $requests_loss -eq 100 ]] &&  echo "$statistics_crit" && exit
+    [[ $requests_loss -gt   1 ]] &&  echo "$statistics_warn" && exit
+    [[ $requests_loss -eq   0 ]] &&  echo "$statistics_ok"   && exit
 
 }
 
@@ -166,51 +165,51 @@ function print_statistics() {
 #
 
 while getopts ":46c:F:hi:l:Dp:vW:q" opt; do
-  case ${opt} in
-     4 )
-       SSH_FLAGS+=("-4")
-       ;;
-     6 )
-       SSH_FLAGS+=("-6")
-       ;;
-     c )
-       [[ $OPTARG =~ ^[0-9]+$ ]] && ping_count=$OPTARG
-       ;;
-     F )
-       SSH_FLAGS+=("-F")
-       SSH_FLAGS+=("$OPTARG")
-       ;;
-     h )
-       usage
-       exit 1
-       ;;
-     i )
-       ping_interval=$OPTARG
-       ;;
-     l )
-       SSH_FLAGS+=("-l") && SSH_FLAGS+=("$OPTARG")
-       ;;
-     D )
-       print_timestamp="yes"
-       ;;
-     p )
-       [[ $OPTARG =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p") && SSH_FLAGS+=("$OPTARG")
-       ;;
-     v )
-       verbose="yes"
-       ;;
-     W )
-       [[ $OPTARG =~ ^[0-9]+$ ]] && connect_timeout=$OPTARG
-       ;;
-     q )
-       quiet="yes"
-       ;;
-    \? )
-       echo "Invalid option: $OPTARG" 1>&2
-       usage
-       exit 1
-      ;;
-  esac
+    case ${opt} in
+        4 )
+            SSH_FLAGS+=("-4")
+        ;;
+        6 )
+            SSH_FLAGS+=("-6")
+        ;;
+        c )
+            [[ $OPTARG =~ ^[0-9]+$ ]] && ping_count=$OPTARG
+        ;;
+        F )
+            SSH_FLAGS+=("-F")
+            SSH_FLAGS+=("$OPTARG")
+        ;;
+        h )
+            usage
+            exit 1
+        ;;
+        i )
+            ping_interval=$OPTARG
+        ;;
+        l )
+            SSH_FLAGS+=("-l") && SSH_FLAGS+=("$OPTARG")
+        ;;
+        D )
+            print_timestamp="yes"
+        ;;
+        p )
+            [[ $OPTARG =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p") && SSH_FLAGS+=("$OPTARG")
+        ;;
+        v )
+            verbose="yes"
+        ;;
+        W )
+            [[ $OPTARG =~ ^[0-9]+$ ]] && connect_timeout=$OPTARG
+        ;;
+        q )
+            quiet="yes"
+        ;;
+        \? )
+            echo "Invalid option: $OPTARG" 1>&2
+            usage
+            exit 1
+        ;;
+    esac
 done
 
 shift $((OPTIND - 1))
@@ -228,10 +227,10 @@ SSH_OPTS+=( -o ConnectTimeout=$connect_timeout )
 #
 
 if [[ $1 == *"@"* ]]; then
-  host=$( echo ${1##*@} )
-  username=$( echo ${1%%@*} )
+    host=$( echo ${1##*@} )
+    username=$( echo ${1%%@*} )
 else
-  host=${1}
+    host=${1}
 fi
 
 [[ -z "${host}" ]] && { echo -e "\n  ${RED}Error: No target host given${RESET}" ; usage; exit 1; }
@@ -243,69 +242,68 @@ fi
 echo "${BOLD}SSHPING${RESET} ${YELLOW}${host}${RESET}"
 
 if [[ ${verbose} == yes ]]; then
-  echo -n "${BLUE}"
-  echo "SSH_FLAGS: ${SSH_FLAGS[@]}"
-  echo "SSH_OPTS: ${SSH_OPTS[@]}"
-  echo -n "${RESET}"
+    echo -n "${BLUE}"
+    echo "SSH_FLAGS: ${SSH_FLAGS[@]}"
+    echo "SSH_OPTS: ${SSH_OPTS[@]}"
+    echo -n "${RESET}"
 fi
 
 command_exists python || echo "${YELLOW}WARNING:${RESET} No python found. Unable to measure time (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
 
 while true; do
 
-  #
-  # ping only $count times or forever if $count = 0
-  #
+    #
+    # ping only $count times or forever if $count = 0
+    #
 
-  [[ ${ping_count} -gt 0 ]] && [[ ${ssh_seq} -gt ${ping_count} ]] && break
+    [[ ${ping_count} -gt 0 ]] && [[ ${ssh_seq} -gt ${ping_count} ]] && break
 
-  #
-  # unix time + microseconds as in gettimeofday - used for -D option
-  #
+    #
+    # unix time + microseconds as in gettimeofday - used for -D option
+    #
 
-  timestamp=$( get_timestamp )
+    timestamp=$( get_timestamp )
 
-  #
-  # Doing the actual request and measure its execution time
-  #
+    #
+    # Doing the actual request and measure its execution time
+    #
 
-  start_request=$( get_request_timestamp )
+    start_request=$( get_request_timestamp )
 
-  if [[ -z "${username}" ]]; then
-    status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
-  else
-    status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
-  fi
+    if [[ -z "${username}" ]]; then
+        status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+    else
+        status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+    fi
 
-  end_request=$( get_request_timestamp )
+    end_request=$( get_request_timestamp )
+    time_request=$((end_request-start_request))
 
-  time_request=$((end_request-start_request))
+    #
+    # Output "Pong"  if request succeeded by login in and echoing back our string
+    # Output "Reply" if the SSH server is at least talking to us but login was denied
+    #
 
-  #
-  # Output "Pong"  if request succeeded by login in and echoing back our string
-  # Output "Reply" if the SSH server is at least talking to us but login was denied
-  #
+    if [[ $status == pong ]]; then
+        requests_received=$(( requests_received + 1 ))
+        [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
+        [[ ${quiet} == no ]] && echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+    elif [[ $status == denied || $status == sftp ]]; then
+        requests_received=$(( requests_received + 1 ))
+        [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
+        [[ ${quiet} == no ]] && echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+    else
+        requests_lost=$(( requests_lost + 1 ))
+    fi
 
-  if [[ $status == pong ]]; then
-    requests_received=$(( requests_received + 1 ))
-    [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
-    [[ ${quiet} == no ]] && echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
-  elif [[ $status == denied || $status == sftp ]]; then
-    requests_received=$(( requests_received + 1 ))
-    [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
-    [[ ${quiet} == no ]] && echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
-  else
-    requests_lost=$(( requests_lost + 1 ))
-  fi
+    requests_transmitted=$ssh_seq
+    ssh_seq=$(( ssh_seq + 1 ))
 
-  requests_transmitted=$ssh_seq
-  ssh_seq=$(( ssh_seq + 1))
+    #
+    # Don't sleep if we do just 1 request
+    #
 
-  #
-  # Don't sleep if we do just 1 request
-  #
-
-  [[ ${ping_count} -eq 1 ]] || sleep ${ping_interval}
+    [[ ${ping_count} -eq 1 ]] || sleep ${ping_interval}
 
 done
 
