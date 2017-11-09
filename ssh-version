@@ -29,15 +29,15 @@ function usage() {
 
 cat << EOF
 
-  Usage: ${0##*/} hostname
+    Usage: ${0##*/} hostname
 
 EOF
 
 }
 
 if [[ -z $1 || $1 == "--help" ]]; then
-  usage
-  exit 1
+    usage
+    exit 1
 fi
 
 if [[ $1 == *"@"* ]]; then
