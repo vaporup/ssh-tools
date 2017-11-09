@@ -1,7 +1,6 @@
-<p>
-<img src="https://img.shields.io/badge/uses-ssh-blue.svg?style=flat-square">
-<img src="https://img.shields.io/badge/license-gpl--3-brightgreen.svg?style=flat-square">
-</p>
+
+![](https://img.shields.io/badge/uses-ssh-blue.svg?style=flat-square)
+![](https://img.shields.io/badge/license-gpl--3-brightgreen.svg?style=flat-square)
 
 ssh-ping
 ========
