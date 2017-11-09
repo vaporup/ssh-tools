@@ -1,7 +1,8 @@
-
-![](https://img.shields.io/badge/uses-ssh-blue.svg?style=flat-square)
-![](https://img.shields.io/badge/license-gpl--3-brightgreen.svg?style=flat-square)
-![](https://img.shields.io/badge/status-stable-ff69b4.svg?style=flat-square)
+<p align="center">
+  <img src="https://img.shields.io/badge/uses-ssh-blue.svg?style=flat-square"/>
+  <img src="https://img.shields.io/badge/license-gpl--3-brightgreen.svg?style=flat-square"/>
+  <img src="https://img.shields.io/badge/status-stable-ff69b4.svg?style=flat-square"/>
+</p>
 
 ssh-ping
 ========
