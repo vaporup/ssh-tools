@@ -1,3 +1,10 @@
+<p align="center">
+  <img src="https://img.shields.io/badge/uses-ssh-blue.svg?style=flat-square"/>
+  <img src="https://img.shields.io/badge/license-gpl--3-brightgreen.svg?style=flat-square"/>
+  <img src="https://img.shields.io/badge/status-stable-ff69b4.svg?style=flat-square"/>
+  <img src="https://img.shields.io/badge/implementation-bash / python-red.svg?style=flat-square"/>
+</p>
+
 ssh-ping
 ========
 Check if host is reachable using ssh_config

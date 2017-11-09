@@ -8,8 +8,7 @@
 #  |                Outputs 'Reply from' when server is reachable but login failed        |
 #  |                Outputs 'Pong from' when server is reachable and login was successful |
 #  |                                                                                      |
-#  | Author       : Sven Wick                                                             |
-#  | Email        : sven.wick@gmx.de                                                      |
+#  | Author       : Sven Wick <sven.wick@gmx.de>                                          |
 #  | URL          : https://github.com/vaporup/ssh-tools                                  |
 #  |                                                                                      |
 #  | Based On     : https://unix.stackexchange.com/a/30146/247383                         |
@@ -76,9 +75,10 @@ function usage() {
 
 cat << EOF
 
-    Usage: ${0##*/} options [user@]host
+    Usage: ${0##*/} [OPTIONS] [user@]hostname
 
     OPTIONS:
+
         -4             Use IPv4 only
         -6             Use IPv6 only
         -c count       Stop after sending <count> request packets
@@ -104,7 +104,7 @@ EOF
 
 if [[ -z $1 || $1 == "--help" ]]; then
     usage
-    exit 1;
+    exit 1
 fi
 
 function command_exists() {

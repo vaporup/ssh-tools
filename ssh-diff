@@ -5,8 +5,8 @@
 #  |                                                                                                   |
 #  | Description  : Diff a file over SSH                                                               |
 #  |                                                                                                   |
-#  | Author       : Sven Wick                                                                          |
-#  | Email        : sven.wick@gmx.de                                                                   |
+#  | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
+#  | Contributors : Denis Meiswinkel                                                                   |
 #  | URL          : https://github.com/vaporup/ssh-tools                                               |
 #  |                                                                                                   |
 #  | Based On     : https://gist.github.com/jhqv/dbd59f5838ae8c83f736bfe951bd80ff                      |
@@ -40,7 +40,7 @@ function usage() {
 
 cat << EOF
 
-    Usage: ${0##*/} [options] filename [user@]host[:filename]
+    Usage: ${0##*/} [OPTIONS] FILE [user@]hostname[:FILE]
 
     There is an extra roundtrip to the remote system
     to check for the existence of the file to be diffed.
