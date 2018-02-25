@@ -1,0 +1,3 @@
+debian export-ignore
+demos export-ignore
+README.md export-ignore
