@@ -2,8 +2,8 @@ Source: ssh-tools
 Section: utils
 Priority: optional
 Maintainer: Sven Wick <sven.wick@gmx.de>
-Build-Depends: debhelper (>= 9), help2man
-Standards-Version: 4.0.1
+Build-Depends: debhelper (>= 11), help2man
+Standards-Version: 4.1.3
 Homepage: https://github.com/vaporup/ssh-tools/
 Vcs-Browser: https://github.com/vaporup/ssh-tools
 Vcs-Git: https://github.com/vaporup/ssh-tools.git
@@ -13,7 +13,8 @@ Architecture: all
 Depends: ${misc:Depends}, openssh-client
 Recommends: colordiff
 Suggests: jo, jq
-Description: ssh-ping, ssh-version, ssh-diff, ssh-facts
+Description: collection of various tools using ssh
+ .
  * ssh-ping: check if host is reachable using ssh_config
  .
    Outputs *Reply from* when server is reachable but login failed

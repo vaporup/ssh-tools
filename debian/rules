@@ -3,9 +3,6 @@
 %:
 	dh $@
 
-override_dh_builddeb:
-	dh_builddeb -- -Zgzip
-
 override_dh_auto_build:
 	help2man -n "check if host is reachable using ssh_config"           -S SSH-TOOLS -N --version-string " " -o    $(CURDIR)/ssh-ping.1 $(CURDIR)/ssh-ping
 	help2man -n "shows version of the SSH server you are connecting to" -S SSH-TOOLS -N --version-string " " -o $(CURDIR)/ssh-version.1 $(CURDIR)/ssh-version
