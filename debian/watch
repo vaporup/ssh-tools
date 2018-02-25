@@ -1,0 +1,2 @@
+version=4
+https://github.com/vaporup/ssh-tools/releases /vaporup/ssh-tools/archive/v(.+).tar.gz
