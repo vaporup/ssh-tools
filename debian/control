@@ -12,7 +12,6 @@ Package: ssh-tools
 Architecture: all
 Depends: ${misc:Depends}, openssh-client
 Recommends: colordiff
-Suggests: jo, jq
 Description: collection of various tools using ssh
  .
  * ssh-ping: check if host is reachable using ssh_config
@@ -21,5 +20,5 @@ Description: collection of various tools using ssh
    Outputs *Pong from* when server is reachable and login was successful
  .
  * ssh-version: shows version of the SSH server you are connecting to
- * ssh-diff: Diff a file over SSH 
+ * ssh-diff: Diff a file over SSH
  * ssh-facts: Get some facts about the remote system
