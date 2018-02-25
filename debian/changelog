@@ -1,52 +1,5 @@
 ssh-tools (1.4-1) unstable; urgency=medium
 
-  * New Upstream Release
-    - added "uptime" and "last_reboot" to ssh-facts
-    - minor fixes
-    - improved documentation
-  * debian/compat
-    - changed from 9 to 10
-  * debian/control
-    - added "jo" and "jq" to Suggests
+  * Initial release (Closes: #891182)
 
- -- Sven Wick <sven.wick@gmx.de>  Sun, 04 Feb 2018 20:02:46 +0100
-
-ssh-tools (1.3-1) unstable; urgency=medium
-
-  * New Upstream Release
-    - better OpenBSD support
-    - consistent code formatting and better output
-    - more robustness
-    - portable to older Bash versions
-    - manpages
-    - changed license from AGPL-3 to GPL-3 and added debian/copyright
-  * debian/control
-    - changed Section from 'net' to 'utils'
-    - changed Priority from 'extra' to 'optional'
-    - added 'help2man' to Build-Depends to create the manpages
-    - added 'openssh-client' to Depends because without ssh client nothing works
-    - added 'ssh-diff' and 'ssh-facts' to Description
-  * debian/rules
-    - override_dh_builddeb to build data.tar.gz instead of data.tar.xz
-      for older systems like Debian Lenny etc...
-    - override_dh_auto_build to create manpages via help2man
-
- -- Sven Wick <sven.wick@gmx.de>  Tue, 03 Oct 2017 22:46:31 +0200
-
-ssh-tools (1.2-1) unstable; urgency=medium
-
-  * New Upstream Release
-  * New Tools
-
-     ssh-diff  - Diff a file over SSH
-     ssh-facts - Get some facts about the remote system
-
-  * ssh-ping works now under OSX
-
- -- Sven Wick <sven.wick@gmx.de>  Sun, 03 Sep 2017 21:27:22 +0200
-
-ssh-tools (1.1-1) unstable; urgency=medium
-
-  * Initial release.
-
- -- Sven Wick <sven.wick@gmx.de>  Thu, 24 Aug 2017 01:17:04 +0200
+ -- Sven Wick <sven.wick@gmx.de>  Sun, 25 Feb 2018 22:43:01 +0100
