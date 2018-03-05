@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+remote_host=$1
+
+fingerprint_hashes=( md5 sha256 )
+
+function get_fingerprints () {
+
+  hash_type=$1
+
+  ssh-keygen -E $hash_type -qlf <(ssh-keyscan $remote_host 2>/dev/null) | while IFS= read -r line; do
+    key_data=( $(printf '%s\n' "$line") )
+    key_size=${key_data[0]}
+    key_hash=${key_data[1]}
+    key_remote_host=${key_data[2]}
+    key_type=${key_data[3]}
+    key_hash_type="${key_hash%%:*}"
+    key_hash_data="${key_hash#*:}"
+    printf "%10s\t%10s\t%s\n" $key_type $key_hash_type $key_hash_data
+  done
+
+}
+
+for fingerprint_hash in ${fingerprint_hashes[@]}; do
+
+  get_fingerprints $fingerprint_hash
+
+done | sort
