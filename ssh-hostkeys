@@ -9,7 +9,7 @@ MAGENTA=$(tput setaf 5)
    CYAN=$(tput setaf 6)
   WHITE=$(tput setaf 7)
    BOLD=$(tput bold   )
-RESET=$(tput sgr0   )
+  RESET=$(tput sgr0   )
 
 remote_host=$1
 
@@ -20,6 +20,7 @@ function get_fingerprints () {
   hash_type=$1
 
   ssh-keygen -E $hash_type -qlf <(ssh-keyscan $remote_host 2>/dev/null) | while IFS= read -r line; do
+
     key_data=( $(printf '%s\n' "$line") )
     key_size=${key_data[0]}
     key_hash=${key_data[1]}
