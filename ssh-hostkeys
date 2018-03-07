@@ -32,10 +32,6 @@ function get_fingerprints () {
 
 }
 
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-printf "${BOLD}%10s\t%10s\t%10s\t%s${RESET}\n" "KEY_TYPE" "KEY_SIZE" "HASH_TYPE" "FINGERPRINT"
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-
 for fingerprint_hash in ${fingerprint_hashes[@]}; do
 
   get_fingerprints $fingerprint_hash
