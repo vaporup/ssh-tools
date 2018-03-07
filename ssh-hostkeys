@@ -26,29 +26,7 @@ function get_fingerprints () {
     key_hash_type="${key_hash%%:*}"
     key_hash_data="${key_hash#*:}"
 
-    if [[ $key_type == *"DSA"* ]]; then
-
-      if [[ $key_type == *"ECDSA"* ]]; then
     printf "${BOLD}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-        continue
-      else
-    printf "${BOLD}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-        continue
-      fi
-    fi
-
-    if [[ $key_type == *"RSA"* ]]; then
-    printf "${BOLD}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-       continue
-    fi
-
-    if [[ $key_type == *"ED25519"* ]]; then
-    printf "${BOLD}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-       continue
-    else
-    printf "${BOLD}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-       continue
-    fi
 
   done
 
