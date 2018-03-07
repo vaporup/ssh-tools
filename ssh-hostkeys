@@ -13,13 +13,18 @@ MAGENTA=$(tput setaf 5)
 
 remote_host=$1
 
+the_hostkeys=$( mktemp /tmp/ssh-hostkeys.XXXXXX )
+trap "rm -f $the_hostkeys" EXIT
+
+ssh-keyscan $remote_host > $the_hostkeys 2>/dev/null
+
 fingerprint_hashes=( md5 sha256 )
 
 function get_fingerprints () {
 
   hash_type=$1
 
-  ssh-keygen -E $hash_type -qlf <(ssh-keyscan $remote_host 2>/dev/null) | while IFS= read -r line; do
+  ssh-keygen -E $hash_type -qlf $the_hostkeys | while IFS= read -r line; do
 
     key_data=( $(printf '%s\n' "$line") )
     key_size=${key_data[0]}
