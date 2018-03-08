@@ -1,17 +1,11 @@
 #!/usr/bin/env bash
 
-  BLACK=$(tput setaf 0)
-    RED=$(tput setaf 1)
-  GREEN=$(tput setaf 2)
- YELLOW=$(tput setaf 3)
-   BLUE=$(tput setaf 4)
-MAGENTA=$(tput setaf 5)
-   CYAN=$(tput setaf 6)
-  WHITE=$(tput setaf 7)
-   BOLD=$(tput bold   )
-  RESET=$(tput sgr0   )
-
 remote_host=$1
+
+the_hostkeys=$( mktemp /tmp/ssh-hostkeys.XXXXXX )
+trap "rm -f $the_hostkeys" EXIT
+
+ssh-keyscan $remote_host > $the_hostkeys 2>/dev/null
 
 fingerprint_hashes=( md5 sha256 )
 
@@ -19,7 +13,7 @@ function get_fingerprints () {
 
   hash_type=$1
 
-  ssh-keygen -E $hash_type -qlf <(ssh-keyscan $remote_host 2>/dev/null) | while IFS= read -r line; do
+  ssh-keygen -E $hash_type -qlf $the_hostkeys | while IFS= read -r line; do
 
     key_data=( $(printf '%s\n' "$line") )
     key_size=${key_data[0]}
@@ -29,37 +23,11 @@ function get_fingerprints () {
     key_hash_type="${key_hash%%:*}"
     key_hash_data="${key_hash#*:}"
 
-    if [[ $key_type == *"DSA"* ]]; then
-
-      if [[ $key_type == *"ECDSA"* ]]; then
-        printf "${MAGENTA}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-        continue
-      else
-        printf "${YELLOW}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-        continue
-      fi
-    fi
-
-    if [[ $key_type == *"RSA"* ]]; then
-       printf "${GREEN}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-       continue
-    fi
-
-    if [[ $key_type == *"ED25519"* ]]; then
-       printf "${CYAN}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-       continue
-    else
-       printf "${WHITE}%10s\t%10s\t%10s\t%s${RESET}\n" $key_type $key_size $key_hash_type $key_hash_data
-       continue
-    fi
+    printf "%10s%6s%8s %s\n" $key_type $key_size $key_hash_type $key_hash_data
 
   done
 
 }
-
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
-printf "${BOLD}%10s\t%10s\t%10s\t%s${RESET}\n" "KEY_TYPE" "KEY_SIZE" "HASH_TYPE" "FINGERPRINT"
-printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
 
 for fingerprint_hash in ${fingerprint_hashes[@]}; do
 
