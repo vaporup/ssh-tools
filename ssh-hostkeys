@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 #  +---------------------------------------------------------------------------------------------------+
-#  | Title        : ssh-hostkey                                                                        |
+#  | Title        : ssh-hostkeys                                                                       |
 #  |                                                                                                   |
 #  | Description  : prints server host keys in several formats                                         |
 #  |                                                                                                   |
