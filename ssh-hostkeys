@@ -12,12 +12,69 @@
 #  | Based On     : https://unix.stackexchange.com/questions/126908/get-ssh-server-key-fingerprint     |
 #  +---------------------------------------------------------------------------------------------------+
 
+#
+# Usage/Help message
+#
+
+function usage() {
+
+cat << EOF
+    Usage: ${0##*/} [OPTIONS] hostname
+    OPTIONS:
+        -4             Use IPv4 only
+        -6             Use IPv6 only
+        -h             Show this message
+        -T timeout     Time to wait for a response, in seconds
+        -p port        Port to connect to on the remote host.
+EOF
+
+}
+
+if [[ -z $1 || $1 == "--help" ]]; then
+    usage
+    exit 1
+fi
+
+#
+# Command line Options
+#
+
+SSH_FLAGS=()
+
+while getopts ":46hp:T:" opt; do
+    case ${opt} in
+        4 )
+            SSH_FLAGS+=("-4")
+        ;;
+        6 )
+            SSH_FLAGS+=("-6")
+        ;;
+        h )
+            usage
+            exit 1
+        ;;
+        p )
+            [[ $OPTARG =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p") && SSH_FLAGS+=("$OPTARG")
+        ;;
+        T )
+            SSH_FLAGS+=("-T") && SSH_FLAGS+=("$OPTARG")
+        ;;
+        \? )
+            echo "Invalid option: $OPTARG" 1>&2
+            usage
+            exit 1
+        ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
 remote_host=$1
 
 the_hostkeys=$( mktemp /tmp/ssh-hostkeys.XXXXXX )
 trap "rm -f $the_hostkeys" EXIT
 
-ssh-keyscan $remote_host > $the_hostkeys 2>/dev/null
+ssh-keyscan "${SSH_FLAGS[@]}" $remote_host > $the_hostkeys 2>/dev/null
 
 fingerprint_hashes=( md5 sha256 )
 
