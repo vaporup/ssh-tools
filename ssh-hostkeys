@@ -3,7 +3,7 @@
 #  +---------------------------------------------------------------------------------------------------+
 #  | Title        : ssh-hostkeys                                                                       |
 #  |                                                                                                   |
-#  | Description  : prints server host keys in several formats                                         |
+#  | Description  : Prints server host keys in several formats                                         |
 #  |                                                                                                   |
 #  | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
 #  | Contributors : Geert Stappers <https://github.com/stappersg>                                      |

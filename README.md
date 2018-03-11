@@ -34,7 +34,7 @@ Get some facts about the remote system
 
 ssh-hostkeys
 ============
-prints server host keys in several formats
+Prints server host keys in several formats
 
   ~~~~
    $ ssh-hostkeys remote_host
