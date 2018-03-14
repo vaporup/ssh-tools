@@ -19,13 +19,16 @@
 function usage() {
 
 cat << EOF
+
     Usage: ${0##*/} [OPTIONS] hostname
+
     OPTIONS:
         -4             Use IPv4 only
         -6             Use IPv6 only
         -h             Show this message
         -T timeout     Time to wait for a response, in seconds
         -p port        Port to connect to on the remote host.
+
 EOF
 
 }

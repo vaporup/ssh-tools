@@ -17,5 +17,6 @@ Description: collection of various tools using ssh
  .
   * ssh-ping: check if host is reachable using ssh_config
   * ssh-version: shows version of the SSH server you are connecting to
-  * ssh-diff: Diff a file over SSH
-  * ssh-facts: Get some facts about the remote system
+  * ssh-diff: diff a file over SSH
+  * ssh-facts: get some facts about the remote system
+  * ssh-hostkeys: prints server host keys in several formats
