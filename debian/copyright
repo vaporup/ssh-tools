@@ -4,14 +4,14 @@ Source: <https://github.com/vaporup/ssh-tools>
 
 Files: *
 Copyright: 2017 Sven Wick <sven.wick@gmx.de>
-License: GPL-3+
+License: GPL-3
 
 Files: ssh-hostkeys
 Copyright: 2018 Sven Wick <sven.wick@gmx.de>
            2018 Geert Stappers <https://github.com/stappersg>
-License: GPL-3+
+License: GPL-3
 
-License: GPL-3+
+License: GPL-3
  This package is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
  the Free Software Foundation; either version 3 of the License, or
