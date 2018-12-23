@@ -2,3 +2,4 @@ ssh-ping.1
 ssh-version.1
 ssh-diff.1
 ssh-facts.1
+ssh-hostkeys.1
