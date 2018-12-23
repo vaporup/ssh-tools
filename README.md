@@ -46,12 +46,3 @@ Prints server host keys in several formats
       (RSA)  2048     MD5 8b:37:63:cd:58:fd:9c:18:93:08:3a:4c:84:64:87:91
       (RSA)  2048  SHA256 WkOzD8BaeljejgTTAwECkByyb4kHdI0pnJB2/gcS1Lk
   ~~~~
-
-### Building and Installing the Debian Package
-  ~~~~
-  # apt-get install build-essential debhelper help2man
-
-  $ dpkg-buildpackage -us -uc
-
-  # dpkg -i ../ssh-tools_<version>_all.deb
-  ~~~~

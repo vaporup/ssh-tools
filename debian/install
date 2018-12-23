@@ -1,5 +1,0 @@
-ssh-ping	usr/bin
-ssh-version	usr/bin
-ssh-diff	usr/bin
-ssh-facts	usr/bin
-ssh-hostkeys	usr/bin
