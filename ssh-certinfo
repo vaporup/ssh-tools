@@ -50,7 +50,7 @@ cat << EOF
 
         -c             show colors
         -h             Show this message
-        -w days        check days into the future (default: 30)
+        -w days        warning threshold (default: 30)
         -v             Verbose output
 
     Examples:
