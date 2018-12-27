@@ -1,0 +1,277 @@
+#!/usr/bin/env bash
+
+#  +--------------------------------------------------------------------------------------+
+#  | Title        : ssh-certinfo                                                          |
+#  |                                                                                      |
+#  | Description  : shows validity and information of SSH certificates                    |
+#  |                                                                                      |
+#  | Author       : Sven Wick <sven.wick@gmx.de>                                          |
+#  | URL          : https://github.com/vaporup/ssh-tools                                  |
+#  +--------------------------------------------------------------------------------------+
+
+
+#
+# Some colors for better output
+#
+
+if [[ "$OSTYPE" == openbsd* ]]; then
+    TERM=linux # https://github.com/rvm/rvm/issues/727
+fi
+
+  BLACK=$(tput setaf 0)
+    RED=$(tput setaf 1)
+  GREEN=$(tput setaf 2)
+ YELLOW=$(tput setaf 3)
+   BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+   CYAN=$(tput setaf 6)
+  WHITE=$(tput setaf 7)
+   BOLD=$(tput bold   )
+  RESET=$(tput sgr0   )
+
+#
+# Defaults
+#
+
+WARN=30                 # days before cert expires
+
+#
+# Usage/Help message
+#
+
+function usage() {
+
+cat << EOF
+
+    Usage: ${0##*/} [OPTIONS] CERT-FILE [...]
+
+    OPTIONS:
+
+        -c             show colors
+        -h             Show this message
+        -w days        check days into the future (default: 30)
+        -v             Verbose output
+
+    Examples:
+
+        Default:
+
+            ${0##*/} ~/.ssh/id_rsa-cert.pub
+
+            ${0##*/} ~/.ssh/*.pub
+
+        With Colors:
+
+            ${0##*/} -c ~/.ssh/id_rsa-cert.pub
+
+            ${0##*/} -c ~/.ssh/*.pub
+
+        Verbose:
+
+            ${0##*/} -v ~/.ssh/id_rsa-cert.pub
+
+            ${0##*/} -v ~/.ssh/*.pub
+
+        Verbose with Colors:
+
+            ${0##*/} -vc ~/.ssh/id_rsa-cert.pub
+
+            ${0##*/} -vc ~/.ssh/*.pub
+
+        Certificates which expire within the next 2 months (colored output):
+
+            ${0##*/} -c -w 60 ~/.ssh/id_rsa-cert.pub
+
+            ${0##*/} -c -w 60 ~/.ssh/*.pub
+
+EOF
+
+}
+
+if [[ -z $1 || $1 == "--help" ]]; then
+    usage
+    exit 1
+fi
+
+
+#
+# Command line Options
+#
+
+while getopts ":chvw:" opt; do
+    case ${opt} in
+        c )
+            colors="yes"
+        ;;
+        h )
+            usage
+            exit 1
+        ;;
+        v )
+            verbose="yes"
+        ;;
+        w )
+            [[ $OPTARG =~ ^[0-9]+$ ]] && WARN=$OPTARG
+        ;;
+        \? )
+            echo "Invalid option: $OPTARG" 1>&2
+            usage
+            exit 1
+        ;;
+    esac
+done
+
+now=$(date +%s)
+WARN_SECONDS=$(( WARN * 24 * 60 * 60))
+
+CERTS=( ${@:$OPTIND}  )
+
+echo
+
+for cert in "${CERTS[@]}"; do
+
+    valid=$(ssh-keygen -L -f "$cert" 2>/dev/null | grep -i valid)
+
+    [[ -z $valid ]] && continue
+
+    if [[ $valid == *"forever"* ]]; then
+        if [[ ${verbose} == yes ]]; then
+            if [[ ${colors} == yes ]]; then
+                echo "${GREEN}"
+                ssh-keygen -L -f "$cert"
+                echo "${RESET}"
+                continue
+            else
+                ssh-keygen -L -f "$cert"
+                echo
+                echo
+                continue
+            fi
+        else
+            if [[ ${colors} == yes ]]; then
+                echo "${GREEN}"
+                echo "$cert - SSH Cert valid ( forever )"
+                echo "${RESET}"
+                continue
+            else
+                echo "$cert - SSH Cert valid ( forever )"
+                continue
+            fi
+        fi
+    fi
+
+    valid_from=$(echo $valid | awk '{print $3}')
+    valid_from_epoch=$(date -d "$valid_from" +%s)
+    valid_to=$(echo $valid | awk '{print $5}')
+    valid_to_epoch=$(date -d "$valid_to" +%s)
+    valid_to_epoch_warning=$(( valid_to_epoch - WARN_SECONDS ))
+
+    expires_in_days=$((  WARN - ( ( now - valid_to_epoch_warning ) / 60 / 60 / 24 ) -1 ))
+
+    if [[ $now -lt $valid_from_epoch ]]; then
+
+        if [[ ${verbose} == yes ]]; then
+            if [[ ${colors} == yes ]]; then
+                echo "${YELLOW}"
+                ssh-keygen -L -f "$cert"
+                echo "${RESET}"
+                continue
+            else
+                ssh-keygen -L -f "$cert"
+                echo
+                echo
+                continue
+            fi
+        else
+            if [[ ${colors} == yes ]]; then
+                echo "${YELLOW}$cert - SSH Cert not valid yet ( $valid_from -> $valid_to )${RESET}"
+                continue
+            else
+                echo "$cert - SSH Cert not valid yet ( $valid_from -> $valid_to )"
+                continue
+            fi
+        fi
+    fi
+
+    if [[ $now -gt $valid_to_epoch ]]; then
+
+
+        if [[ ${verbose} == yes ]]; then
+            if [[ ${colors} == yes ]]; then
+                echo "${RED}"
+                ssh-keygen -L -f "$cert"
+                echo "${RESET}"
+                continue
+            else
+                ssh-keygen -L -f "$cert"
+                echo
+                echo
+                continue
+            fi
+        else
+            if [[ ${colors} == yes ]]; then
+                echo "${RED}$cert - SSH Cert expired ( $valid_from -> $valid_to )${RESET}"
+                continue
+            else
+                echo "$cert - SSH Cert expired ( $valid_from -> $valid_to )"
+                continue
+            fi
+        fi
+
+    fi
+
+    if [[ $now -gt $valid_to_epoch_warning ]]; then
+
+        if [[ ${verbose} == yes ]]; then
+            if [[ ${colors} == yes ]]; then
+                echo "${YELLOW}"
+                ssh-keygen -L -f "$cert"
+                echo "${RESET}"
+                continue
+            else
+                ssh-keygen -L -f "$cert"
+                echo
+                echo
+                continue
+            fi
+        else
+            if [[ ${colors} == yes ]]; then
+                echo "${YELLOW}$cert - SSH Cert expires in $expires_in_days day(s) ( $valid_from -> $valid_to )${RESET}"
+                continue
+            else
+                echo "$cert - SSH Cert expires in $expires_in_days day(s) ( $valid_from -> $valid_to )"
+                continue
+            fi
+        fi
+
+    fi
+
+    if [[ $now -gt $valid_from_epoch && $now -lt $valid_to_epoch ]]; then
+
+        if [[ ${verbose} == yes ]]; then
+            if [[ ${colors} == yes ]]; then
+                echo "${GREEN}"
+                ssh-keygen -L -f "$cert"
+                echo "${RESET}"
+                continue
+            else
+                ssh-keygen -L -f "$cert"
+                echo
+                echo
+                continue
+            fi
+        else
+            if [[ ${colors} == yes ]]; then
+                echo "${GREEN}$cert - SSH Cert valid ( $valid_from -> $valid_to )${RESET}"
+                continue
+            else
+                echo "$cert - SSH Cert valid ( $valid_from -> $valid_to )"
+                continue
+            fi
+        fi
+
+    fi
+
+done
+
+echo
