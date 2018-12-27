@@ -60,24 +60,6 @@ cat << EOF
 
             ${0##*/} ~/.ssh/*.pub
 
-        With Colors:
-
-            ${0##*/} -c ~/.ssh/id_rsa-cert.pub
-
-            ${0##*/} -c ~/.ssh/*.pub
-
-        Verbose:
-
-            ${0##*/} -v ~/.ssh/id_rsa-cert.pub
-
-            ${0##*/} -v ~/.ssh/*.pub
-
-        Verbose with Colors:
-
-            ${0##*/} -vc ~/.ssh/id_rsa-cert.pub
-
-            ${0##*/} -vc ~/.ssh/*.pub
-
         Certificates which expire within the next 2 months (colored output):
 
             ${0##*/} -c -w 60 ~/.ssh/id_rsa-cert.pub
