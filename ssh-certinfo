@@ -34,6 +34,7 @@ MAGENTA=$(tput setaf 5)
 #
 
 WARN=30                 # days before cert expires
+CERTS_FOUND="no"	# flag to memorize if any certificates were found
 
 #
 # Usage/Help message
@@ -114,7 +115,11 @@ for cert in "${CERTS[@]}"; do
 
     valid=$(ssh-keygen -L -f "$cert" 2>/dev/null | grep -i valid)
 
-    [[ -z $valid ]] && continue
+    if [[ -z $valid ]]; then
+        continue
+    else
+        CERTS_FOUND="yes"
+    fi
 
     if [[ $valid == *"forever"* ]]; then
         if [[ ${verbose} == yes ]]; then
@@ -131,9 +136,7 @@ for cert in "${CERTS[@]}"; do
             fi
         else
             if [[ ${colors} == yes ]]; then
-                echo "${GREEN}"
-                echo "$cert - SSH Cert valid ( forever )"
-                echo "${RESET}"
+                echo "${GREEN}$cert - SSH Cert valid ( forever )${RESET}"
                 continue
             else
                 echo "$cert - SSH Cert valid ( forever )"
@@ -176,7 +179,6 @@ for cert in "${CERTS[@]}"; do
     fi
 
     if [[ $now -gt $valid_to_epoch ]]; then
-
 
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
@@ -255,5 +257,9 @@ for cert in "${CERTS[@]}"; do
     fi
 
 done
+
+if [[ $CERTS_FOUND == *"no"* ]]; then
+    echo "No SSH certificates found."
+fi
 
 echo
