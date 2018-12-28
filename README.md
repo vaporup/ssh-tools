@@ -12,7 +12,18 @@ Check if host is reachable using ssh_config
 * Outputs **Reply from** when server is reachable but login failed
 * Outputs **Pong from** when server is reachable and login was successful
 
-![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/demos/ssh-ping.gif)
+  ~~~~
+  $ ssh-ping -c 3 kim
+
+
+  SSHPING kim
+  Reply from kim: ssh_seq=1 time=109 ms
+  Reply from kim: ssh_seq=2 time=136 ms
+  Reply from kim: ssh_seq=3 time=141 ms
+
+  --- kim ping statistics ---
+  3 requests transmitted, 3 requests received, 0% request loss
+  ~~~~
 
 ssh-version
 ===========
