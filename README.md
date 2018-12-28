@@ -29,7 +29,7 @@ ssh-diff
 Diff a file over SSH
 
   ~~~~
-  $ ssh-diff -y /etc/hosts kim
+  $ ssh-diff /etc/hosts kim
 
   Comparing kim:/etc/hosts (<) with /etc/hosts (>)
 
