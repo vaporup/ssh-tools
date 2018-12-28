@@ -5,8 +5,7 @@
   <img src="https://img.shields.io/badge/implementation-bash / python-red.svg?style=flat-square"/>
 </p>
 
-ssh-ping
-========
+### ssh-ping
 Check if host is reachable using ssh_config
 
   * Outputs **Reply from** when server is reachable but login failed
@@ -24,8 +23,7 @@ Check if host is reachable using ssh_config
   3 requests transmitted, 3 requests received, 0% request loss
   ~~~~
 
-ssh-version
-===========
+### ssh-version
 Shows version of the SSH server you are connecting to
 
   ~~~~
@@ -34,8 +32,7 @@ Shows version of the SSH server you are connecting to
   Remote protocol version 2.0, remote software version OpenSSH_7.2p2 Ubuntu-4ubuntu2.6
   ~~~~
 
-ssh-diff
-=========
+### ssh-diff
 Diff a file over SSH
 
   ~~~~
@@ -51,8 +48,7 @@ Diff a file over SSH
   > 127.0.1.1 blinky
   ~~~~
 
-ssh-facts
-=========
+### ssh-facts
 Get some facts about the remote system
 
   ~~~~
@@ -77,8 +73,7 @@ Get some facts about the remote system
   ~~~~
 
 
-ssh-hostkeys
-============
+### ssh-hostkeys
 Prints server host keys in several formats
 
   ~~~~
