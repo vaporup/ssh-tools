@@ -28,7 +28,18 @@ ssh-diff
 =========
 Diff a file over SSH
 
-![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/demos/ssh-diff.gif)
+  ~~~~
+  ssh-diff -y /etc/hosts kim
+
+  Comparing kim:/etc/hosts (<) with /etc/hosts (>)
+
+  1,2c1,2
+  < 127.0.0.1 localhost
+  < 127.0.1.1 kim
+  ---
+  > 127.0.0.1 localhost 
+  > 127.0.1.1 blinky
+  ~~~~
 
 ssh-facts
 =========
