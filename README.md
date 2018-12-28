@@ -30,7 +30,27 @@ ssh-facts
 =========
 Get some facts about the remote system
 
-![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/demos/ssh-facts.gif)
+  ~~~~
+  $ ssh-facts root@kim
+
+  OS=ubuntu
+  OS_VERSION=16.04
+  UPTIME=7 days, 22 hours, 25 minutes
+  LAST_REBOOT=Dec 20 19:34:27 2018
+  CPU_CORES=2
+  CPU_SOCKETS=2
+  HOSTNAME=kim
+  KERNEL_NAME=Linux
+  MACHINE=x86_64
+  MACHINE_TYPE=virtual_by_kvm
+  MEMORY=4045996
+  INIT=systemd
+  LSB_CODENAME=xenial
+  LSB_DESCRIPTION=Ubuntu 16.04.5 LTS
+  LSB_ID=Ubuntu
+  LSB_RELEASE=16.04
+  ~~~~
+
 
 ssh-hostkeys
 ============
