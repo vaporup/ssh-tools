@@ -15,7 +15,6 @@ Check if host is reachable using ssh_config
   ~~~~
   $ ssh-ping -c 3 kim
 
-
   SSHPING kim
   Reply from kim: ssh_seq=1 time=109 ms
   Reply from kim: ssh_seq=2 time=136 ms
