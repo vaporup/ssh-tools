@@ -52,7 +52,7 @@ Diff a file over SSH
 Get some facts about the remote system
 
   ~~~~
-  $ ssh-facts root@kim
+  $ ssh-facts kim
 
   OS=ubuntu
   OS_VERSION=16.04
