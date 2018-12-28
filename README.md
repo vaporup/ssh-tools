@@ -9,8 +9,8 @@ ssh-ping
 ========
 Check if host is reachable using ssh_config
 
-* Outputs **Reply from** when server is reachable but login failed
-* Outputs **Pong from** when server is reachable and login was successful
+  * Outputs **Reply from** when server is reachable but login failed
+  * Outputs **Pong from** when server is reachable and login was successful
 
   ~~~~
   $ ssh-ping -c 3 kim
