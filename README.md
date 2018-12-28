@@ -18,7 +18,11 @@ ssh-version
 ===========
 Shows version of the SSH server you are connecting to
 
-![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/demos/ssh-version.gif)
+  ~~~~
+  $ ssh-version kim
+
+  Remote protocol version 2.0, remote software version OpenSSH_7.2p2 Ubuntu-4ubuntu2.6
+  ~~~~
 
 ssh-diff
 =========
