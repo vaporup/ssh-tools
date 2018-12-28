@@ -86,3 +86,30 @@ Prints server host keys in several formats
       (RSA)  2048     MD5 8b:37:63:cd:58:fd:9c:18:93:08:3a:4c:84:64:87:91
       (RSA)  2048  SHA256 WkOzD8BaeljejgTTAwECkByyb4kHdI0pnJB2/gcS1Lk
   ~~~~
+
+## ssh-certinfo
+Shows validity and information of SSH certificates
+
+  ~~~~
+  $ ssh-certinfo ~/.ssh/*.pub
+
+  /home/vaporup/.ssh/id_rsa-cert.pub - SSH Cert valid ( forever )
+
+  $ ssh-certinfo -v ~/.ssh/*.pub
+
+  /home/vaporup/.ssh/id_rsa-cert.pub:
+          Type: ssh-rsa-cert-v01@openssh.com user certificate
+          Public key: RSA-CERT SHA256:Mm7o312345YEaWetVshTBslX48h0XJceLWzxx3RugDg
+          Signing CA: RSA SHA256:4fcOpOm/Xk12345mYnihk0cr6SdjghPgONxriMJex+A
+          Key ID: "vaporup"
+          Serial: 0
+          Valid: forever
+          Principals: (none)
+          Critical Options: (none)
+          Extensions: 
+                  permit-X11-forwarding
+                  permit-agent-forwarding
+                  permit-port-forwarding
+                  permit-pty
+                  permit-user-rc
+  ~~~~
