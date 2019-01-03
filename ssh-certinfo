@@ -33,7 +33,7 @@ MAGENTA=$(tput setaf 5)
 # Defaults
 #
 
-WARN=30                 # days before cert expires
+WARN=30             # days before cert expires
 CERTS_FOUND="no"	# flag to memorize if any certificates were found
 
 #
