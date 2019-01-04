@@ -14,7 +14,7 @@
 # Some colors for better output
 #
 
-if [[ "$OSTYPE" == openbsd* ]]; then
+if [[ "${OSTYPE}" == openbsd* ]]; then
     TERM=linux # https://github.com/rvm/rvm/issues/727
 fi
 
@@ -94,10 +94,10 @@ while getopts ":chvw:" opt; do
             verbose="yes"
         ;;
         w )
-            [[ $OPTARG =~ ^[0-9]+$ ]] && WARN=$OPTARG
+            [[ ${OPTARG} =~ ^[0-9]+$ ]] && WARN=${OPTARG}
         ;;
         \? )
-            echo "Invalid option: $OPTARG" 1>&2
+            echo "Invalid option: ${OPTARG}" 1>&2
             usage
             exit 1
         ;;
@@ -107,149 +107,149 @@ done
 now=$(date +%s)
 WARN_SECONDS=$(( WARN * 24 * 60 * 60))
 
-CERTS=( ${@:$OPTIND}  )
+CERTS=( ${@:${OPTIND}}  )
 
 echo
 
 for cert in "${CERTS[@]}"; do
 
-    valid=$(ssh-keygen -L -f "$cert" 2>/dev/null | grep -i valid)
+    valid=$(ssh-keygen -L -f "${cert}" 2>/dev/null | grep -i valid)
 
-    if [[ -z $valid ]]; then
+    if [[ -z ${valid} ]]; then
         continue
     else
         CERTS_FOUND="yes"
     fi
 
-    if [[ $valid == *"forever"* ]]; then
+    if [[ ${valid} == *"forever"* ]]; then
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${GREEN}"
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo
                 echo
                 continue
             fi
         else
             if [[ ${colors} == yes ]]; then
-                echo "${GREEN}$cert - SSH Cert valid ( forever )${RESET}"
+                echo "${GREEN}${cert} - SSH Cert valid ( forever )${RESET}"
                 continue
             else
-                echo "$cert - SSH Cert valid ( forever )"
+                echo "${cert} - SSH Cert valid ( forever )"
                 continue
             fi
         fi
     fi
 
-    valid_from=$(echo $valid | awk '{print $3}')
-    valid_from_epoch=$(date -d "$valid_from" +%s)
-    valid_to=$(echo $valid | awk '{print $5}')
-    valid_to_epoch=$(date -d "$valid_to" +%s)
+    valid_from=$(echo ${valid} | awk '{print $3}')
+    valid_from_epoch=$(date -d "${valid_from}" +%s)
+    valid_to=$(echo ${valid} | awk '{print $5}')
+    valid_to_epoch=$(date -d "${valid_to}" +%s)
     valid_to_epoch_warning=$(( valid_to_epoch - WARN_SECONDS ))
 
     expires_in_days=$((  WARN - ( ( now - valid_to_epoch_warning ) / 60 / 60 / 24 ) -1 ))
 
-    if [[ $now -lt $valid_from_epoch ]]; then
+    if [[ ${now} -lt ${valid_from_epoch} ]]; then
 
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${YELLOW}"
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo
                 echo
                 continue
             fi
         else
             if [[ ${colors} == yes ]]; then
-                echo "${YELLOW}$cert - SSH Cert not valid yet ( $valid_from -> $valid_to )${RESET}"
+                echo "${YELLOW}${cert} - SSH Cert not valid yet ( ${valid_from} -> ${valid_to} )${RESET}"
                 continue
             else
-                echo "$cert - SSH Cert not valid yet ( $valid_from -> $valid_to )"
+                echo "${cert} - SSH Cert not valid yet ( ${valid_from} -> ${valid_to} )"
                 continue
             fi
         fi
     fi
 
-    if [[ $now -gt $valid_to_epoch ]]; then
+    if [[ ${now} -gt ${valid_to_epoch} ]]; then
 
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${RED}"
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo
                 echo
                 continue
             fi
         else
             if [[ ${colors} == yes ]]; then
-                echo "${RED}$cert - SSH Cert expired ( $valid_from -> $valid_to )${RESET}"
+                echo "${RED}${cert} - SSH Cert expired ( ${valid_from} -> ${valid_to} )${RESET}"
                 continue
             else
-                echo "$cert - SSH Cert expired ( $valid_from -> $valid_to )"
+                echo "${cert} - SSH Cert expired ( ${valid_from} -> ${valid_to} )"
                 continue
             fi
         fi
 
     fi
 
-    if [[ $now -gt $valid_to_epoch_warning ]]; then
+    if [[ ${now} -gt ${valid_to_epoch_warning} ]]; then
 
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${YELLOW}"
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo
                 echo
                 continue
             fi
         else
             if [[ ${colors} == yes ]]; then
-                echo "${YELLOW}$cert - SSH Cert expires in $expires_in_days day(s) ( $valid_from -> $valid_to )${RESET}"
+                echo "${YELLOW}${cert} - SSH Cert expires in ${expires_in_days} day(s) ( ${valid_from} -> ${valid_to} )${RESET}"
                 continue
             else
-                echo "$cert - SSH Cert expires in $expires_in_days day(s) ( $valid_from -> $valid_to )"
+                echo "${cert} - SSH Cert expires in ${expires_in_days} day(s) ( ${valid_from} -> ${valid_to} )"
                 continue
             fi
         fi
 
     fi
 
-    if [[ $now -gt $valid_from_epoch && $now -lt $valid_to_epoch ]]; then
+    if [[ ${now} -gt ${valid_from_epoch} && ${now} -lt ${valid_to_epoch} ]]; then
 
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${GREEN}"
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "$cert"
+                ssh-keygen -L -f "${cert}"
                 echo
                 echo
                 continue
             fi
         else
             if [[ ${colors} == yes ]]; then
-                echo "${GREEN}$cert - SSH Cert valid ( $valid_from -> $valid_to )${RESET}"
+                echo "${GREEN}${cert} - SSH Cert valid ( ${valid_from} -> ${valid_to} )${RESET}"
                 continue
             else
-                echo "$cert - SSH Cert valid ( $valid_from -> $valid_to )"
+                echo "${cert} - SSH Cert valid ( ${valid_from} -> ${valid_to} )"
                 continue
             fi
         fi
@@ -258,7 +258,7 @@ for cert in "${CERTS[@]}"; do
 
 done
 
-if [[ $CERTS_FOUND == *"no"* ]]; then
+if [[ ${CERTS_FOUND} == *"no"* ]]; then
     echo "No SSH certificates found."
 fi
 
