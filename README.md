@@ -93,7 +93,7 @@ Shows validity and information of SSH certificates
   ~~~~
   $ ssh-certinfo ~/.ssh/*.pub
 
-  /home/vaporup/.ssh/id_rsa-cert.pub - SSH Cert valid ( forever )
+  /home/vaporup/.ssh/id_rsa-cert.pub    SSH_CERT_VALID  forever ->  forever
 
   $ ssh-certinfo -v ~/.ssh/*.pub
 
