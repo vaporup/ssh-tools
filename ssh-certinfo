@@ -103,6 +103,11 @@ while getopts ":chvw:" opt; do
     esac
 done
 
+function print_cert() {
+
+    ssh-keygen -L -f "${cert}"
+}
+
 now=$(date +%s)
 WARN_SECONDS=$(( WARN * 24 * 60 * 60))
 
@@ -112,7 +117,7 @@ echo
 
 for cert in "${CERTS[@]}"; do
 
-    valid=$(ssh-keygen -L -f "${cert}" 2>/dev/null | grep -i valid)
+    valid=$( print_cert 2>/dev/null | grep -i valid)
 
     if [[ -z ${valid} ]]; then
         continue
@@ -124,11 +129,11 @@ for cert in "${CERTS[@]}"; do
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${GREEN}"
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo
                 echo
                 continue
@@ -157,11 +162,11 @@ for cert in "${CERTS[@]}"; do
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${YELLOW}"
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo
                 echo
                 continue
@@ -182,11 +187,11 @@ for cert in "${CERTS[@]}"; do
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${RED}"
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo
                 echo
                 continue
@@ -208,11 +213,11 @@ for cert in "${CERTS[@]}"; do
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${YELLOW}"
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo
                 echo
                 continue
@@ -234,11 +239,11 @@ for cert in "${CERTS[@]}"; do
         if [[ ${verbose} == yes ]]; then
             if [[ ${colors} == yes ]]; then
                 echo "${GREEN}"
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo "${RESET}"
                 continue
             else
-                ssh-keygen -L -f "${cert}"
+                print_cert
                 echo
                 echo
                 continue
