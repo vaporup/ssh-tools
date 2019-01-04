@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+
+hops=()
+
+function has_next_hop() {
+
+  local config
+  local next_hop
+
+  config=( $( ssh -G $1 | grep -P "^proxycommand\s+ssh") )
+  next_hop=${config[@]:2}
+
+  if [[ -z "${next_hop// }" ]]; then
+    return 1
+  else
+    return 0
+  fi
+
+}
+
+function get_next_hop() {
+
+  local config
+  local next_hop
+
+  config=( $( ssh -G $1 | grep -P "^proxycommand\s+ssh") )
+  next_hop=${config[@]:2}
+
+  if [[ -z "${next_hop// }" ]]; then
+    echo ""
+  else
+    echo ${next_hop}
+  fi
+
+}
+
+next_hop=$1
+
+while true; do
+
+  sleep 0.2
+
+  if has_next_hop $next_hop; then
+    hops+=( ${next_hop} )
+    next_hop=$(get_next_hop $next_hop)
+  else
+    break
+  fi
+
+done
+
+for hop in "${hops[@]::${#hops[@]}-1}" ; do
+
+  echo -n "${hop} -> "
+
+done
+
+echo ${hops[@]: -1:1}

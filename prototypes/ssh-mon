@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+
+   BG_BLACK="$(tput setab 0)"
+    BG_BLUE="$(tput setab 4)"
+
+   FG_BLACK="$(tput setaf 0)"
+     FG_RED="$(tput setaf 1)"
+   FG_GREEN="$(tput setaf 2)"
+  FG_YELLOW="$(tput setaf 3)"
+   FG_WHITE="$(tput setaf 7)"
+
+SCREEN_TITLE="SSH_MON"
+
+SSH_OPTS=(
+    -o BatchMode=yes
+    -o CheckHostIP=no
+    -o StrictHostKeyChecking=no
+    -o HashKnownHosts=no
+    #-o ConnectTimeout=16
+    -o ConnectTimeout=4
+    -o PasswordAuthentication=no
+    -o PubkeyAuthentication=no
+)
+
+SSH_FLAGS=(
+ "-l ForceLogin2Fail"
+)
+
+function init_screen() {
+
+  tput smcup
+  tput bold
+  tput civis
+
+}
+
+function restore_screen() {
+
+  tput rmcup
+  tput cnorm
+
+}
+
+function clean_up() {
+
+  rm -f /tmp/ssh-mon/*
+
+}
+
+function finish() {
+
+  clean_up
+  restore_screen
+}
+
+function usage() {
+
+cat << EOF
+
+  Usage: ${0##*/} host [host2] [...]
+
+EOF
+
+}
+
+function check_daemon() {
+
+  while true; do
+
+    [[ -e /tmp/ssh-mon/ ]] || mkdir /tmp/ssh-mon/ &> /dev/null
+
+    for host in "$@"; do
+
+      status=$( ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "$host" 2>&1 | grep -oE 'denied|sftp' )
+
+      if [[ $status == denied || $status == sftp ]]; then
+        touch /tmp/ssh-mon/$host
+      else
+        rm -f /tmp/ssh-mon/$host
+      fi
+
+    done
+
+    sleep 1
+
+  done
+
+}
+
+if [[ -z $1 || $1 == "--help" ]]; then
+  usage
+  exit 1
+fi
+
+trap finish EXIT
+
+init_screen
+
+#
+# Run the monitoring function in the background
+# and remember its PID for checking
+#
+
+check_daemon "$@" &
+DAEMON_PID="$!"
+
+#
+# MAIN
+#
+
+while true; do
+
+  screen_columns=$(tput cols)
+  screen_lines=$(tput lines)
+
+  tput home
+
+  echo -n ${BG_BLACK}${FG_GREEN}
+  tput ed
+
+  echo -n ${BG_BLUE}${FG_WHITE}
+  tput el
+  tput cup 0 1
+  echo "${SCREEN_TITLE}"
+
+  tput cup $(( screen_lines )) 0
+  tput el
+
+  #
+  # Check if monitoring process is still running in the background
+  #
+
+  if kill -s 0 ${DAEMON_PID} &>/dev/null; then
+    echo -n " Monitoring running... ( PID: ${DAEMON_PID} )"
+   else
+     echo -n " Monitoring NOT running..."
+  fi
+  echo -n ${BG_BLUE}${FG_WHITE}
+
+  tput cup 1 1
+
+  for host in "$@"; do
+
+    tput cud1
+
+    if [[ -e /tmp/ssh-mon/$host ]]; then
+
+      if [[ $(( $(date +%s) - $(date -r /tmp/ssh-mon/$host +%s) )) -lt 60 ]]; then
+        echo -n ${BG_BLACK}${FG_GREEN}
+        echo -n " $host"
+      else
+        echo -n ${BG_BLACK}${FG_YELLOW}
+        echo -n " $host"
+      fi
+
+    else
+      echo -n ${BG_BLACK}${FG_RED}
+      echo -n " $host"
+    fi
+
+  done
+
+  sleep 1
+
+done
+
+finish
