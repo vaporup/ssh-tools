@@ -9,7 +9,6 @@
 #  | URL          : https://github.com/vaporup/ssh-tools                                  |
 #  +--------------------------------------------------------------------------------------+
 
-
 #
 # Some colors for better output
 #
@@ -352,4 +351,3 @@ else
     print_if_certs_were_found
 
 fi
-
