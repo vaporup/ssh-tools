@@ -41,11 +41,5 @@ if [[ -z $1 || $1 == "--help" ]]; then
     exit 1
 fi
 
-if [[ $1 == *"@"* ]]; then
-    SERVER=$( echo ${1##*@} )
-else
-    SERVER=${1}
-fi
-
 SSH_VERSION=$(ssh -vN "${ssh_opts[@]}" "$@" -l ForceLogin2Fail 2>&1 | grep "remote software version")
 echo ${SSH_VERSION#debug1: }
