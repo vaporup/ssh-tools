@@ -104,6 +104,7 @@ done
 function print_cert() {
 
     ssh-keygen -L -f "${cert}"
+    echo
 }
 
 function get_cert_data() {
@@ -195,14 +196,12 @@ if [[ ${verbose} == yes ]]; then
 
         if [[ ${valid} == *"forever"* ]]; then
                 if [[ ${colors} == yes ]]; then
-                    echo "${GREEN}"
+                    echo -n "${GREEN}"
                     print_cert
-                    echo "${RESET}"
+                    echo -n "${RESET}"
                     continue
                 else
                     print_cert
-                    echo
-                    echo
                     continue
                 fi
         fi
@@ -212,14 +211,12 @@ if [[ ${verbose} == yes ]]; then
         if cert_is_invalid; then
 
             if [[ ${colors} == yes ]]; then
-                echo "${YELLOW}"
+                echo -n "${YELLOW}"
                 print_cert
-                echo "${RESET}"
+                echo -n "${RESET}"
                 continue
             else
                 print_cert
-                echo
-                echo
                 continue
             fi
         fi
@@ -227,14 +224,12 @@ if [[ ${verbose} == yes ]]; then
         if cert_is_expired; then
 
             if [[ ${colors} == yes ]]; then
-                echo "${RED}"
+                echo -n "${RED}"
                 print_cert
-                echo "${RESET}"
+                echo -n "${RESET}"
                 continue
             else
                 print_cert
-                echo
-                echo
                 continue
             fi
 
@@ -243,14 +238,12 @@ if [[ ${verbose} == yes ]]; then
         if cert_expires; then
 
             if [[ ${colors} == yes ]]; then
-                echo "${YELLOW}"
+                echo -n "${YELLOW}"
                 print_cert
-                echo "${RESET}"
+                echo -n "${RESET}"
                 continue
             else
                 print_cert
-                echo
-                echo
                 continue
             fi
 
@@ -259,14 +252,12 @@ if [[ ${verbose} == yes ]]; then
         if cert_is_valid; then
 
             if [[ ${colors} == yes ]]; then
-                echo "${GREEN}"
+                echo -n "${GREEN}"
                 print_cert
-                echo "${RESET}"
+                echo -n "${RESET}"
                 continue
             else
                 print_cert
-                echo
-                echo
                 continue
             fi
 
