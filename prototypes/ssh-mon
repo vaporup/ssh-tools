@@ -69,7 +69,7 @@ function check_daemon() {
 
     [[ -e /tmp/ssh-mon/ ]] || mkdir /tmp/ssh-mon/ &> /dev/null
 
-    for host in "$@"; do
+    for host in "${servers[@]}"; do
 
       status=$( ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "$host" 2>&1 | grep -oE 'denied|sftp' )
 
@@ -96,12 +96,15 @@ trap finish EXIT
 
 init_screen
 
+servers=( $( printf "%s\n" "$@" | uniq ) )
+
 #
 # Run the monitoring function in the background
 # and remember its PID for checking
 #
 
-check_daemon "$@" &
+#check_daemon "${servers[@]}" &
+check_daemon &
 DAEMON_PID="$!"
 
 #
@@ -139,7 +142,7 @@ while true; do
 
   tput cup 1 1
 
-  for host in "$@"; do
+  for host in "${servers[@]}"; do
 
     tput cud1
 
