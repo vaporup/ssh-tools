@@ -117,15 +117,11 @@ function command_exists() {
 
 function get_timestamp() {
 
-    if [[ "$OSTYPE" == "linux-gnu" ]]; then
-      if [[ "$print_timestamp_human_readable" == "yes" ]]; then
-        date
-      else
-        date +%s.%6N
-      fi
+    if [[ "$print_timestamp_human_readable" == "yes" ]]; then
+      date
     else
-      if [[ "$print_timestamp_human_readable" == "yes" ]]; then
-        command_exists python && python -c 'import time; print time.ctime()'
+      if [[ "$OSTYPE" == "linux-gnu" ]]; then
+        date +%s.%6N
       else
         command_exists python && python -c 'import time; ms = time.time() ; print "%.6f" % ms'
       fi
