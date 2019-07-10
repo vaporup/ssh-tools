@@ -92,6 +92,7 @@ cat << EOF
                        The default is 1 second.
         -l user        Try login with <user> as username. The default is \$USER.
         -D             Print timestamp (unix time + microseconds as in gettimeofday) before each line
+        -H             Print timestamp (human readable) before each line
         -W timeout     Time to wait for a response, in seconds
         -p port        Port to connect to on the remote host.
                        This can be specified on a per-host basis in the configuration file.
@@ -117,9 +118,17 @@ function command_exists() {
 function get_timestamp() {
 
     if [[ "$OSTYPE" == "linux-gnu" ]]; then
+      if [[ "$print_timestamp_human_readable" == "yes" ]]; then
+        date
+      else
         date +%s.%6N
+      fi
     else
+      if [[ "$print_timestamp_human_readable" == "yes" ]]; then
+        command_exists python && python -c 'import time; print time.ctime()'
+      else
         command_exists python && python -c 'import time; ms = time.time() ; print "%.6f" % ms'
+      fi
     fi
 
 }
@@ -165,7 +174,7 @@ function print_statistics() {
 # Command line Options
 #
 
-while getopts ":46c:F:hi:l:Dp:vW:q" opt; do
+while getopts ":46c:F:hi:l:DHp:vW:q" opt; do
     case ${opt} in
         4 )
             SSH_FLAGS+=("-4")
@@ -192,6 +201,10 @@ while getopts ":46c:F:hi:l:Dp:vW:q" opt; do
         ;;
         D )
             print_timestamp="yes"
+        ;;
+        H )
+            print_timestamp="yes"
+            print_timestamp_human_readable="yes"
         ;;
         p )
             [[ $OPTARG =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p") && SSH_FLAGS+=("$OPTARG")
@@ -260,7 +273,7 @@ while true; do
     [[ ${ping_count} -gt 0 ]] && [[ ${ssh_seq} -gt ${ping_count} ]] && break
 
     #
-    # unix time + microseconds as in gettimeofday - used for -D option
+    # used for -D and or -H option
     #
 
     timestamp=$( get_timestamp )
