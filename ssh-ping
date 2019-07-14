@@ -23,19 +23,15 @@ trap print_statistics SIGINT
 # Some colors for better output
 #
 
-if [[ "$OSTYPE" == openbsd* ]]; then
-    TERM=linux # https://github.com/rvm/rvm/issues/727
-fi
-
-    RED=$(tput setaf 1)
-  GREEN=$(tput setaf 2)
- YELLOW=$(tput setaf 3)
-   BLUE=$(tput setaf 4)
-MAGENTA=$(tput setaf 5)
-   CYAN=$(tput setaf 6)
-  WHITE=$(tput setaf 7)
-   BOLD=$(tput bold   )
-  RESET=$(tput sgr0   )
+     RED='\033[0;91m'
+   GREEN='\033[0;92m'
+  YELLOW='\033[0;93m'
+    BLUE='\033[0;94m'
+ MAGENTA='\033[0;95m'
+    CYAN='\033[0;96m'
+   WHITE='\033[0;97m'
+    BOLD='\033[1m'
+   RESET='\033[0m'
 
 #
 # Default SSH Options
@@ -145,7 +141,7 @@ function print_statistics() {
     requests_loss=$(( 100 * requests_lost / requests_transmitted ))
 
     echo ""
-    echo "${WHITE}---${RESET} ${YELLOW}$host${RESET} ${WHITE}ping statistics${RESET} ${WHITE}---${RESET}"
+    echo -e "${WHITE}---${RESET} ${YELLOW}$host${RESET} ${WHITE}ping statistics${RESET} ${WHITE}---${RESET}"
 
     statistics_ok="${GREEN}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
     statistics_ok+="${GREEN}$requests_received${RESET} ${WHITE}requests received${RESET}, "
@@ -159,9 +155,9 @@ function print_statistics() {
     statistics_crit+="${RED}$requests_received${RESET} ${WHITE}requests received${RESET}, "
     statistics_crit+="${RED}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
 
-    [[ $requests_loss -eq 100 ]] &&  echo "$statistics_crit" && exit
-    [[ $requests_loss -gt   1 ]] &&  echo "$statistics_warn" && exit
-    [[ $requests_loss -eq   0 ]] &&  echo "$statistics_ok"   && exit
+    [[ $requests_loss -eq 100 ]] &&  echo -e "$statistics_crit" && exit
+    [[ $requests_loss -gt   1 ]] &&  echo -e "$statistics_warn" && exit
+    [[ $requests_loss -eq   0 ]] &&  echo -e "$statistics_ok"   && exit
 
 }
 
@@ -248,16 +244,16 @@ fi
 # Output header with optional debugging output
 #
 
-echo "${BOLD}SSHPING${RESET} ${YELLOW}${host}${RESET}"
+echo -e "${BOLD}SSHPING${RESET} ${YELLOW}${host}${RESET}"
 
 if [[ ${verbose} == yes ]]; then
-    echo -n "${BLUE}"
+    echo -e -n "${BLUE}"
     echo "SSH_FLAGS: ${SSH_FLAGS[@]}"
     echo "SSH_OPTS: ${SSH_OPTS[@]}"
-    echo -n "${RESET}"
+    echo -e -n "${RESET}"
 fi
 
-command_exists perl || echo "${YELLOW}WARNING:${RESET} No perl found. Unable to measure time (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
+command_exists perl || echo -e "${YELLOW}WARNING:${RESET} No perl found. Unable to measure time (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
 
 while true; do
 
@@ -295,12 +291,12 @@ while true; do
 
     if [[ $status == pong ]]; then
         requests_received=$(( requests_received + 1 ))
-        [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
-        [[ ${quiet} == no ]] && echo "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+        [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -e -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
+        [[ ${quiet} == no ]] && echo -e "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
     elif [[ $status == denied || $status == sftp ]]; then
         requests_received=$(( requests_received + 1 ))
-        [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
-        [[ ${quiet} == no ]] && echo "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
+        [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -e -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
+        [[ ${quiet} == no ]] && echo -e "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
     else
         requests_lost=$(( requests_lost + 1 ))
     fi

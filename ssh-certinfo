@@ -13,19 +13,15 @@
 # Some colors for better output
 #
 
-if [[ "${OSTYPE}" == openbsd* ]]; then
-    TERM=linux # https://github.com/rvm/rvm/issues/727
-fi
-
-    RED=$(tput setaf 1)
-  GREEN=$(tput setaf 2)
- YELLOW=$(tput setaf 3)
-   BLUE=$(tput setaf 4)
-MAGENTA=$(tput setaf 5)
-   CYAN=$(tput setaf 6)
-  WHITE=$(tput setaf 7)
-   BOLD=$(tput bold   )
-  RESET=$(tput sgr0   )
+     RED='\033[0;91m'
+   GREEN='\033[0;92m'
+  YELLOW='\033[0;93m'
+    BLUE='\033[0;94m'
+ MAGENTA='\033[0;95m'
+    CYAN='\033[0;96m'
+   WHITE='\033[0;97m'
+    BOLD='\033[1m'
+   RESET='\033[0m'
 
 #
 # Defaults
@@ -124,9 +120,9 @@ function print_if_certs_were_found() {
         echo
     else
         if [[ ${colors} == yes ]]; then
-            echo -n "${YELLOW}"
+            echo -e -n "${YELLOW}"
             echo -e "No SSH certificates found.\n"
-            echo -n "${RESET}"
+            echo -e -n "${RESET}"
         else
             echo -e "No SSH certificates found.\n"
         fi  
@@ -195,9 +191,9 @@ if [[ ${verbose} == yes ]]; then
 
         if [[ ${valid} == *"forever"* ]]; then
                 if [[ ${colors} == yes ]]; then
-                    echo -n "${GREEN}"
+                    echo -e -n "${GREEN}"
                     print_cert
-                    echo -n "${RESET}"
+                    echo -e -n "${RESET}"
                     continue
                 else
                     print_cert
@@ -210,9 +206,9 @@ if [[ ${verbose} == yes ]]; then
         if cert_is_invalid; then
 
             if [[ ${colors} == yes ]]; then
-                echo -n "${YELLOW}"
+                echo -e -n "${YELLOW}"
                 print_cert
-                echo -n "${RESET}"
+                echo -e -n "${RESET}"
                 continue
             else
                 print_cert
@@ -223,9 +219,9 @@ if [[ ${verbose} == yes ]]; then
         if cert_is_expired; then
 
             if [[ ${colors} == yes ]]; then
-                echo -n "${RED}"
+                echo -e -n "${RED}"
                 print_cert
-                echo -n "${RESET}"
+                echo -e -n "${RESET}"
                 continue
             else
                 print_cert
@@ -237,9 +233,9 @@ if [[ ${verbose} == yes ]]; then
         if cert_expires; then
 
             if [[ ${colors} == yes ]]; then
-                echo -n "${YELLOW}"
+                echo -e -n "${YELLOW}"
                 print_cert
-                echo -n "${RESET}"
+                echo -e -n "${RESET}"
                 continue
             else
                 print_cert
@@ -251,9 +247,9 @@ if [[ ${verbose} == yes ]]; then
         if cert_is_valid; then
 
             if [[ ${colors} == yes ]]; then
-                echo -n "${GREEN}"
+                echo -e -n "${GREEN}"
                 print_cert
-                echo -n "${RESET}"
+                echo -e -n "${RESET}"
                 continue
             else
                 print_cert
@@ -280,7 +276,7 @@ else
 
         if [[ ${valid} == *"forever"* ]]; then
             if [[ ${colors} == yes ]]; then
-                echo "${GREEN}${cert} SSH_CERT_VALID forever -> forever${RESET}"
+                echo -e "${GREEN}${cert} SSH_CERT_VALID forever -> forever${RESET}"
                 continue
             else
                 echo "${cert} SSH_CERT_VALID forever -> forever"
@@ -293,7 +289,7 @@ else
         if cert_is_invalid; then
 
             if [[ ${colors} == yes ]]; then
-                echo "${YELLOW}${cert} SSH_CERT_INVALID ${valid_from} -> ${valid_to}${RESET}"
+                echo -e "${YELLOW}${cert} SSH_CERT_INVALID ${valid_from} -> ${valid_to}${RESET}"
                 continue
             else
                 echo "${cert} SSH_CERT_INVALID ${valid_from} -> ${valid_to}"
@@ -304,7 +300,7 @@ else
         if cert_is_expired; then
 
             if [[ ${colors} == yes ]]; then
-                echo "${RED}${cert} SSH_CERT_EXPIRED ${valid_from} -> ${valid_to}${RESET}"
+                echo -e "${RED}${cert} SSH_CERT_EXPIRED ${valid_from} -> ${valid_to}${RESET}"
                 continue
             else
                 echo "${cert} SSH_CERT_EXPIRED ${valid_from} -> ${valid_to}"
@@ -316,7 +312,7 @@ else
         if cert_expires; then
 
             if [[ ${colors} == yes ]]; then
-                echo "${YELLOW}${cert} SSH_CERT_EXPIRES_IN_${expires_in_days}_DAYS ${valid_from} -> ${valid_to} ${RESET}"
+                echo -e "${YELLOW}${cert} SSH_CERT_EXPIRES_IN_${expires_in_days}_DAYS ${valid_from} -> ${valid_to} ${RESET}"
                 continue
             else
                 echo "${cert} SSH_CERT_EXPIRES_IN_${expires_in_days}_DAYS ${valid_from} -> ${valid_to}"
@@ -328,7 +324,7 @@ else
         if cert_is_valid; then
 
             if [[ ${colors} == yes ]]; then
-                echo "${GREEN}${cert} SSH_CERT_VALID ${valid_from} -> ${valid_to}${RESET}"
+                echo -e "${GREEN}${cert} SSH_CERT_VALID ${valid_from} -> ${valid_to}${RESET}"
                 continue
             else
                 echo "${cert} SSH_CERT_VALID ${valid_from} -> ${valid_to}"
