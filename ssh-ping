@@ -123,7 +123,7 @@ function get_timestamp() {
       if [[ "$OSTYPE" == "linux-gnu" ]]; then
         date +%s.%6N
       else
-        command_exists python && python -c 'import time; ms = time.time() ; print "%.6f" % ms'
+        command_exists perl && perl -MTime::HiRes=time -e 'printf "%.6f", time'
       fi
     fi
 
@@ -134,7 +134,7 @@ function get_request_timestamp() {
     if [[ "$OSTYPE" == "linux-gnu" ]]; then
         date +%s%3N
     else
-        command_exists python && python -c 'import time; ms = int(round(time.time() * 1000)) ; print ms'
+        command_exists perl && perl -MTime::HiRes=time -e 'printf "%i", time * 1000'
     fi
 
 }
@@ -258,7 +258,7 @@ if [[ ${verbose} == yes ]]; then
     echo -n "${RESET}"
 fi
 
-command_exists python || echo "${YELLOW}WARNING:${RESET} No python found. Unable to measure time (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
+command_exists perl || echo "${YELLOW}WARNING:${RESET} No perl found. Unable to measure time (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
 
 while true; do
 
