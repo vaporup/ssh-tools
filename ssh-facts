@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 
-#  +----------------------------------------------------------------------------------+
-#  | Title        : ssh-facts                                                         |
-#  |                                                                                  |
-#  | Description  : Get some facts about the remote system                            |
-#  |                                                                                  |
-#  | Author       : Sven Wick <sven.wick@gmx.de>                                      |
-#  | Contributors : Denis Meiswinkel                                                  |
-#  | URL          : https://github.com/vaporup/ssh-tools                              |
-#  |                                                                                  |
-#  | Based On     : https://github.com/ungleich/cdist/tree/master/cdist/conf/explorer |
-#  |                https://serverfault.com/a/343678                                  |
-#  |                https://stackoverflow.com/a/8057052                               |
-#  +----------------------------------------------------------------------------------+
+#  +-----------------------------------------------------------------------------------------------+
+#  | Title        : ssh-facts                                                                      |
+#  |                                                                                               |
+#  | Description  : Get some facts about the remote system                                         |
+#  |                                                                                               |
+#  | Author       : Sven Wick <sven.wick@gmx.de>                                                   |
+#  | Contributors : Denis Meiswinkel                                                               |
+#  | URL          : https://github.com/vaporup/ssh-tools                                           |
+#  |                                                                                               |
+#  | Based On     : https://code.ungleich.ch/ungleich-public/cdist/tree/master/cdist/conf/explorer |
+#  |                https://serverfault.com/a/343678                                               |
+#  |                https://stackoverflow.com/a/8057052                                            |
+#  +-----------------------------------------------------------------------------------------------+
 
 #
 #  Usage/Help message
