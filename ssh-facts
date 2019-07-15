@@ -79,15 +79,17 @@ function _os() {
        exit 0
     fi
 
+    # devuan ascii has both devuan_version and debian_version, so we need to check devuan_version first!
+    if [ -f /etc/devuan_version ]; then
+       echo devuan
+       exit 0
+    fi
+
     if [ -f /etc/debian_version ]; then
        echo debian
        exit 0
     fi
 
-    if [ -f /etc/devuan_version ]; then
-       echo devuan
-       exit 0
-    fi
     ###
 
     if [ -f /etc/gentoo-release ]; then
@@ -255,12 +257,15 @@ function _cpu_cores() {
     os=$(_os)
     case "$os" in
         "macosx")
-              echo "$(sysctl -n hw.physicalcpu)"
+            sysctl -n hw.physicalcpu
+        ;;
+        "openbsd")
+            sysctl -n hw.ncpuonline
         ;;
         *)
             if [ -r /proc/cpuinfo ]; then
                 cores="$(grep "core id" /proc/cpuinfo | sort | uniq | wc -l)"
-                if [ ${cores} -eq 0 ]; then
+                if [ "${cores}" -eq 0 ]; then
                     cores="1"
                 fi
                 echo "$cores"
@@ -275,13 +280,13 @@ function _cpu_sockets() {
     os=$(_os)
     case "$os" in
         "macosx")
-              echo "$(system_profiler SPHardwareDataType | grep "Number of Processors" | awk -F': ' '{print $2}')"
+            system_profiler SPHardwareDataType | grep "Number of Processors" | awk -F': ' '{print $2}'
         ;;
         *)
             if [ -r /proc/cpuinfo ]; then
-                sockets="$(grep "physical id" /proc/cpuinfo | sort | uniq | wc -l)"
-                if [ ${sockets} -eq 0 ]; then
-                    sockets="$(cat /proc/cpuinfo | grep "processor" | wc -l)"
+                sockets="$(grep "physical id" /proc/cpuinfo | sort -u | wc -l)"
+                if [ "${sockets}" -eq 0 ]; then
+                    sockets="$(grep -c "processor" /proc/cpuinfo)"
                 fi
                 echo "${sockets}"
             fi
@@ -306,7 +311,7 @@ function _kernel_name() {
 
 function _machine() {
 
-    if command -v uname 2>&1 >/dev/null; then
+    if command -v uname >/dev/null 2>&1 ; then
         uname -m
     fi
 
@@ -314,13 +319,13 @@ function _machine() {
 
 function _machine_type() {
 
-    if [ -d "/proc/vz" -a ! -d "/proc/bc" ]; then
+    if [ -d "/proc/vz" ] && [ ! -d "/proc/bc" ]; then
         echo openvz
         exit
     fi
 
-    if [ -r "/proc/1/environ" ] &&
-        cat "/proc/1/environ" | tr '\000' '\n' | grep -Eiq '^container='; then
+    if [ -e "/proc/1/environ" ] &&
+        tr '\000' '\n' < "/proc/1/environ" | grep -Eiq '^container='; then
         echo lxc
         exit
     fi
@@ -363,7 +368,6 @@ function _machine_type() {
                     fi
                 fi
             fi
-
             echo "virtual_by_unknown"
         else
             echo "physical"
@@ -381,6 +385,11 @@ function _memory() {
         "macosx")
             echo "$(sysctl -n hw.memsize)/1024" | bc
         ;;
+
+        "openbsd")
+            echo "$(sysctl -n hw.physmem) / 1048576" | bc
+        ;;
+
         *)
             if [ -r /proc/meminfo ]; then
                 grep "MemTotal:" /proc/meminfo | awk '{print $2}'
@@ -393,11 +402,12 @@ function _memory() {
 function _init() {
 
     uname_s="$(uname -s)"
+
     case "$uname_s" in
         Linux)
             (pgrep -P0 -l | awk '/^1[ \t]/ {print $2;}') || true
         ;;
-        FreeBSD)
+        FreeBSD|OpenBSD)
             ps -o comm= -p 1 || true
         ;;
         *)
@@ -476,6 +486,16 @@ function _lsb_release() {
 
 }
 
+function _runlevel() {
+
+    set +e
+    executable=$(command -v runlevel)
+    if [ -x "$executable" ]; then
+       "$executable" | awk '{ print $2 }'
+    fi
+
+}
+
 function get_facts() {
 
     local function_name=${1}
@@ -502,5 +522,6 @@ get_facts _lsb_codename
 get_facts _lsb_description
 get_facts _lsb_id
 get_facts _lsb_release
+get_facts _runlevel
 
 END
