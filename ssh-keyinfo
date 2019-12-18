@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+
+#  +---------------------------------------------------------------------------------------------------+
+#  | Title        : ssh-keyinfo                                                                        |
+#  |                                                                                                   |
+#  | Description  : Prints keys in several formats                                                     |
+#  |                                                                                                   |
+#  | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
+#  | URL          : https://github.com/vaporup/ssh-tools                                               |
+#  |                                                                                                   |
+#  +---------------------------------------------------------------------------------------------------+
+
+#
+# Usage/Help message
+#
+
+function usage() {
+
+cat << EOF
+
+    Usage: ${0##*/} FILE [...]
+
+    Examples:
+
+        ${0##*/} ~/.ssh/id_rsa.pub
+
+        ${0##*/} ~/.ssh/*.pub
+
+EOF
+
+}
+
+if [[ -z $1 || $1 == "--help" ]]; then
+    usage
+    exit 1
+fi
+
+fingerprint_hashes=( md5 sha256 )
+
+function get_fingerprints () {
+
+  hash_type=$1
+  key_file=$2
+
+  ssh-keygen -E $hash_type -qlf $key_file | while IFS= read -r line; do
+
+    key_data=( $(printf '%s\n' "$line") )
+    key_size=${key_data[0]}
+    key_hash=${key_data[1]}
+    key_comment=${key_data[2]}
+    key_type=${key_data[3]}
+    key_hash_type="${key_hash%%:*}"
+    key_hash_data="${key_hash#*:}"
+
+    printf "%10s%6s%8s %-50s %s\n" $key_type $key_size $key_hash_type $key_hash_data $key_file
+
+  done
+
+}
+
+KEYS=( "$@" )
+
+for KEY in "${KEYS[@]}"; do
+
+  for fingerprint_hash in ${fingerprint_hashes[@]}; do
+    get_fingerprints $fingerprint_hash $KEY
+  done
+
+done
+
+
