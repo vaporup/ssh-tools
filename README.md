@@ -88,7 +88,7 @@ Prints server host keys in several formats
   ~~~~
 
 
-## ssh-ssh-keyinfo
+## ssh-keyinfo
 Prints keys in several formats
 
   ~~~~
