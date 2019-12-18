@@ -87,6 +87,19 @@ Prints server host keys in several formats
       (RSA)  2048  SHA256 WkOzD8BaeljejgTTAwECkByyb4kHdI0pnJB2/gcS1Lk
   ~~~~
 
+
+## ssh-ssh-keyinfo
+Prints keys in several formats
+
+  ~~~~
+   $ ssh-keyinfo ~/.ssh/*.pub
+
+  (RSA-CERT)  2048     MD5 40:52:aa:14:a5:9a:fe:b5:96:c0:d2:dc:99:f1:a5:77    /home/swick/.ssh/id_rsa-cert.pub
+  (RSA-CERT)  2048  SHA256 V4F6ipY4gG83sQGM0eRk0+g1RWE9K4asDUj1jFpCa48        /home/swick/.ssh/id_rsa-cert.pub
+       (RSA)  2048     MD5 40:52:aa:14:a5:9a:fe:b5:96:c0:d2:dc:99:f1:a5:77    /home/swick/.ssh/id_rsa.pub
+       (RSA)  2048  SHA256 V4F6ipY4gG83sQGM0eRk0+g1RWE9K4asDUj1jFpCa48        /home/swick/.ssh/id_rsa.pub
+  ~~~~
+
 ## ssh-certinfo
 Shows validity and information of SSH certificates
 
