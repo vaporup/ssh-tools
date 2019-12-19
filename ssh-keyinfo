@@ -42,7 +42,7 @@ function get_fingerprints () {
   hash_type=$1
   key_file=$2
 
-  ssh-keygen -E $hash_type -qlf $key_file | while IFS= read -r line; do
+  ssh-keygen -E "${hash_type}" -qlf "${key_file}" | while IFS= read -r line; do
 
     key_data=( $(printf '%s\n' "$line") )
     key_size=${key_data[0]}
@@ -52,7 +52,7 @@ function get_fingerprints () {
     key_hash_type="${key_hash%%:*}"
     key_hash_data="${key_hash#*:}"
 
-    printf "%10s%6s%8s %-50s %s\n" $key_type $key_size $key_hash_type $key_hash_data $key_file
+    printf "%10s%6s%8s %-50s %s\n" "${key_type}" "${key_size}" "${key_hash_type}" "${key_hash_data}" "${key_file}"
 
   done
 
@@ -62,8 +62,8 @@ KEYS=( "$@" )
 
 for KEY in "${KEYS[@]}"; do
 
-  for fingerprint_hash in ${fingerprint_hashes[@]}; do
-    get_fingerprints $fingerprint_hash $KEY
+  for fingerprint_hash in "${fingerprint_hashes[@]}"; do
+    get_fingerprints "${fingerprint_hash}" "${KEY}"
   done
 
 done
