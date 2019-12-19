@@ -297,8 +297,10 @@ function _cpu_sockets() {
 
 function _hostname() {
 
-    if command -v uname >/dev/null; then
-        uname -n
+    if command -v hostname >/dev/null; then
+      hostname
+    else
+      uname -n
     fi
 
 }
@@ -496,6 +498,33 @@ function _runlevel() {
 
 }
 
+function _disks() {
+
+    uname_s="$(uname -s)"
+
+    case "$uname_s" in
+      FreeBSD)
+        sysctl -n kern.disks
+      ;;
+      OpenBSD|NetBSD)
+        sysctl -n hw.disknames | grep -Eo '[lsw]d[0-9]+' | xargs
+      ;;
+      Linux)
+        if command -v lsblk > /dev/null; then
+          # exclude ram disks, floppies and cdroms
+          # https://www.kernel.org/doc/Documentation/admin-guide/devices.txt
+          lsblk -e 1,2,11 -dno name | xargs
+        else
+          printf "Don't know how to list disks for %s operating system without lsblk, if you can please submit a patch\n" "${uname_s}" >&2
+        fi
+      ;;
+      *)
+        printf "Don't know how to list disks for %s operating system, if you can please submit a patch\n" "${uname_s}" >&2
+      ;;
+    esac
+
+}
+
 function get_facts() {
 
     local function_name=${1}
@@ -523,5 +552,6 @@ get_facts _lsb_description
 get_facts _lsb_id
 get_facts _lsb_release
 get_facts _runlevel
+get_facts _disks
 
 END
