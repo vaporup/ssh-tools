@@ -1,0 +1,1 @@
+ssh -vN -o BatchMode=yes $args[0] 2>&1 | Select-String "remote software version"
