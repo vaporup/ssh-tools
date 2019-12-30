@@ -30,7 +30,14 @@ function usage() {
 
 cat << EOF
 
-    Usage: ${0##*/} hostname
+    Usage: ${0##*/} [OPTIONS] hostname
+
+    Examples:
+
+        ${0##*/} 127.0.0.1
+
+        ${0##*/} -p 35007 127.0.0.1
+
 
 EOF
 
