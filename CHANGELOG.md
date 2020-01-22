@@ -7,17 +7,17 @@
 
 ## Changed
 
-- **ssh-diff**:
+- ssh-diff:
   - Replaced tput with ANSI Escape codes for color output
   - Add environment variable to disable remote file checking
   - Pipe output to cat to get a zero exit code for test.sh
-- **ssh-facts**:
+- ssh-facts:
   - Update explorers
   - Add explorers ( runlevel, disks )
-- **ssh-ping**:
+- ssh-ping:
   - Added -H option to print timestamp human readable
   - Changed from Python to Perl for calculating time
-- **ssh-version**:
+- ssh-version:
   - Updated usage (with examples)
 
 # 1.5 (2018-12-23)
@@ -34,7 +34,7 @@
 
 ## Added
 
-- **ssh-facts**: uptime and last_reboot fact
+- ssh-facts: uptime and last_reboot fact
 
 ## Changed
 
@@ -63,14 +63,14 @@
 
 ## Changed
 
-- **ssh-ping**: works now under OSX
+- ssh-ping: works now under OSX
 - debianized package
 
 # 1.1 (2017-08-20)
 
 ## Added
 
-- **ssh-ping**: colors in statistics output
+- ssh-ping: colors in statistics output
 
 # 1.0 (2017-08-14)
 
