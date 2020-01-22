@@ -15,6 +15,7 @@
   - Update explorers
   - Add explorers ( runlevel, disks )
 - ssh-ping:
+  - Replaced tput with ANSI Escape codes for color output
   - Added -H option to print human readable timestamp
   - Changed from Python to Perl for calculating time
 - ssh-version:
