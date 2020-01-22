@@ -15,7 +15,7 @@
   - Update explorers
   - Add explorers ( runlevel, disks )
 - ssh-ping:
-  - Added -H option to print timestamp human readable
+  - Added -H option to print human readable timestamp
   - Changed from Python to Perl for calculating time
 - ssh-version:
   - Updated usage (with examples)
