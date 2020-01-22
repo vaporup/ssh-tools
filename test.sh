@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -euo pipefail
+
 TEST_SSH_USER="root"
 TEST_SSH_SERVER="192.168.1.10"
 
@@ -30,3 +32,4 @@ for (( i = 0; i < ${#test_commands[@]} ; i++ )); do
 
 done
 
+printf "\n**** Finished *****\n\n"
