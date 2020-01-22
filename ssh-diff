@@ -42,6 +42,8 @@ cat << EOF
     So if you are not using SSH Keys
     you may get prompted twice for a password.
 
+    Use "CHECK_REMOTE_FILE_EXISTS=NO ${0##*/}" to disable that behavior
+
     Diff Options:
 
     All options your local diff command supports ( except '-r' ).
@@ -110,6 +112,10 @@ function show_header() {
 }
 
 function login_successful_and_remote_file_exists() {
+
+    if [[ ${CHECK_REMOTE_FILE_EXISTS} == "NO" ]]; then
+      return 0
+    fi
 
     if [[ -z "${username}" ]]; then
         ssh "${ssh_params[@]}" $remote_host "test -e $remote_file" &> /dev/null
