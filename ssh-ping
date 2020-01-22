@@ -253,7 +253,7 @@ if [[ ${verbose} == yes ]]; then
     echo -e -n "${RESET}"
 fi
 
-command_exists perl || echo -e "${YELLOW}WARNING:${RESET} No perl found. Unable to measure time (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
+command_exists perl || echo -e "${YELLOW}WARNING:${RESET} No perl found, time measure probably fails (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
 
 while true; do
 
