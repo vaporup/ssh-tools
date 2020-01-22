@@ -4,19 +4,19 @@
 
 - **ssh-certinfo**: Shows validity and information of SSH certificates
 - **ssh-keyinfo**: Prints keys in several formats
+- ssh-diff: Environment variable to disable remote file checking
+- ssh-facts: New explorers ( runlevel, disks )
+- ssh-ping: Option to print human readable timestamp (-H)
 
 ## Changed
 
 - ssh-diff:
   - Replaced tput with ANSI Escape codes for color output
-  - Add environment variable to disable remote file checking
   - Pipe output to cat to get a zero exit code for test.sh
 - ssh-facts:
   - Update explorers
-  - Add explorers ( runlevel, disks )
 - ssh-ping:
   - Replaced tput with ANSI Escape codes for color output
-  - Added -H option to print human readable timestamp
   - Changed from Python to Perl for calculating time
 - ssh-version:
   - Updated usage (with examples)
