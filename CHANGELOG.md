@@ -1,10 +1,14 @@
-# Unreleased
+# 1.6 Unreleased
 
 # 1.5 (2018-12-23)
 
 ## Added
 
-- **ssh-hostkeys**:  prints server host keys in several formats
+- **ssh-hostkeys**:  Prints server host keys in several formats
+
+## Removed
+
+- Moved packaging files for debian to https://salsa.debian.org/swick-guest/ssh-tools
 
 # 1.4 (2018-02-25)
 
@@ -44,8 +48,13 @@
 
 # 1.1 (2017-08-20)
 
-colors in statistics output
+## Added
+
+- **ssh-ping**: colors in statistics output
 
 # 1.0 (2017-08-14)
 
 Initial Release
+
+- **ssh-ping**: Check if host is reachable using ssh_config
+- **ssh-version**: Shows version of the SSH server you are connecting to
