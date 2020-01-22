@@ -148,6 +148,12 @@ function diff_files() {
             if supports_colordiff; then
                 ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
             else
+                # Pipe the output to cat after diffing
+                #
+                # test.sh fails when colordiff is not installed.
+                # Reason is that a normal diff returns with 1
+                # when files differ but colordiff changes the return code to 0.
+
                 ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
             fi
         fi
