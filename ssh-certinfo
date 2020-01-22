@@ -161,7 +161,7 @@ function print_if_certs_were_found() {
             echo -e -n "${RESET}"
         else
             echo -e "No SSH certificates found.\n"
-        fi  
+        fi
     fi
 }
 
