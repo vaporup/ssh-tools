@@ -1,5 +1,25 @@
 # 1.6 Unreleased
 
+## Added
+
+- **ssh-certinfo**: Shows validity and information of SSH certificates
+- **ssh-keyinfo**: Prints keys in several formats 
+
+## Changed
+
+- **ssh-diff**:
+  - Replaced tput with ANSI Escape codes for color output
+  - Add environment variable to disable remote file checking
+  - Pipe output to cat to get a zero exit code for test.sh
+- **ssh-facts**:
+  - Update explorers
+  - Add explorers ( runlevel, disks )
+- **ssh-ping**:
+  - Added -H option to print timestamp human readable
+  - Changed from Python to Perl for calculating time
+- **ssh-version**:
+  - Updated usage (with examples)
+
 # 1.5 (2018-12-23)
 
 ## Added
