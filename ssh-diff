@@ -139,7 +139,7 @@ function diff_files() {
             if supports_colordiff; then
                 ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
             else
-                ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file
+                ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | cat
             fi
         fi
     else
