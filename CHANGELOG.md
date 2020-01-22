@@ -4,13 +4,13 @@
 
 ## Added
 
-- ssh-hostkeys:  prints server host keys in several formats
+- **ssh-hostkeys**:  prints server host keys in several formats
 
 # 1.4 (2018-02-25)
 
 ## Added
 
-- ssh-facts: uptime and last_reboot fact
+- **ssh-facts**: uptime and last_reboot fact
 
 ## Changed
 
@@ -34,12 +34,12 @@
 
 ## Added
 
-- ssh-diff: Diff a file over SSH
-- ssh-facts: Get some facts about the remote system
+- **ssh-diff**: Diff a file over SSH
+- **ssh-facts**: Get some facts about the remote system
 
 ## Changed
 
-- ssh-ping: works now under OSX
+- **ssh-ping**: works now under OSX
 - debianized package
 
 # 1.1 (2017-08-20)
