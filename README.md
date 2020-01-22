@@ -44,7 +44,7 @@ Diff a file over SSH
   < 127.0.0.1 localhost
   < 127.0.1.1 kim
   ---
-  > 127.0.0.1 localhost 
+  > 127.0.0.1 localhost
   > 127.0.1.1 blinky
   ~~~~
 
@@ -120,7 +120,7 @@ Shows validity and information of SSH certificates
           Valid: forever
           Principals: (none)
           Critical Options: (none)
-          Extensions: 
+          Extensions:
                   permit-X11-forwarding
                   permit-agent-forwarding
                   permit-port-forwarding

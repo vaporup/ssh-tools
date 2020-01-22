@@ -3,7 +3,7 @@
 ## Added
 
 - **ssh-certinfo**: Shows validity and information of SSH certificates
-- **ssh-keyinfo**: Prints keys in several formats 
+- **ssh-keyinfo**: Prints keys in several formats
 
 ## Changed
 
