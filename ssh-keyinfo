@@ -48,7 +48,7 @@ function get_fingerprints () {
     key_size=${key_data[0]}
     key_hash=${key_data[1]}
     key_comment=${key_data[2]}
-    key_type=${key_data[3]}
+    key_type=${key_data[-1]}
     key_hash_type="${key_hash%%:*}"
     key_hash_data="${key_hash#*:}"
 
