@@ -122,8 +122,8 @@ function login_successful_and_remote_file_exists() {
 
     RETVAL=$?
 
-    [[ ${RETVAL} -eq 255 ]] && { echo -e "\n  ${RED}Error: Could not connect to remote server${RESET}\n" >&2 ; exit ${RETVAL}; }
-    [[ ${RETVAL} -ge   1 ]] && { echo -e "\n  ${RED}Error: Remote file ${remote_file} not found${RESET}\n" >&2 ; exit ${RETVAL}; }
+    [[ ${RETVAL} -eq 255 ]] && { echo -e "\n  ${RED}Error: Could not connect to remote server${RESET}\n" >&2 ; exit "${RETVAL}"; }
+    [[ ${RETVAL} -ge   1 ]] && { echo -e "\n  ${RED}Error: Remote file ${remote_file} not found${RESET}\n" >&2 ; exit "${RETVAL}"; }
     [[ ${RETVAL} -eq   0 ]] && true
 
 }
