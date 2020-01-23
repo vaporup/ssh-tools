@@ -75,7 +75,7 @@ shift $((OPTIND - 1))
 remote_host=$1
 
 the_hostkeys=$( mktemp /tmp/ssh-hostkeys.XXXXXX )
-trap "rm -f $the_hostkeys" EXIT
+trap 'rm -f $the_hostkeys' EXIT
 
 ssh-keyscan "${SSH_FLAGS[@]}" $remote_host > $the_hostkeys 2>/dev/null
 
