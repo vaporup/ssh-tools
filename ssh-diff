@@ -95,7 +95,7 @@ fi
 
 function supports_colordiff() {
 
-    type colordiff &> /dev/null && true || false
+    type colordiff &> /dev/null
 
 }
 
