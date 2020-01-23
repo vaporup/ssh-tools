@@ -44,7 +44,7 @@ function get_fingerprints () {
 
   ssh-keygen -E "${hash_type}" -qlf "${key_file}" | while IFS= read -r line; do
 
-    key_data=( $(printf '%s\n' "$line") )
+    key_data=( $(printf '%s\n' "${line}") )
     key_size=${key_data[0]}
     key_hash=${key_data[1]}
     #key_comment=${key_data[2]}

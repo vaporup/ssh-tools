@@ -100,7 +100,7 @@ function supports_colordiff() {
 function show_header() {
 
     echo ""
-    echo -e "Comparing ${BOLD}$remote_host:$remote_file${RESET} (<) with ${BOLD}$local_file${RESET} (>)"
+    echo -e "Comparing ${BOLD}${remote_host}:${remote_file}${RESET} (<) with ${BOLD}${local_file}${RESET} (>)"
     echo ""
 
 }
@@ -113,15 +113,15 @@ function login_successful_and_remote_file_exists() {
     fi
 
     if [[ -z "${username}" ]]; then
-        ssh "${ssh_params[@]}" $remote_host "test -e $remote_file" &> /dev/null
+        ssh "${ssh_params[@]}" ${remote_host} "test -e ${remote_file}" &> /dev/null
     else
-        ssh "${ssh_params[@]}" $username@$remote_host "test -e $remote_file" &> /dev/null
+        ssh "${ssh_params[@]}" ${username}@${remote_host} "test -e ${remote_file}" &> /dev/null
     fi
 
     RETVAL=$?
 
     [[ ${RETVAL} -eq 255 ]] && { echo -e "\n  ${RED}Error: Could not connect to remote server${RESET}\n" >&2 ; exit ${RETVAL}; }
-    [[ ${RETVAL} -ge   1 ]] && { echo -e "\n  ${RED}Error: Remote file $remote_file not found${RESET}\n" >&2 ; exit ${RETVAL}; }
+    [[ ${RETVAL} -ge   1 ]] && { echo -e "\n  ${RED}Error: Remote file ${remote_file} not found${RESET}\n" >&2 ; exit ${RETVAL}; }
     [[ ${RETVAL} -eq   0 ]] && true
 
 }
@@ -132,7 +132,7 @@ function diff_files() {
         if login_successful_and_remote_file_exists; then
             show_header
             if supports_colordiff; then
-                ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
+                ssh "${ssh_params[@]}" ${remote_host} "cat ${remote_file}" | diff "${diff_params[@]}" --label "${remote_host}:${remote_file}" - ${local_file} | colordiff
             else
                 # Pipe the output to cat after diffing
                 #
@@ -140,14 +140,14 @@ function diff_files() {
                 # Reason is that a normal diff returns with 1
                 # when files differ but colordiff changes the return code to 0.
 
-                ssh "${ssh_params[@]}" $remote_host "cat $remote_file" | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | cat
+                ssh "${ssh_params[@]}" ${remote_host} "cat ${remote_file}" | diff "${diff_params[@]}" --label "${remote_host}:${remote_file}" - ${local_file} | cat
             fi
         fi
     else
         if login_successful_and_remote_file_exists; then
             show_header
             if supports_colordiff; then
-                ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | colordiff
+                ssh "${ssh_params[@]}" ${username}@${remote_host} "cat ${remote_file}"  | diff "${diff_params[@]}" --label "${remote_host}:${remote_file}" - ${local_file} | colordiff
             else
                 # Pipe the output to cat after diffing
                 #
@@ -155,7 +155,7 @@ function diff_files() {
                 # Reason is that a normal diff returns with 1
                 # when files differ but colordiff changes the return code to 0.
 
-                ssh "${ssh_params[@]}" $username@$remote_host "cat $remote_file"  | diff "${diff_params[@]}" --label "$remote_host:$remote_file" - $local_file | cat
+                ssh "${ssh_params[@]}" ${username}@${remote_host} "cat ${remote_file}"  | diff "${diff_params[@]}" --label "${remote_host}:${remote_file}" - ${local_file} | cat
             fi
         fi
     fi
@@ -231,34 +231,34 @@ done
 #                    -> filename gets stored in $remote_file
 #
 
-if [[ $remote_params == *"@"* ]]; then
+if [[ ${remote_params} == *"@"* ]]; then
     remote_part=$( echo ${remote_params##*@} )
     username=$( echo ${remote_params%%@*} )
 else
     remote_part=${remote_params}
 fi
 
-if [[ $remote_part == *":"* ]]; then
+if [[ ${remote_part} == *":"* ]]; then
     remote_file=$( echo ${remote_part##*:} )
     remote_host=$( echo ${remote_part%%:*} )
 else
     remote_host=${remote_part}
 fi
 
-local_file=$(readlink -f $local_filename) # get absolute path to file in case it was relative
+local_file=$(readlink -f ${local_filename}) # get absolute path to file in case it was relative
 
-if [[ -z "$local_file" ]]; then
+if [[ -z "${local_file}" ]]; then
     echo -e "\n  ${RED}Error: Given file not found${RESET}\n" >&2
     exit 1
 fi
 
-if [[ ! -f $local_file ]]; then
-    echo -e "\n  ${RED}Error: Local file $local_file not found${RESET}\n" >&2
+if [[ ! -f ${local_file} ]]; then
+    echo -e "\n  ${RED}Error: Local file ${local_file} not found${RESET}\n" >&2
     exit 1
 fi
 
-if [[ -z "$remote_file" ]]; then
-    remote_file=$local_file
+if [[ -z "${remote_file}" ]]; then
+    remote_file=${local_file}
 fi
 
 #

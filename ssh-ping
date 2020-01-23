@@ -112,10 +112,10 @@ function command_exists() {
 
 function get_timestamp() {
 
-    if [[ "$print_timestamp_human_readable" == "yes" ]]; then
+    if [[ "${print_timestamp_human_readable}" == "yes" ]]; then
       date
     else
-      if [[ "$OSTYPE" == "linux-gnu" ]]; then
+      if [[ "${OSTYPE}" == "linux-gnu" ]]; then
         date +%s.%6N
       else
         command_exists perl && perl -MTime::HiRes=time -e 'printf "%.6f", time'
@@ -126,7 +126,7 @@ function get_timestamp() {
 
 function get_request_timestamp() {
 
-    if [[ "$OSTYPE" == "linux-gnu" ]]; then
+    if [[ "${OSTYPE}" == "linux-gnu" ]]; then
         date +%s%3N
     else
         command_exists perl && perl -MTime::HiRes=time -e 'printf "%i", time * 1000'
@@ -136,28 +136,28 @@ function get_request_timestamp() {
 
 function print_statistics() {
 
-    [[ $requests_transmitted -eq 0 ]] && exit
+    [[ ${requests_transmitted} -eq 0 ]] && exit
 
     requests_loss=$(( 100 * requests_lost / requests_transmitted ))
 
     echo ""
-    echo -e "${WHITE}---${RESET} ${YELLOW}$host${RESET} ${WHITE}ping statistics${RESET} ${WHITE}---${RESET}"
+    echo -e "${WHITE}---${RESET} ${YELLOW}${host}${RESET} ${WHITE}ping statistics${RESET} ${WHITE}---${RESET}"
 
-    statistics_ok="${GREEN}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
-    statistics_ok+="${GREEN}$requests_received${RESET} ${WHITE}requests received${RESET}, "
-    statistics_ok+="${GREEN}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+    statistics_ok="${GREEN}${requests_transmitted}${RESET} ${WHITE}requests transmitted${RESET}, "
+    statistics_ok+="${GREEN}${requests_received}${RESET} ${WHITE}requests received${RESET}, "
+    statistics_ok+="${GREEN}${requests_loss}%${RESET} ${WHITE}request loss${RESET}"
 
-    statistics_warn="${YELLOW}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
-    statistics_warn+="${YELLOW}$requests_received${RESET} ${WHITE}requests received${RESET}, "
-    statistics_warn+="${YELLOW}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+    statistics_warn="${YELLOW}${requests_transmitted}${RESET} ${WHITE}requests transmitted${RESET}, "
+    statistics_warn+="${YELLOW}${requests_received}${RESET} ${WHITE}requests received${RESET}, "
+    statistics_warn+="${YELLOW}${requests_loss}%${RESET} ${WHITE}request loss${RESET}"
 
-    statistics_crit="${RED}$requests_transmitted${RESET} ${WHITE}requests transmitted${RESET}, "
-    statistics_crit+="${RED}$requests_received${RESET} ${WHITE}requests received${RESET}, "
-    statistics_crit+="${RED}$requests_loss%${RESET} ${WHITE}request loss${RESET}"
+    statistics_crit="${RED}${requests_transmitted}${RESET} ${WHITE}requests transmitted${RESET}, "
+    statistics_crit+="${RED}${requests_received}${RESET} ${WHITE}requests received${RESET}, "
+    statistics_crit+="${RED}${requests_loss}%${RESET} ${WHITE}request loss${RESET}"
 
-    [[ $requests_loss -eq 100 ]] &&  echo -e "$statistics_crit" && exit
-    [[ $requests_loss -gt   1 ]] &&  echo -e "$statistics_warn" && exit
-    [[ $requests_loss -eq   0 ]] &&  echo -e "$statistics_ok"   && exit
+    [[ ${requests_loss} -eq 100 ]] &&  echo -e "${statistics_crit}" && exit
+    [[ ${requests_loss} -gt   1 ]] &&  echo -e "${statistics_warn}" && exit
+    [[ ${requests_loss} -eq   0 ]] &&  echo -e "${statistics_ok}"   && exit
 
 }
 
@@ -174,21 +174,21 @@ while getopts ":46c:F:hi:l:DHp:vW:q" opt; do
             SSH_FLAGS+=("-6")
         ;;
         c )
-            [[ $OPTARG =~ ^[0-9]+$ ]] && ping_count=$OPTARG
+            [[ ${OPTARG} =~ ^[0-9]+$ ]] && ping_count=${OPTARG}
         ;;
         F )
             SSH_FLAGS+=("-F")
-            SSH_FLAGS+=("$OPTARG")
+            SSH_FLAGS+=("${OPTARG}")
         ;;
         h )
             usage
             exit 1
         ;;
         i )
-            ping_interval=$OPTARG
+            ping_interval=${OPTARG}
         ;;
         l )
-            SSH_FLAGS+=("-l") && SSH_FLAGS+=("$OPTARG")
+            SSH_FLAGS+=("-l") && SSH_FLAGS+=("${OPTARG}")
         ;;
         D )
             print_timestamp="yes"
@@ -198,19 +198,19 @@ while getopts ":46c:F:hi:l:DHp:vW:q" opt; do
             print_timestamp_human_readable="yes"
         ;;
         p )
-            [[ $OPTARG =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p") && SSH_FLAGS+=("$OPTARG")
+            [[ ${OPTARG} =~ ^[0-9]+$ ]] && SSH_FLAGS+=("-p") && SSH_FLAGS+=("${OPTARG}")
         ;;
         v )
             verbose="yes"
         ;;
         W )
-            [[ $OPTARG =~ ^[0-9]+$ ]] && connect_timeout=$OPTARG
+            [[ ${OPTARG} =~ ^[0-9]+$ ]] && connect_timeout=${OPTARG}
         ;;
         q )
             quiet="yes"
         ;;
         \? )
-            echo "Invalid option: $OPTARG" 1>&2
+            echo "Invalid option: ${OPTARG}" 1>&2
             usage
             exit 1
         ;;
@@ -219,7 +219,7 @@ done
 
 shift $((OPTIND - 1))
 
-SSH_OPTS+=( -o ConnectTimeout=$connect_timeout )
+SSH_OPTS+=( -o ConnectTimeout=${connect_timeout} )
 
 #
 # Getting username and host from command line without using grep and awk
@@ -253,7 +253,7 @@ if [[ ${verbose} == yes ]]; then
     echo -e -n "${RESET}"
 fi
 
-if [[ ! "$OSTYPE" == "linux-gnu" ]]; then
+if [[ ! "${OSTYPE}" == "linux-gnu" ]]; then
   command_exists perl || echo -e "${YELLOW}WARNING:${RESET} No perl found, time measure probably fails (${WHITE}time${RESET}=${RED}0${RESET} ms)" >&2
 fi
 
@@ -291,11 +291,11 @@ while true; do
     # Output "Reply" if the SSH server is at least talking to us but login was denied
     #
 
-    if [[ $status == pong ]]; then
+    if [[ ${status} == pong ]]; then
         requests_received=$(( requests_received + 1 ))
         [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -e -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
         [[ ${quiet} == no ]] && echo -e "${GREEN}Pong${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
-    elif [[ $status == denied || $status == sftp ]]; then
+    elif [[ ${status} == denied || ${status} == sftp ]]; then
         requests_received=$(( requests_received + 1 ))
         [[ ${quiet} == no ]] && [[ ${print_timestamp} == yes ]] && echo -e -n "${WHITE}[${RESET}${MAGENTA}${timestamp}${RESET}${WHITE}]${RESET} "
         [[ ${quiet} == no ]] && echo -e "${CYAN}Reply${RESET} ${WHITE}from${RESET} ${YELLOW}${host}${RESET}${WHITE}: ssh_seq${RESET}=${RED}${ssh_seq}${RESET} ${WHITE}time${RESET}=${RED}${time_request}${RESET} ms"
@@ -303,7 +303,7 @@ while true; do
         requests_lost=$(( requests_lost + 1 ))
     fi
 
-    requests_transmitted=$ssh_seq
+    requests_transmitted=${ssh_seq}
     ssh_seq=$(( ssh_seq + 1 ))
 
     #
