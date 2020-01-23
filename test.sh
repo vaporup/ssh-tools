@@ -7,8 +7,8 @@ TEST_SSH_SERVER="192.168.1.10"
 
 SCRIPT_PATH="$(dirname "${BASH_SOURCE[0]}")"
 
-
- test_commands=( "${SCRIPT_PATH}/ssh-keyinfo ${SCRIPT_PATH}/examples/*/*" )
+ test_commands=( "shellcheck ${SCRIPT_PATH}/ssh-*" )
+test_commands+=( "${SCRIPT_PATH}/ssh-keyinfo ${SCRIPT_PATH}/examples/*/*" )
 test_commands+=( "${SCRIPT_PATH}/ssh-certinfo ${SCRIPT_PATH}/examples/*/*" )
 test_commands+=( "${SCRIPT_PATH}/ssh-certinfo -v ${SCRIPT_PATH}/examples/*/*" )
 test_commands+=( "${SCRIPT_PATH}/ssh-certinfo -c ${SCRIPT_PATH}/examples/*/*" )
