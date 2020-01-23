@@ -123,7 +123,7 @@ function return_epoch_from_date_string() {
 
     DATES+=( $( date -d "$(echo $1 | sed 's/T/ /')" +%s 2>/dev/null || echo NO_DATE ) )
 
-    for DATE in ${DATES[@]}; do
+    for DATE in "${DATES[@]}"; do
       if [[ ${DATE} -gt 0 ]]; then
         echo ${DATE}
         break

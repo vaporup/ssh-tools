@@ -101,7 +101,7 @@ function get_fingerprints () {
 
 }
 
-for fingerprint_hash in ${fingerprint_hashes[@]}; do
+for fingerprint_hash in "${fingerprint_hashes[@]}"; do
 
   get_fingerprints $fingerprint_hash
 

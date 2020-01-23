@@ -195,7 +195,7 @@ diff_params_index=0
 ssh_params=()
 ssh_params_indices=()
 
-for param in ${diff_params[@]}; do
+for param in "${diff_params[@]}"; do
 
     next_diff_params_index=$(( diff_params_index +1 ))
 
@@ -221,7 +221,7 @@ for param in ${diff_params[@]}; do
 
 done
 
-for ssh_param in ${ssh_params_indices[@]}; do
+for ssh_param in "${ssh_params_indices[@]}"; do
 
     unset diff_params[$ssh_param]
 
