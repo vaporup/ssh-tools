@@ -18,8 +18,8 @@ test_commands+=( "${SCRIPT_PATH}/ssh-certinfo -cv -w 20000 ${SCRIPT_PATH}/exampl
 test_commands+=( "CHECK_REMOTE_FILE_EXISTS=NO sshpass -e ${SCRIPT_PATH}/ssh-diff /etc/hosts ${TEST_SSH_USER}@${TEST_SSH_SERVER}" )
 test_commands+=( "sshpass -e ${SCRIPT_PATH}/ssh-facts ${TEST_SSH_USER}@${TEST_SSH_SERVER}" )
 test_commands+=( "${SCRIPT_PATH}/ssh-hostkeys ${TEST_SSH_SERVER}" )
-test_commands+=( "sshpass -e ${SCRIPT_PATH}/ssh-ping -v -c 3 -D ${TEST_SSH_USER}@${TEST_SSH_SERVER}" )
-test_commands+=( "sshpass -e ${SCRIPT_PATH}/ssh-ping -v -c 3 -H ${TEST_SSH_USER}@${TEST_SSH_SERVER}" )
+test_commands+=( "sshpass -e ${SCRIPT_PATH}/ssh-ping -4 -v -c 3 -D ${TEST_SSH_USER}@${TEST_SSH_SERVER}" )
+test_commands+=( "sshpass -e ${SCRIPT_PATH}/ssh-ping -4 -v -c 3 -H ${TEST_SSH_USER}@${TEST_SSH_SERVER}" )
 test_commands+=( "${SCRIPT_PATH}/ssh-version ${TEST_SSH_SERVER}" )
 
 for (( i = 0; i < ${#test_commands[@]} ; i++ )); do
