@@ -18,12 +18,6 @@
 #
 
      RED='\033[0;91m'
-   GREEN='\033[0;92m'
-  YELLOW='\033[0;93m'
-    BLUE='\033[0;94m'
- MAGENTA='\033[0;95m'
-    CYAN='\033[0;96m'
-   WHITE='\033[0;97m'
     BOLD='\033[1m'
    RESET='\033[0m'
 
@@ -221,6 +215,7 @@ for param in "${diff_params[@]}"; do
 
 done
 
+# shellcheck disable=SC2034
 for ssh_param in "${ssh_params_indices[@]}"; do
 
     unset diff_params[$ssh_param]
