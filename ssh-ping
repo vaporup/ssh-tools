@@ -165,6 +165,7 @@ function print_statistics() {
 # Command line Options
 #
 
+# shellcheck disable=SC2249
 while getopts ":46c:F:hi:l:DHp:vW:q" opt; do
     case ${opt} in
         4 )

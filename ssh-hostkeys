@@ -46,6 +46,7 @@ fi
 
 SSH_FLAGS=()
 
+# shellcheck disable=SC2249
 while getopts ":46hp:T:" opt; do
     case ${opt} in
         4 )

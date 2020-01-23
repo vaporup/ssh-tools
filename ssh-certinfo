@@ -70,6 +70,7 @@ fi
 # Command line Options
 #
 
+# shellcheck disable=SC2249
 while getopts ":chvw:" opt; do
     case ${opt} in
         c )
