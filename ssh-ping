@@ -106,7 +106,7 @@ fi
 
 function command_exists() {
 
-    command -v ${1} >/dev/null 2>&1
+    command -v "${1}" >/dev/null 2>&1
 
 }
 
@@ -232,8 +232,8 @@ SSH_OPTS+=( -o "ConnectTimeout=${connect_timeout}" )
 #
 
 if [[ $1 == *"@"* ]]; then
-    host=$( echo ${1##*@} )
-    username=$( echo ${1%%@*} )
+    host=$( echo "${1##*@}" )
+    username=$( echo "${1%%@*}" )
 else
     host=${1}
 fi
@@ -310,7 +310,7 @@ while true; do
     # Don't sleep if we do just 1 request
     #
 
-    [[ ${ping_count} -eq 1 ]] || sleep ${ping_interval}
+    [[ ${ping_count} -eq 1 ]] || sleep "${ping_interval}"
 
 done
 

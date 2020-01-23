@@ -118,11 +118,11 @@ function return_epoch_from_date_string() {
     # BusyBox
     #
 
-    DATES+=( $( date -d "$(echo $1 | sed 's/T/ /')" +%s 2>/dev/null || echo NO_DATE ) )
+    DATES+=( $( date -d "$(echo "$1" | sed 's/T/ /')" +%s 2>/dev/null || echo NO_DATE ) )
 
     for DATE in "${DATES[@]}"; do
       if [[ ${DATE} -gt 0 ]]; then
-        echo ${DATE}
+        echo "${DATE}"
         break
       fi
     done
@@ -137,8 +137,8 @@ function print_cert() {
 
 function get_cert_data() {
 
-                valid_from=$(  echo ${valid} | awk '{print $3}' )
-                  valid_to=$(  echo ${valid} | awk '{print $5}' )
+                valid_from=$(  echo "${valid}" | awk '{print $3}' )
+                  valid_to=$(  echo "${valid}" | awk '{print $5}' )
           valid_from_epoch=$(  return_epoch_from_date_string "${valid_from}" )
             valid_to_epoch=$(  return_epoch_from_date_string "${valid_to}"   )
 
@@ -149,7 +149,7 @@ function get_cert_data() {
 
 function print_if_certs_were_found() {
 
-    if grep -q "yes" ${certs_found}; then
+    if grep -q "yes" "${certs_found}"; then
         echo
     else
         if [[ ${colors} == yes ]]; then
@@ -219,7 +219,7 @@ if [[ ${verbose} == yes ]]; then
         if [[ -z ${valid} ]]; then
             continue
         else
-            echo "yes" > ${certs_found}
+            echo "yes" > "${certs_found}"
         fi
 
         if [[ ${valid} == *"forever"* ]]; then
@@ -304,7 +304,7 @@ else
         if [[ -z ${valid} ]]; then
             continue
         else
-            echo "yes" > ${certs_found}
+            echo "yes" > "${certs_found}"
         fi
 
         if [[ ${valid} == *"forever"* ]]; then
