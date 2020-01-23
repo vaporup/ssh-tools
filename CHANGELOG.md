@@ -10,6 +10,8 @@
 
 ## Changed
 
+- all
+  - shellchecked and fixed errors and warnings (https://www.shellcheck.net)
 - ssh-diff:
   - Replaced tput with ANSI Escape codes for color output
   - Pipe output to cat to get a zero exit code for test.sh
