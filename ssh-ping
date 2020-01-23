@@ -248,8 +248,8 @@ echo -e "${BOLD}SSHPING${RESET} ${YELLOW}${host}${RESET}"
 
 if [[ ${verbose} == yes ]]; then
     echo -e -n "${BLUE}"
-    echo "SSH_FLAGS: ${SSH_FLAGS[@]}"
-    echo "SSH_OPTS: ${SSH_OPTS[@]}"
+    echo "SSH_FLAGS:" "${SSH_FLAGS[@]}"
+    echo "SSH_OPTS:" "${SSH_OPTS[@]}"
     echo -e -n "${RESET}"
 fi
 
