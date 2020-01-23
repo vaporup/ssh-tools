@@ -13,6 +13,8 @@
 #  |                https://serverfault.com/questions/59140/how-do-diff-over-ssh#comment1027981_216496 |
 #  +---------------------------------------------------------------------------------------------------+
 
+# shellcheck disable=SC2029
+
 #
 #  Some colors for better output
 #
