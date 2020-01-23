@@ -221,6 +221,8 @@ done
 # shellcheck disable=SC2034
 for ssh_param in "${ssh_params_indices[@]}"; do
 
+    # shellcheck disable=SC2184
+    # shellcheck disable=SC2102
     unset diff_params[$ssh_param]
 
 done
