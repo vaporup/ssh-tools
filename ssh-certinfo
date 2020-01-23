@@ -119,7 +119,7 @@ function return_epoch_from_date_string() {
     # BusyBox
     #
 
-    DATES+=( $( date -d "$(echo "$1" | sed 's/T/ /')" +%s 2>/dev/null || echo NO_DATE ) )
+    DATES+=( $( date -d "${1//T/ }" +%s 2>/dev/null || echo NO_DATE ) )
 
     for DATE in "${DATES[@]}"; do
       if [[ ${DATE} -gt 0 ]]; then
