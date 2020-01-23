@@ -38,10 +38,10 @@ trap print_statistics SIGINT
 #
 
 SSH_OPTS=(
-    -o BatchMode=yes
-    -o CheckHostIP=no
-    -o StrictHostKeyChecking=no
-    -o HashKnownHosts=no
+    -o "BatchMode=yes"
+    -o "CheckHostIP=no"
+    -o "StrictHostKeyChecking=no"
+    -o "HashKnownHosts=no"
 )
 
 #
@@ -219,7 +219,7 @@ done
 
 shift $((OPTIND - 1))
 
-SSH_OPTS+=( -o ConnectTimeout=${connect_timeout} )
+SSH_OPTS+=( -o "ConnectTimeout=${connect_timeout}" )
 
 #
 # Getting username and host from command line without using grep and awk

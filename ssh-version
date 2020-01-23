@@ -13,13 +13,13 @@
 #  +-----------------------------------------------------------------------------------------------------------+
 
 ssh_opts=(
-    -o BatchMode=yes
-    -o CheckHostIP=no
-    -o StrictHostKeyChecking=no
-    -o HashKnownHosts=no
-    -o ConnectTimeout=16
-    -o PasswordAuthentication=no
-    -o PubkeyAuthentication=no
+    -o "BatchMode=yes"
+    -o "CheckHostIP=no"
+    -o "StrictHostKeyChecking=no"
+    -o "HashKnownHosts=no"
+    -o "ConnectTimeout=16"
+    -o "PasswordAuthentication=no"
+    -o "PubkeyAuthentication=no"
 )
 
 #
