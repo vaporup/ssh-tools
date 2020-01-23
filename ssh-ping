@@ -233,8 +233,8 @@ SSH_OPTS+=( -o "ConnectTimeout=${connect_timeout}" )
 #
 
 if [[ $1 == *"@"* ]]; then
-    host=$( echo "${1##*@}" )
-    username=$( echo "${1%%@*}" )
+    host="${1##*@}"
+    username="${1%%@*}"
 else
     host=${1}
 fi

@@ -234,15 +234,15 @@ done
 #
 
 if [[ ${remote_params} == *"@"* ]]; then
-    remote_part=$( echo "${remote_params##*@}" )
-    username=$( echo "${remote_params%%@*}" )
+    remote_part="${remote_params##*@}"
+    username="${remote_params%%@*}"
 else
     remote_part=${remote_params}
 fi
 
 if [[ ${remote_part} == *":"* ]]; then
-    remote_file=$( echo "${remote_part##*:}" )
-    remote_host=$( echo "${remote_part%%:*}" )
+    remote_file="${remote_part##*:}"
+    remote_host="${remote_part%%:*}"
 else
     remote_host=${remote_part}
 fi
