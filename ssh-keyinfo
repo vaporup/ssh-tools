@@ -67,5 +67,3 @@ for KEY in "${KEYS[@]}"; do
   done
 
 done
-
-
