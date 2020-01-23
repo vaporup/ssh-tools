@@ -12,6 +12,8 @@
 #  | Based On     : https://unix.stackexchange.com/questions/126908/get-ssh-server-key-fingerprint     |
 #  +---------------------------------------------------------------------------------------------------+
 
+# shellcheck disable=SC2207
+
 #
 # Usage/Help message
 #
