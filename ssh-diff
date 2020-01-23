@@ -201,8 +201,8 @@ for param in "${diff_params[@]}"; do
     #
 
     if [[ ${param} == "-p" ]] && [[ -z "${diff_params[${next_diff_params_index}]//[0-9]}" ]]; then
-        ssh_params_indices+=( ${diff_params_index} ${next_diff_params_index} )
-        ssh_params+=( ${param} ${diff_params[${next_diff_params_index}]} )
+        ssh_params_indices+=( "${diff_params_index}" "${next_diff_params_index}" )
+        ssh_params+=( "${param}" "${diff_params[${next_diff_params_index}]}" )
     fi
 
     #
@@ -210,8 +210,8 @@ for param in "${diff_params[@]}"; do
     #
 
     if [[ ${param} == "-4" ]] || [[ ${param} == "-6" ]]; then
-        ssh_params_indices+=( ${diff_params_index} )
-        ssh_params+=( ${param} )
+        ssh_params_indices+=( "${diff_params_index}" )
+        ssh_params+=( "${param}" )
     fi
 
     diff_params_index=$(( diff_params_index +1 ))

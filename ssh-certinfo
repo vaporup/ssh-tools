@@ -204,7 +204,7 @@ function cert_expires() {
 }
 
 WARN_SECONDS=$(( WARN * 24 * 60 * 60))
-CERTS=( ${@:${OPTIND}}  )
+CERTS=( "${@:${OPTIND}}"  )
 now=$(date +%s)
 certs_found="$(mktemp)"
 trap 'rm -f ${certs_found}' EXIT
