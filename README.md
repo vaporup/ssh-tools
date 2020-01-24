@@ -3,9 +3,8 @@
   <img src="https://img.shields.io/badge/license-gpl--3-brightgreen.svg?style=flat-square"/>
   <img src="https://img.shields.io/badge/status-stable-ff69b4.svg?style=flat-square"/>
   <img src="https://img.shields.io/badge/implementation-bash / perl-red.svg?style=flat-square"/>
+  <img src="https://raw.githubusercontent.com/vaporup/ssh-tools/master/logo.png"/>
 </p>
-
-![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/logo.png)
 
 ## ssh-ping
 Check if host is reachable using ssh_config
