@@ -5,6 +5,8 @@
   <img src="https://img.shields.io/badge/implementation-bash / perl-red.svg?style=flat-square"/>
 </p>
 
+![](https://raw.githubusercontent.com/vaporup/ssh-tools/master/logo.png)
+
 ## ssh-ping
 Check if host is reachable using ssh_config
 
