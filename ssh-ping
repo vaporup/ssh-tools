@@ -155,8 +155,8 @@ function print_statistics() {
     statistics_crit+="${RED}${requests_received}${RESET} ${WHITE}requests received${RESET}, "
     statistics_crit+="${RED}${requests_loss}%${RESET} ${WHITE}request loss${RESET}"
 
-    [[ ${requests_loss} -eq 100 ]] &&  echo -e "${statistics_crit}" && exit
-    [[ ${requests_loss} -gt   1 ]] &&  echo -e "${statistics_warn}" && exit
+    [[ ${requests_loss} -eq 100 ]] &&  echo -e "${statistics_crit}" && exit 1
+    [[ ${requests_loss} -gt   1 ]] &&  echo -e "${statistics_warn}" && exit 1
     [[ ${requests_loss} -eq   0 ]] &&  echo -e "${statistics_ok}"   && exit
 
 }
