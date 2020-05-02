@@ -130,7 +130,7 @@ function get_timestamp() {
     if [[ "${print_timestamp_human_readable}" == "yes" ]]; then
       date
     else
-      if [[ "${OSTYPE}" == "linux-gnu" ]]; then
+      if [[ "${OSTYPE}" == "linux-gnu" ]] && command_exists date; then
         date +%s.%6N
       else
         command_exists perl && perl -MTime::HiRes=time -e 'printf "%.6f", time'
@@ -141,7 +141,7 @@ function get_timestamp() {
 
 function get_request_timestamp() {
 
-    if [[ "${OSTYPE}" == "linux-gnu" ]]; then
+    if [[ "${OSTYPE}" == "linux-gnu" ]] && command_exists date; then
         date +%s%3N
     else
         command_exists perl && perl -MTime::HiRes=time -e 'printf "%i", time * 1000'
