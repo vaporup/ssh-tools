@@ -95,6 +95,16 @@ cat << EOF
                        Nothing is displayed except the summary lines at startup time and when finished
         -v             Verbose output
 
+    EXIT_CODES:
+
+        0             No requests lost
+        1             More than 1 request lost
+        2             All requests lost
+
+        Example:      ${0##*/} -q -c 1 my_website >/dev/null || ...
+
+
+
 EOF
 
 }
@@ -155,8 +165,8 @@ function print_statistics() {
     statistics_crit+="${RED}${requests_received}${RESET} ${WHITE}requests received${RESET}, "
     statistics_crit+="${RED}${requests_loss}%${RESET} ${WHITE}request loss${RESET}"
 
-    [[ ${requests_loss} -eq 100 ]] &&  echo -e "${statistics_crit}" && exit
-    [[ ${requests_loss} -gt   1 ]] &&  echo -e "${statistics_warn}" && exit
+    [[ ${requests_loss} -eq 100 ]] &&  echo -e "${statistics_crit}" && exit 2
+    [[ ${requests_loss} -gt   1 ]] &&  echo -e "${statistics_warn}" && exit 1
     [[ ${requests_loss} -eq   0 ]] &&  echo -e "${statistics_ok}"   && exit
 
 }
