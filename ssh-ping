@@ -110,7 +110,6 @@ cat << EOF
         Example:      ${0##*/} -q -c 1 hostname >/dev/null || ...
 
 
-
 EOF
 
 }
