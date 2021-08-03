@@ -321,13 +321,13 @@ while true; do
 
     if [[ -z "${username}" ]]; then
         if [[ "${just_connect}" == "yes" ]]; then
-            status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "ForceLoginToFail@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+            status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "sshping@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
         else
             status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
         fi
     else
         if [[ "${just_connect}" == "yes" ]]; then
-            status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "ForceLoginToFail@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+            status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "sshping@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
         else
             status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
         fi
