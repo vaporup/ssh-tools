@@ -93,6 +93,8 @@ cat << EOF
                        This can be specified on a per-host basis in the configuration file.
         -q             Quiet output.
                        Nothing is displayed except the summary lines at startup time and when finished
+        -n             No colors.
+                       (e.g. for black on white terminals)
         -v             Verbose output
 
     ENVIRONMENT_VARIABLES:
