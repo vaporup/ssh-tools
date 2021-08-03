@@ -95,6 +95,12 @@ cat << EOF
                        Nothing is displayed except the summary lines at startup time and when finished
         -v             Verbose output
 
+    ENVIRONMENT_VARIABLES:
+
+        SSH_PING_NO_COLORS    if set, no colors are shown (like -n)
+
+        Example:      SSH_PING_NO_COLORS=yes ${0##*/} -c 1 hostname
+
     EXIT_CODES:
 
         0             No requests lost
@@ -176,7 +182,7 @@ function print_statistics() {
 #
 
 # shellcheck disable=SC2249
-while getopts ":46c:F:hi:l:DHp:vW:q" opt; do
+while getopts ":46c:F:hi:l:DHp:vW:qn" opt; do
     case ${opt} in
         4 )
             SSH_FLAGS+=("-4")
@@ -220,6 +226,9 @@ while getopts ":46c:F:hi:l:DHp:vW:q" opt; do
         q )
             quiet="yes"
         ;;
+        n )
+            colors="no"
+        ;;
         \? )
             echo "Invalid option: ${OPTARG}" 1>&2
             usage
@@ -247,6 +256,23 @@ if [[ $1 == *"@"* ]]; then
     username="${1%%@*}"
 else
     host=${1}
+fi
+
+#
+# Colors are counter productive
+# on black on white terminals
+#
+
+if [[ -n "${SSH_PING_NO_COLORS}" ]]; then
+
+    colors="no"
+
+fi
+
+if [[ ${colors} == no ]]; then
+
+    unset -v RED GREEN YELLOW BLUE MAGENTA CYAN WHITE BOLD
+
 fi
 
 [[ -z "${host}" ]] && { echo -e "\n  ${RED}Error: No target host given${RESET}" ; usage; exit 1; }
