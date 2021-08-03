@@ -48,5 +48,5 @@ if [[ -z $1 || $1 == "--help" ]]; then
     exit 1
 fi
 
-SSH_VERSION=$(ssh -vN "${ssh_opts[@]}" "$@" -l ForceLogin2Fail 2>&1 | grep "remote software version")
+SSH_VERSION=$(ssh -vN "${ssh_opts[@]}" "$@" -l ssh-version 2>&1 | grep "remote software version")
 echo "${SSH_VERSION#debug1: }"
