@@ -101,7 +101,7 @@ cat << EOF
         1             More than 1 request lost
         2             All requests lost
 
-        Example:      ${0##*/} -q -c 1 my_website >/dev/null || ...
+        Example:      ${0##*/} -q -c 1 hostname >/dev/null || ...
 
 
 
