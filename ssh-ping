@@ -78,6 +78,7 @@ cat << EOF
         -4             Use IPv4 only
         -6             Use IPv6 only
         -c count       Stop after sending <count> request packets
+        -C             Just connect (for example for IDRAC, IPMI, ILO devices, switches etc...)
         -F configfile  Specifies an alternative per-user configuration file.
                        If a configuration file is given on the command line,
                        the system-wide configuration file ( /etc/ssh/ssh_config ) will be ignored.
@@ -183,7 +184,7 @@ function print_statistics() {
 #
 
 # shellcheck disable=SC2249
-while getopts ":46c:F:hi:l:DHp:vW:qn" opt; do
+while getopts ":46c:CF:hi:l:DHp:vW:qn" opt; do
     case ${opt} in
         4 )
             SSH_FLAGS+=("-4")
@@ -193,6 +194,9 @@ while getopts ":46c:F:hi:l:DHp:vW:qn" opt; do
         ;;
         c )
             [[ ${OPTARG} =~ ^[0-9]+$ ]] && ping_count=${OPTARG}
+        ;;
+        C )
+            just_connect="yes"
         ;;
         F )
             SSH_FLAGS+=("-F")
@@ -316,9 +320,17 @@ while true; do
     start_request=$( get_request_timestamp )
 
     if [[ -z "${username}" ]]; then
-        status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+        if [[ "${just_connect}" == "yes" ]]; then
+            status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "ForceLoginToFail@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+        else
+            status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+        fi
     else
-        status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+        if [[ "${just_connect}" == "yes" ]]; then
+            status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "ForceLoginToFail@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+        else
+            status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
+        fi
     fi
 
     end_request=$( get_request_timestamp )
@@ -343,6 +355,10 @@ while true; do
 
     requests_transmitted=${ssh_seq}
     ssh_seq=$(( ssh_seq + 1 ))
+
+    if [[ "${just_connect}" == "yes" ]]; then
+        ssh "${SSH_FLAGS[@]}" -o "BatchMode=no" "${SSH_OPTS[@]}" "${username}@${host}"
+    fi
 
     #
     # Don't sleep if we do just 1 request
