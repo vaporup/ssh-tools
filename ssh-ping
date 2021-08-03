@@ -99,7 +99,7 @@ cat << EOF
 
         SSH_PING_NO_COLORS    if set, no colors are shown (like -n)
 
-        Example:      SSH_PING_NO_COLORS=yes ${0##*/} -c 1 hostname
+        Example:      SSH_PING_NO_COLORS=true ${0##*/} -c 1 hostname
 
     EXIT_CODES:
 
