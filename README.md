@@ -129,3 +129,14 @@ Shows validity and information of SSH certificates
                   permit-pty
                   permit-user-rc
   ~~~~
+
+## ssh-force-password
+Enforces password authentication (as long as the server allows it).  
+It became quite annoying googling the SSH options for this every time.  
+e.g. used to skip key-based login for password testing.
+
+  ~~~~
+  $ ssh-force-password kim
+
+  vaporup@kim's password:
+  ~~~~
