@@ -85,7 +85,7 @@ cat << EOF
         -h             Show this message
         -i interval    Wait <interval> seconds between sending each request.
                        The default is 1 second.
-        -l user        Try login with <user> as username. The default is \$USER.
+        -l user        Try login with <user> as username. The default is \$USER ($USER).
         -D             Print timestamp (unix time + microseconds as in gettimeofday) before each line
         -H             Print timestamp (human readable) before each line
         -W timeout     Time to wait for a response, in seconds
