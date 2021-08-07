@@ -140,3 +140,6 @@ e.g. used to skip key-based login for password testing.
 
   vaporup@kim's password:
   ~~~~
+
+
+[![Packaging status](https://repology.org/badge/vertical-allrepos/ssh-tools.svg)](https://repology.org/project/ssh-tools/versions)
