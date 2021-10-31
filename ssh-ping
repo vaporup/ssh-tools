@@ -78,7 +78,11 @@ cat << EOF
         -4             Use IPv4 only
         -6             Use IPv6 only
         -c count       Stop after sending <count> request packets
-        -C             Just connect (for example for IDRAC, IPMI, ILO devices, switches etc...)
+        -C             Connect as soon as the host responds
+                       and try reconnecting after a SSH session ends (like after rebooting).
+                       Useful also for IDRAC, IPMI, ILO devices, Switches, etc...
+                       which don't have a full shell environment.
+                       CTRL+C stops reconnect attempts.
         -F configfile  Specifies an alternative per-user configuration file.
                        If a configuration file is given on the command line,
                        the system-wide configuration file ( /etc/ssh/ssh_config ) will be ignored.
@@ -196,7 +200,7 @@ while getopts ":46c:CF:hi:l:DHp:vW:qn" opt; do
             [[ ${OPTARG} =~ ^[0-9]+$ ]] && ping_count=${OPTARG}
         ;;
         C )
-            just_connect="yes"
+            connect="yes"
         ;;
         F )
             SSH_FLAGS+=("-F")
@@ -320,13 +324,13 @@ while true; do
     start_request=$( get_request_timestamp )
 
     if [[ -z "${username}" ]]; then
-        if [[ "${just_connect}" == "yes" ]]; then
+        if [[ "${connect}" == "yes" ]]; then
             status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "sshping@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
         else
             status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
         fi
     else
-        if [[ "${just_connect}" == "yes" ]]; then
+        if [[ "${connect}" == "yes" ]]; then
             status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "sshping@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
         else
             status=$(ssh "${SSH_FLAGS[@]}" "${SSH_OPTS[@]}" "${username}@${host}" echo pong 2>&1 | grep -oE 'pong|denied|sftp')
@@ -356,8 +360,9 @@ while true; do
     requests_transmitted=${ssh_seq}
     ssh_seq=$(( ssh_seq + 1 ))
 
-    if [[ "${just_connect}" == "yes" ]]; then
+    if [[ "${connect}" == "yes" ]]; then
         ssh "${SSH_FLAGS[@]}" -o "BatchMode=no" "${SSH_OPTS[@]}" "${username}@${host}"
+        echo -e "Reconnecting... (Press CTRL+C to abort)"
     fi
 
     #
