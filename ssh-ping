@@ -79,7 +79,7 @@ cat << EOF
         -6             Use IPv6 only
         -c count       Stop after sending <count> request packets
         -C             Connect as soon as the host responds
-                       and try reconnecting after a SSH session ends (like after rebooting).
+                       and try reconnecting after a SSH session ends (e.g. rebooting).
                        Useful also for IDRAC, IPMI, ILO devices, Switches, etc...
                        which don't have a full shell environment.
                        CTRL+C stops reconnect attempts.
