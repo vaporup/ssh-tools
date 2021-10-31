@@ -362,7 +362,11 @@ while true; do
     ssh_seq=$(( ssh_seq + 1 ))
 
     if [[ "${connect}" == "yes" ]]; then
-        ssh "${SSH_FLAGS[@]}" -o "BatchMode=no" "${SSH_OPTS[@]}" "${username}@${host}"
+        if [[ -z "${username}" ]]; then
+            ssh "${SSH_FLAGS[@]}" -o "BatchMode=no" "${SSH_OPTS[@]}" "${host}"
+        else
+            ssh "${SSH_FLAGS[@]}" -o "BatchMode=no" "${SSH_OPTS[@]}" "${username}@${host}"
+        fi
         echo -e "Reconnecting... (Press CTRL+C to abort)"
     fi
 
