@@ -1,3 +1,16 @@
+# 1.7 (2021-10-31)
+
+## Added
+
+- **ssh-force-password**: Enforces password authentication
+- ssh-ping
+  - Option (-C) to connect/reconnect as soon as the host responds
+  - Exit Codes
+    - 1: More than 1 request lost
+    - 2: All requests lost
+  - Environment Variable
+    - SSH_PING_NO_COLORS: if set, no colors are shown (like -n)
+
 # 1.6 (2020-01-23)
 
 ## Added
