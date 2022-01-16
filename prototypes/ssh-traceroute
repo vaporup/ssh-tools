@@ -7,7 +7,6 @@ SSH_OPTS=(
     -o BatchMode=yes
     -o CheckHostIP=no
     -o StrictHostKeyChecking=no
-    -o HashKnownHosts=no
     -o ConnectTimeout=3
 )
 
