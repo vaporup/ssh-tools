@@ -49,7 +49,7 @@ if [[ -z $1 || $1 == "--help" ]]; then
     exit 1
 fi
 
-ssh "$@" 'bash -s' 2>/dev/null <<'END' | sed 's/\s*=\s*/=/'
+ssh "$@" 'bash -s' 2>/dev/null <<'END' | sed 's/[[:space:]]*=[[:space:]]*/=/'
 
 function _os() {
 
