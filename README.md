@@ -1,3 +1,5 @@
+<h1 align="center"><code>ssh-tools</code></h1>
+<p align="center">Making SSH more convenient</p>
 <p align="center">
   <br/>
   <img src="https://img.shields.io/badge/uses-ssh-blue.svg?style=flat-square"/>
