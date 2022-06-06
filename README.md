@@ -147,4 +147,4 @@ e.g. used to skip key-based login for password testing.
 
 # Packages
 
-[![Packaging status](https://repology.org/badge/vertical-allrepos/ssh-tools.svg)](https://repology.org/project/ssh-tools/versions)
+[![Packaging status](https://repology.org/badge/vertical-allrepos/ssh-tools.svg?columns=3)](https://repology.org/project/ssh-tools/versions)
