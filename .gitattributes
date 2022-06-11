@@ -2,4 +2,5 @@ prototypes export-ignore
 debian export-ignore
 demos export-ignore
 README.md export-ignore
+publiccode.yml export-ignore
 .gitattributes export-ignore
