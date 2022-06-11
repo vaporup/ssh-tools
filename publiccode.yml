@@ -1,0 +1,61 @@
+publiccodeYmlVersion: "0.3.0"
+
+name: "ssh-tools"
+
+url: "https://github.com/vaporup/ssh-tools"
+
+softwareVersion: "1.7"
+
+releaseDate: "2021-10-31"
+
+platforms:
+  - linux
+
+categories:
+  - productivity-suite
+  - it-management
+
+developmentStatus: "stable"
+
+softwareType: "standalone/desktop"
+
+intendedAudience:
+  scope:
+    - science-and-technology
+
+description:
+  en:
+    shortDescription: Making SSH more convenient
+
+    longDescription: >
+          Using the native OpenSSH Tools
+          and making the more convenient
+          for daily usage.
+
+    features:
+       - ssh-ping
+       - ssh-version
+       - ssh-diff
+       - ssh-facts
+       - ssh-hostkeys
+       - ssh-keyinfo
+       - ssh-certinfo
+       - ssh-force-password
+
+    videos:
+       - https://www.youtube.com/watch?v=YCVFtyfZMp8
+
+    awards:
+       - https://github.com/vaporup/CISS
+
+legal:
+  license: GPL-3.0-only
+
+  mainCopyrightOwner: Sven Wick
+
+maintenance:
+  type: "internal"
+
+  contacts:
+    - name: Sven Wick
+      email: "sven.wick@gmx.de"
