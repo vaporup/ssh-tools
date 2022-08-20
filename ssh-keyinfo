@@ -1,14 +1,11 @@
 #!/usr/bin/env bash
 
-#  +---------------------------------------------------------------------------------------------------+
-#  | Title        : ssh-keyinfo                                                                        |
-#  |                                                                                                   |
-#  | Description  : Prints keys in several formats                                                     |
-#  |                                                                                                   |
-#  | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
-#  | URL          : https://github.com/vaporup/ssh-tools                                               |
-#  |                                                                                                   |
-#  +---------------------------------------------------------------------------------------------------+
+# +-----------------------------------------------------+
+# | Title        : ssh-keyinfo                          |
+# | Description  : Prints keys in several formats       |
+# | Author       : Sven Wick <sven.wick@gmx.de>         |
+# | URL          : https://github.com/vaporup/ssh-tools |
+# +-----------------------------------------------------+
 
 # shellcheck disable=SC2207
 
