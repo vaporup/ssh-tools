@@ -1,17 +1,14 @@
 #!/usr/bin/env bash
 
-#  +---------------------------------------------------------------------------------------------------+
-#  | Title        : ssh-diff                                                                           |
-#  |                                                                                                   |
-#  | Description  : Diff a file over SSH                                                               |
-#  |                                                                                                   |
-#  | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
-#  | Contributors : Denis Meiswinkel                                                                   |
-#  | URL          : https://github.com/vaporup/ssh-tools                                               |
-#  |                                                                                                   |
-#  | Based On     : https://gist.github.com/jhqv/dbd59f5838ae8c83f736bfe951bd80ff                      |
-#  |                https://serverfault.com/questions/59140/how-do-diff-over-ssh#comment1027981_216496 |
-#  +---------------------------------------------------------------------------------------------------+
+# +---------------------------------------------------------------------------------------------------+
+# | Title        : ssh-diff                                                                           |
+# | Description  : Diff a file over SSH                                                               |
+# | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
+# | Contributors : Denis Meiswinkel                                                                   |
+# | URL          : https://github.com/vaporup/ssh-tools                                               |
+# | Based On     : https://gist.github.com/jhqv/dbd59f5838ae8c83f736bfe951bd80ff                      |
+# |                https://serverfault.com/questions/59140/how-do-diff-over-ssh#comment1027981_216496 |
+# +---------------------------------------------------------------------------------------------------+
 
 # shellcheck disable=SC2029
 

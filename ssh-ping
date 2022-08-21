@@ -1,20 +1,16 @@
 #!/usr/bin/env bash
 
-#  +--------------------------------------------------------------------------------------+
-#  | Title        : ssh-ping                                                              |
-#  |                                                                                      |
-#  | Description  : Check if host is reachable using ssh_config                           |
-#  |                                                                                      |
-#  |                Outputs 'Reply from' when server is reachable but login failed        |
-#  |                Outputs 'Pong from' when server is reachable and login was successful |
-#  |                                                                                      |
-#  | Author       : Sven Wick <sven.wick@gmx.de>                                          |
-#  | Contributors : Denis Meiswinkel                                                      |
-#  | URL          : https://github.com/vaporup/ssh-tools                                  |
-#  |                                                                                      |
-#  | Based On     : https://unix.stackexchange.com/a/30146/247383                         |
-#  |                https://stackoverflow.com/a/33277226                                  |
-#  +--------------------------------------------------------------------------------------+
+# +--------------------------------------------------------------------------------------+
+# | Title        : ssh-ping                                                              |
+# | Description  : Check if host is reachable using ssh_config                           |
+# |                Outputs 'Reply from' when server is reachable but login failed        |
+# |                Outputs 'Pong from' when server is reachable and login was successful |
+# | Author       : Sven Wick <sven.wick@gmx.de>                                          |
+# | Contributors : Denis Meiswinkel                                                      |
+# | URL          : https://github.com/vaporup/ssh-tools                                  |
+# | Based On     : https://unix.stackexchange.com/a/30146/247383                         |
+# |                https://stackoverflow.com/a/33277226                                  |
+# +--------------------------------------------------------------------------------------+
 
 # trap CTRL-C and call print_statistics()
 trap print_statistics SIGINT

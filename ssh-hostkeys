@@ -1,16 +1,13 @@
 #!/usr/bin/env bash
 
-#  +---------------------------------------------------------------------------------------------------+
-#  | Title        : ssh-hostkeys                                                                       |
-#  |                                                                                                   |
-#  | Description  : Prints server host keys in several formats                                         |
-#  |                                                                                                   |
-#  | Author       : Sven Wick <sven.wick@gmx.de>                                                       |
-#  | Contributors : Geert Stappers <https://github.com/stappersg>                                      |
-#  | URL          : https://github.com/vaporup/ssh-tools                                               |
-#  |                                                                                                   |
-#  | Based On     : https://unix.stackexchange.com/questions/126908/get-ssh-server-key-fingerprint     |
-#  +---------------------------------------------------------------------------------------------------+
+# +-----------------------------------------------------------------------------------------------+
+# | Title        : ssh-hostkeys                                                                   |
+# | Description  : Prints server host keys in several formats                                     |
+# | Author       : Sven Wick <sven.wick@gmx.de>                                                   |
+# | Contributors : Geert Stappers <https://github.com/stappersg>                                  |
+# | URL          : https://github.com/vaporup/ssh-tools                                           |
+# | Based On     : https://unix.stackexchange.com/questions/126908/get-ssh-server-key-fingerprint |
+# +-----------------------------------------------------------------------------------------------+
 
 # shellcheck disable=SC2207
 

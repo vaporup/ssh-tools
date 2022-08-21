@@ -1,13 +1,11 @@
 #!/usr/bin/env bash
 
-#  +--------------------------------------------------------------------------------------+
-#  | Title        : ssh-certinfo                                                          |
-#  |                                                                                      |
-#  | Description  : shows validity and information of SSH certificates                    |
-#  |                                                                                      |
-#  | Author       : Sven Wick <sven.wick@gmx.de>                                          |
-#  | URL          : https://github.com/vaporup/ssh-tools                                  |
-#  +--------------------------------------------------------------------------------------+
+# +------------------------------------------------------------------+
+# | Title       : ssh-certinfo                                       |
+# | Description : shows validity and information of SSH certificates |
+# | Author      : Sven Wick <sven.wick@gmx.de>                       |
+# | URL         : https://github.com/vaporup/ssh-tools               |
+# +------------------------------------------------------------------+
 
 # shellcheck disable=SC2207
 
