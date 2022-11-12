@@ -15,15 +15,19 @@
 # or in part on concepts and ideas taken from a Python script called SSH-last,
 # by courtesy of the company AB+M GmbH, based in Karlsruhe (Germany).
 
-# "You may sometimes find that others have made
-#  more of your ideas than you have yourself"
-#
-#    -- Tim O'Reilly
-#
-# http://radar.oreilly.com/2009/01/work-on-stuff-that-matters-fir.html
+# **************************************************************************
+# *                                                                        *
+# *  "You may sometimes find that others have made                         *
+# *   more of your ideas than you have yourself"                           *
+# *                                                                        *
+# *     -- Tim O'Reilly                                                    *
+# *                                                                        *
+# *  http://radar.oreilly.com/2009/01/work-on-stuff-that-matters-fir.html  *
+# *                                                                        *
+# **************************************************************************
 
 # Divergence to the original:
-# ---------------------------
+# ===========================
 #
 # 1) Perl instead of Python
 #
