@@ -52,7 +52,7 @@
 #     which sometimes creates a false positive when a SSH session was not closed cleanly.
 #
 #     This implementation therefore uses a counting algorithm
-#     to piece together a SSH session by its login and logout logline
+#     to piece together a SSH session by its Accepted and Disconnected logline
 #
 # - The "Known" and "Ignored" mechanics are implemented
 #   in a hierarchical filesystem manner instead of hardcoding them into the script
