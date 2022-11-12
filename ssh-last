@@ -56,7 +56,7 @@
 #
 # - The "Known" and "Ignored" mechanics are implemented
 #   in a hierarchical filesystem manner instead of hardcoding them into the script
-# - The output includes some flags which give a hint about which login type was used:
+# - The output includes some flags which give a hint about which auth type was used:
 #
 #   e.g:
 #
