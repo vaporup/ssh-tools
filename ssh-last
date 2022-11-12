@@ -9,10 +9,10 @@
 
 # Die Implementierung dieser Software beruht ganz oder in Teilen
 # auf Konzepten und Ideen, die mit freundlicher Genehmigung der Firma AB+M GmbH
-# mit Sitz in Karlsruhe (Deutschland) dem firmeninternen Python-Skript SSH-last entnommen wurden.
+# mit Sitz in Karlsruhe (Deutschland) dem firmeninternen Python-Skript ssh_last entnommen wurden.
 
 # The implementation of this software is based in whole
-# or in part on concepts and ideas taken from a Python script called SSH-last,
+# or in part on concepts and ideas taken from a Python script called ssh_last,
 # by courtesy of the company AB+M GmbH, based in Karlsruhe (Germany).
 
 # **************************************************************************
