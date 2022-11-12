@@ -471,18 +471,18 @@ my $log_cmd_files_pfsense  = 'grep -hE "Accepted|Disconnected"'
                            . ' /var/log/auth.log'
                            . ' 2>/dev/null';
 
-my $log_cmd_files_opnsense  = 'grep -hE "Accepted|Disconnected"'
-                            . ' /var/log/audit/latest.log'
-                            . ' 2>/dev/null';
+my $log_cmd_files_opnsense = 'grep -hE "Accepted|Disconnected"'
+                           . ' /var/log/audit/latest.log'
+                           . ' 2>/dev/null';
 
-my $log_cmd_journal      = 'LC_TIME=C journalctl _COMM=sshd --no-pager        -g "Accepted|Disconnected"';
-my $log_cmd_journal_grep = 'LC_TIME=C journalctl _COMM=sshd --no-pager | grep -E "Accepted|Disconnected"';
+my $log_cmd_journal        = 'LC_TIME=C journalctl _COMM=sshd --no-pager        -g "Accepted|Disconnected"';
+my $log_cmd_journal_grep   = 'LC_TIME=C journalctl _COMM=sshd --no-pager | grep -E "Accepted|Disconnected"';
 
 #
 # Try first via journalctl
 #
 
-my $log_cmd             = $log_cmd_journal;
+my $log_cmd                = $log_cmd_journal;
 
 #
 # or via logfiles if requested by the user
@@ -490,7 +490,7 @@ my $log_cmd             = $log_cmd_journal;
 
 if ( $use_logfiles ) {
 
-    $log_cmd            = $log_cmd_files;
+    $log_cmd               = $log_cmd_files;
 
 }
 
