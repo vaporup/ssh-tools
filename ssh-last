@@ -33,7 +33,7 @@
 #     works even on Firewall appliances like pfSense and OPNSense
 # - Uses systemd's journal by default and logfiles only as a fallback
 #   when run on Non-Linux or Non-systemd Linux systems
-#   and yoou can even pipe in the logs.
+#   and you can even pipe in the logs.
 # - The algorithm to reconstruct SSH sessions works differently:
 #
 #     Some distributions, especially some BSDs, do different privilege separation
