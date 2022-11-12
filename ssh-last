@@ -1,0 +1,1453 @@
+#!/usr/bin/env perl
+
+# +-----------------------------------------------------+
+# | Title        : ssh-last                             |
+# | Description  : like last but for SSH sessions       |
+# | Author       : Sven Wick <sven.wick@gmx.de>         |
+# | URL          : https://github.com/vaporup/ssh-tools |
+# +-----------------------------------------------------+
+
+# Die Implementierung dieser Software beruht ganz oder in Teilen
+# auf Konzepten und Ideen, die mit freundlicher Genehmigung der Firma AB+M GmbH
+# mit Sitz in Karlsruhe (Deutschland) dem firmeninternen Python-Skript SSH-last entnommen wurden.
+
+# The implementation of this software is based in whole
+# or in part on concepts and ideas taken from a Python script called SSH-last,
+# by courtesy of the company AB+M GmbH, based in Karlsruhe (Germany).
+
+# "You may sometimes find that others have made
+#  more of your ideas than you have yourself"
+#
+#    -- Tim O'Reilly
+#
+# http://radar.oreilly.com/2009/01/work-on-stuff-that-matters-fir.html
+
+# Divergence to the original:
+# ---------------------------
+#
+# - Perl instead of Python
+# - Works on a broad set of operating systems not only the latest Ubuntu
+#   - Major GNU/Linux distributions
+#   - Niche GNU/Linux distributions like guix, void, etc...
+#   - Major BSD distributions like OpenBSD, FreeBSD, DragonFlyBSD,
+#     works even on Firewall appliances like pfSense and OPNSense
+# - Uses systemd's journal by default and logfiles only as a fallback
+#   when run on Non-Linux or Non-systemd Linux systems
+#   and yoou can even pipe in the logs.
+# - The algorithm to reconstruct SSH sessions works differently:
+#
+#     Some distributions, especially some BSDs, do different privilege separation
+#     which results in changing the PID during login phase for a normal user connection
+#
+#     https://security.stackexchange.com/questions/115896/can-someone-explain-how-sshd-does-privilege-separation
+#
+#     Relying upon PIDs is therefore not very robust
+#     because you can't map login and logout session afterwards anymore
+#     so a different algorithm using TCP ports was used instead
+#     (the port stays the same during the whole session including login phase)
+#
+#     Also, finding the logout timestamp is implemented in a more precise fashion:
+#
+#     The original version fetches just the last log of a PID
+#     which sometimes creates a false positive when a SSH session was not closed cleanly.
+#
+#     This implementation therefore uses a counting algorithm
+#     to piece together a SSH session by its login and logout logline
+#
+# - The "Known" and "Ignored" mechanics are implemented
+#   in a hierarchical filesystem manner instead of hardcoding them into the script
+# - The output includes some flags which give a hint about which login type was used:
+#
+#   e.g:
+#
+#   (C) sshd authorized login via (c)ertificate
+#   (K) sshd authorized login via public (k)ey
+#   (?) sshd authorized login via some other type (password, pam)
+
+use strict;
+use warnings;
+
+use Memoize;
+use Pod::Usage;
+use Getopt::Std;
+use Data::Dumper;
+use Time::Piece;
+use Time::Seconds;
+use File::Basename;
+use Term::ANSIColor;
+
+$Data::Dumper::Sortkeys = 1;
+
+# +-------+
+# | USAGE |
+# +-------+
+
+sub print_usage {
+    pod2usage();
+    return;
+}
+
+sub print_usage_full {
+    pod2usage(-verbose  => 2);
+    return;
+}
+
+if ( defined($ARGV[0]) ) {
+
+    if ( $ARGV[0] eq '-h' or $ARGV[0] eq '--help' ) {
+
+        &print_usage;
+        exit;
+
+    }
+
+    if ( $ARGV[0] eq '-?' ) {
+
+        &print_usage_full;
+        exit;
+
+    }
+}
+
+# +---------+
+# | OPTIONS |
+# +---------+
+
+my %opts;
+
+my $show_all           = 0;
+my $colors             = 0;
+my $debug              = 0;
+my $show_fingerprints  = 0;
+my $show_cert_ids      = 0;
+my $show_host_in_clear = 0;
+my $who_mode           = 0;
+my $use_logfiles       = 0;
+
+getopts('acdfilnw', \%opts);
+
+$show_all              = 1 if $opts{a};
+$colors                = 1 if $opts{c};
+$debug                 = 1 if $opts{d};
+$show_fingerprints     = 1 if $opts{f};
+$show_cert_ids         = 1 if $opts{i};
+$show_host_in_clear    = 1 if $opts{n};
+$who_mode              = 1 if $opts{w};
+$use_logfiles          = 1 if $opts{l};
+
+# +---------+
+# | REGEXES |
+# +---------+
+#
+# (default)
+#
+# These very likely change further down the code for different operating systems
+
+my $matches_login  = '^(?<TS>\w+\s+\d+\s+\d+:\d+:\d+)'
+                   . '\s+(?<HOSTNAME>\S+)'
+                   . '\s+sshd\[(?<PID>\d+)\]:'
+                   . '\s+Accepted\s+(?<AUTH_TYPE>\S+)'
+                   . '\s+for\s+(?<USER>\S+)'
+                   . '\s+from\s+(?<HOST>\S+)'
+                   . '\s+port\s+(?<PORT>\d+)\s+ssh2:?\s*(?<DETAILS>.*)'
+                   ;
+
+my $matches_logout = '^(?<TS>\w+\s+\d+\s+\d+:\d+:\d+)'
+                   . '\s+(?<HOSTNAME>\S+)'
+                   . '\s+sshd\[(?<PID>\d+)\]:'
+                   . '\s+Disconnected'
+                   . '\s+from\s+user\s+(?<USER>\S+)'
+                   . '\s+(?<HOST>\S+)'
+                   . '\s+port\s+(?<PORT>\d+)'
+                   ;
+
+my $matches_cert   = '^(?<KEY_TYPE>\S+-CERT) (?<FINGERPRINT>\S+)'
+                   . ' ID (?<AUTH_ID>\S+)'
+                   ;
+
+my $matches_key    = '^(?<KEY_TYPE>\w+) (?<FINGERPRINT>\S+)'
+                   ;
+
+# +-----------------+
+# | DATA STRUCTURES |
+# +-----------------+
+
+my %session_ids_counter;    # Self-created IDs
+                            # from network port and count of its occurence
+                            # in chronological order from logfiles
+                            #
+                            # Example with Port 1234
+                            #
+                            # - First  occurrence in log -> ID = 1234-1
+                            # - Second occurrence in log -> ID = 1234-2
+
+my @ssh_session_ids;        # List to store Login IDs in chronological order
+my %ssh_sessions;           # Hash to store all the data we parse from logs
+
+# +------------------------------------------+
+# | SUBS FOR DATE AND TIME STRING FORMATTING |
+# +------------------------------------------+
+
+sub str2epoch {
+
+    my (@args) = @_;
+    my $str    = $args[0];
+    #my $now   = localtime;
+    my $now    = Time::Piece->new();
+    my $year   = $now->year;
+
+    # YEAR is missing in syslog timestamp, so add the current year.
+    #
+    # Example: "Aug 23 00:22:05" -> "2022 Aug 23 00:22:05"
+
+    $str =~ s/^/$year /g;
+
+    # Parse Timestamp string
+    #
+    # Force localtime instead UTC
+    # https://stackoverflow.com/a/47722347
+
+    my $t = localtime->strptime($str, '%Y %b %d %H:%M:%S');
+
+    # If the timestamp is in the future, it is from last year.
+
+    if ( $t > $now ) {
+
+        $t = $t - ONE_YEAR;
+    }
+
+    return $t->epoch;
+}
+
+sub str2epoch_opensuse {
+
+    my (@args) = @_;
+    my $str    = $args[0];
+    my $now    = Time::Piece->new();
+
+    # Parse Timestamp string
+    #
+    # Force localtime instead UTC
+    # https://stackoverflow.com/a/47722347
+
+    my $t = localtime->strptime($str, '%Y-%m-%d %H:%M:%S');
+
+    return $t->epoch;
+}
+
+sub format_seconds {
+
+    # 1 year = 31557600 seconds
+
+    my (@args) = @_;
+
+    my $total_seconds = $args[0];
+
+    my ($hours, $hourremainder)  = (($total_seconds/(60*60)), $total_seconds % (60*60));
+    my ($minutes, $seconds)      = (int $hourremainder / 60, $hourremainder % 60);
+
+    ($hours, $minutes, $seconds) = (sprintf('%02d', $hours), sprintf('%02d', $minutes), sprintf('%02d', $seconds));
+
+    return $hours . ':' . $minutes . ':' . $seconds;
+}
+
+# +-------------------+
+# | ignored and known |
+# +-------------------+
+
+my $matches_data        = '\s*(?<KEY>\S+)\s*(?<VALUE>.*)';
+
+my @ignored_files = (
+    '/etc/ssh-tools/ssh-last/ignored',
+    glob('~/.config/ssh-tools/ssh-last/ignored'),
+    'ignored',
+);
+
+my @known_files = (
+    '/etc/ssh-tools/ssh-last/known',
+    glob('~/.config/ssh-tools/ssh-last/known'),
+    'known',
+);
+
+sub get_file_data {
+
+    my $data_type = $_[0];
+
+    my %file_data;
+    my @data_files;
+
+    if ( $data_type eq 'ignored' ) {
+        @data_files = @ignored_files;
+    }
+
+    if ( $data_type eq 'known' ) {
+        @data_files = @known_files;
+    }
+
+    foreach my $data_file (@data_files) {
+
+        if ( -r $data_file ) {
+
+            open( my $file_fh, '<', $data_file );
+
+            while ( my $line = <$file_fh> ) {
+
+                chomp($line);
+
+                if ($line =~ /^\s*#.*/ ) { next; } # Ignore comments
+
+                if ($line =~ /$matches_data/ ) {
+
+                    my $key   = $+{KEY};
+                    my $value = $+{VALUE};
+
+                       $value =~ s/#+.*$//g;  # Remove comment    from rest of the line
+                       $value =~ s/\s+$//g;   # Remove whitespace from rest of the line
+
+                    $file_data{$key} = $value;
+                }
+            }
+        }
+    }
+
+    return %file_data;
+};
+
+my %ignored = get_file_data('ignored');
+my %known   = get_file_data('known');
+
+# +--------------------------------------------------------------+
+# | SUBS FOR MAPPING A FINGERPRINT IN .ssh/authorized_keys       |
+# | TO ITS COMMENT FIELD (using ssh-keygen -lf)                  |
+# | TO SHOW THE COMMENT IN THE OUTPUT INSTEAD OF THE FINGERPRINT |
+# +--------------------------------------------------------------+
+
+sub get_ssh_keygen_data {
+
+    my $fh    = $_[0];
+    my @lines = `ssh-keygen -lf $fh`;
+    return @lines;
+
+}
+
+# Caching the result, so the data does not need to be generated again and again.
+# Saves further unnecessarily calls of ssh-keygen.
+
+memoize('get_ssh_keygen_data');
+
+sub detail_from_fingerprint {
+
+    my $user = $_[0];
+    my $fp   = $_[1];
+
+    if ($known{$fp}) {
+        return $known{$fp};
+    }
+
+    if ($ignored{$fp}) {
+        return $ignored{$fp};
+    }
+
+    # In scalar context, glob iterates through such filename expansions,
+    # returning undef when the list is exhausted.
+    #
+    # So, we use a list first
+    #
+    # https://stackoverflow.com/questions/1274642/why-does-perls-glob-return-undef-for-every-other-call
+
+    my @authorized_keys_files = glob("~${user}/.ssh/authorized_keys");
+    my $authorized_keys_file  = $authorized_keys_files[0];
+
+    if ( $authorized_keys_file ) {
+
+        if ( -r $authorized_keys_file ) {
+
+            my @lines = get_ssh_keygen_data($authorized_keys_file);
+            my $data  = $fp;
+
+            foreach my $line (@lines) {
+
+                chomp $line;
+
+                my @columns     = split(' ', $line);
+
+                my $fingerprint = $columns[1];
+                my $comment     = $columns[2];
+
+                if ( $fp eq $fingerprint ) {
+
+                    $data =  $comment;
+                    last;
+
+                }
+            }
+
+            return $data;
+
+        }
+        else {
+            return $fp;
+        }
+
+    }
+    else {
+        return $fp;
+    }
+}
+
+# +--------------+
+# | PARSING LOGS |
+# +--------------+
+
+my $log_cmd_files_dragonfly = 'zgrep -hE "Accepted|Disconnected"'
+                            . ' /var/log/auth.log.6.gz'
+                            . ' /var/log/auth.log.5.gz'
+                            . ' /var/log/auth.log.4.gz'
+                            . ' /var/log/auth.log.3.gz'
+                            . ' /var/log/auth.log.2.gz'
+                            . ' /var/log/auth.log.1'
+                            . ' /var/log/auth.log'
+                            . ' 2>/dev/null';
+
+my $log_cmd_files          = 'zgrep -hE "Accepted|Disconnected"'
+                           . ' $(ls /var/log/auth.log* --sort=time --reverse)'
+                           . ' prevent-grep-to-wait'
+                           . ' 2>/dev/null';
+
+my $log_cmd_files_secure   = 'zgrep -hE "Accepted|Disconnected"'
+                           . ' $(ls /var/log/secure* --sort=time --reverse)'
+                           . ' prevent-grep-to-wait'
+                           . ' 2>/dev/null';
+
+my $log_cmd_files_messages = 'zgrep -hE "Accepted|Disconnected"'
+                           . ' $(ls /var/log/messages* --sort=time --reverse)'
+                           . ' prevent-grep-to-wait'
+                           . ' 2>/dev/null';
+
+my $log_cmd_files_alpine   = 'grep -hE "Accepted|Disconnected"'
+                           . ' /var/log/messages.0'
+                           . ' /var/log/messages'
+                           . ' 2>/dev/null';
+
+my $log_cmd_files_openbsd  = 'zgrep -hE "Accepted|Disconnected"'
+                           . ' /var/log/authlog.6.gz'
+                           . ' /var/log/authlog.5.gz'
+                           . ' /var/log/authlog.4.gz'
+                           . ' /var/log/authlog.3.gz'
+                           . ' /var/log/authlog.2.gz'
+                           . ' /var/log/authlog.1.gz'
+                           . ' /var/log/authlog.0.gz'
+                           . ' /var/log/authlog'
+                           . ' 2>/dev/null';
+
+my $log_cmd_files_freebsd  = 'zgrep -hE "Accepted|Disconnected"'
+                           . ' /var/log/auth.log.6.bz2'
+                           . ' /var/log/auth.log.5.bz2'
+                           . ' /var/log/auth.log.4.bz2'
+                           . ' /var/log/auth.log.3.bz2'
+                           . ' /var/log/auth.log.2.bz2'
+                           . ' /var/log/auth.log.1.bz2'
+                           . ' /var/log/auth.log.0.bz2'
+                           . ' /var/log/auth.log'
+                           . ' 2>/dev/null';
+
+my $log_cmd_files_pfsense  = 'grep -hE "Accepted|Disconnected"'
+                           . ' /var/log/auth.log.6.bz2'
+                           . ' /var/log/auth.log.5.bz2'
+                           . ' /var/log/auth.log.4.bz2'
+                           . ' /var/log/auth.log.3.bz2'
+                           . ' /var/log/auth.log.2.bz2'
+                           . ' /var/log/auth.log.1.bz2'
+                           . ' /var/log/auth.log.0.bz2'
+                           . ' /var/log/auth.log'
+                           . ' 2>/dev/null';
+
+my $log_cmd_files_opnsense  = 'grep -hE "Accepted|Disconnected"'
+                            . ' /var/log/audit/latest.log'
+                            . ' 2>/dev/null';
+
+my $log_cmd_journal      = 'LC_TIME=C journalctl _COMM=sshd --no-pager        -g "Accepted|Disconnected"';
+my $log_cmd_journal_grep = 'LC_TIME=C journalctl _COMM=sshd --no-pager | grep -E "Accepted|Disconnected"';
+
+#
+# Try first via journalctl
+#
+
+my $log_cmd             = $log_cmd_journal;
+
+#
+# or via logfiles if requested by the user
+#
+
+if ( $use_logfiles ) {
+
+    $log_cmd            = $log_cmd_files;
+
+}
+
+#
+# Try different methods depending on operating system
+#
+
+my %os_data;
+
+$os_data{TYPE} = $^O;
+$os_data{ID}   = '-';
+
+if ( -e '/etc/pfSense-rc' ) {
+  $os_data{ID} = 'pfsense';
+}
+
+if ( -e '/usr/local/sbin/opnsense-shell' ) {
+  $os_data{ID} = 'opnsense';
+}
+
+if ( -r '/etc/os-release' ) {
+
+  open( my $os_release_fh, '<', '/etc/os-release' );
+
+  while ( my $line = <$os_release_fh> ) {
+
+    chomp($line);
+
+    if ($line) {
+
+        my @cols  = split('=', $line) ;
+
+        my $key   = $cols[0];
+        my $value = $cols[1];
+           $value =~ s/"//g;   # Remove all quotes: "10" -> 10
+
+        $os_data{$key} = $value;
+    }
+
+  }
+}
+
+if ( $debug ) {
+    print Dumper \%os_data;
+}
+
+if ( $os_data{TYPE} eq 'linux' ) {
+
+    if ( $os_data{ID} eq 'debian' ) {
+
+        # Debian Buster misses grep support in journalctl
+        # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=890265
+
+        if ( $os_data{VERSION_CODENAME} && $os_data{VERSION_CODENAME} eq 'buster' ) {
+            $log_cmd = $log_cmd_journal_grep;
+            $log_cmd = $log_cmd_files if $use_logfiles;
+        }
+
+    }
+
+    if ( $os_data{ID} eq 'pureos' ) {
+
+        # Misses grep support in journalctl
+        # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=890265
+
+        if ( $os_data{VERSION_CODENAME} eq 'amber' ) {
+            $log_cmd = $log_cmd_journal_grep;
+            $log_cmd = $log_cmd_files if $use_logfiles;
+        }
+
+    }
+
+    if ( $os_data{ID} eq 'ubuntu' ) {
+
+        if ( $os_data{VERSION_CODENAME} eq 'xenial' ) {
+
+            # Ubuntu Xenial misses grep support in journalctl
+
+            $log_cmd = $log_cmd_journal_grep;
+            $log_cmd = $log_cmd_files if $use_logfiles;
+
+            # Xenial logs Disconnects differently
+            #
+            # Normal: Disconnected from user root 192.168.1.101 port 48356
+            # Xenial: Disconnected from 192.168.1.101 port 48356
+
+            $matches_logout = '^(?<TS>\w+\s+\d+\s+\d+:\d+:\d+)'
+                            . '\s+(?<HOSTNAME>\S+)'
+                            . '\s+sshd\[(?<PID>\d+)\]:'
+                            . '\s+Disconnected'
+                            . '\s+from'
+                            . '\s+(?<HOST>\S+)'
+                            . '\s+port\s+(?<PORT>\d+)'
+                            ;
+
+            # Ubuntu Xenial does not log Fingerprint in CERT Details
+
+            $matches_cert   = '^(?<KEY_TYPE>\S+-CERT)'
+                            . ' ID (?<AUTH_ID>\S+)'
+                            ;
+        }
+
+        if ( $os_data{VERSION_CODENAME} eq 'bionic' ) {
+
+            # Ubuntu Bionic misses grep support in journalctl
+
+            $log_cmd = $log_cmd_journal_grep;
+            $log_cmd = $log_cmd_files if $use_logfiles;
+
+            # Ubuntu Bionic does not log Fingerprint in CERT Details
+
+            $matches_cert   = '^(?<KEY_TYPE>\S+-CERT)'
+                            . ' ID (?<AUTH_ID>\S+)'
+                            ;
+        }
+
+    }
+
+    if ( $os_data{ID} eq 'opensuse-leap' ) {
+
+        # OpenSUSE Leap 15.2 misses grep support in journalctl
+
+        if ( $os_data{VERSION_ID} eq '15.2' ) {
+            $log_cmd = $log_cmd_journal_grep;
+        }
+
+        if ( $use_logfiles ) {
+
+            $log_cmd = $log_cmd_files_messages;
+
+            $matches_login  = '^(?<TS>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'
+                            . '\.(?<IGNORE>\S+)'
+                            . '\s+(?<HOSTNAME>\S+)'
+                            . '\s+sshd\[(?<PID>\d+)\]:'
+                            . '\s+Accepted\s+(?<AUTH_TYPE>\S+)'
+                            . '\s+for\s+(?<USER>\S+)'
+                            . '\s+from\s+(?<HOST>\S+)'
+                            . '\s+port\s+(?<PORT>\d+)\s+ssh2:?\s*(?<DETAILS>.*)'
+                            ;
+
+            $matches_logout = '^(?<TS>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'
+                            . '\.(?<IGNORE>\S+)'
+                            . '\s+(?<HOSTNAME>\S+)'
+                            . '\s+sshd\[(?<PID>\d+)\]:'
+                            . '\s+Disconnected'
+                            . '\s+from\s+user\s+(?<USER>\S+)'
+                            . '\s+(?<HOST>\S+)'
+                            . '\s+port\s+(?<PORT>\d+)'
+                            ;
+
+        }
+
+    }
+
+    if ( $os_data{ID} eq 'alpine' ) {
+
+        # Alpine uses OpenRC so we have to use logfiles
+
+        $log_cmd        = $log_cmd_files_alpine;
+
+        $matches_login  = '^(?<TS>\w+\s+\d+\s+\d+:\d+:\d+)'
+                        . '\s+(?<HOSTNAME>\S+)'
+                        . '\s+(?<SYSLOG>\S+)'
+                        . '\s+sshd\[(?<PID>\d+)\]:'
+                        . '\s+Accepted\s+(?<AUTH_TYPE>\S+)'
+                        . '\s+for\s+(?<USER>\S+)'
+                        . '\s+from\s+(?<HOST>\S+)'
+                        . '\s+port\s+(?<PORT>\d+)\s+ssh2:?\s*(?<DETAILS>.*)'
+                        ;
+
+        $matches_logout = '^(?<TS>\w+\s+\d+\s+\d+:\d+:\d+)'
+                        . '\s+(?<HOSTNAME>\S+)'
+                        . '\s+(?<SYSLOG>\S+)'
+                        . '\s+sshd\[(?<PID>\d+)\]:'
+                        . '\s+Disconnected'
+                        . '\s+from\s+user\s+(?<USER>\S+)'
+                        . '\s+(?<HOST>\S+)'
+                        . '\s+port\s+(?<PORT>\d+)'
+                        ;
+
+    }
+
+    if ( $os_data{ID} eq 'devuan' ) {
+
+        # Devuan uses other Init systems so we have to use logfiles
+
+        $log_cmd = $log_cmd_files;
+
+        if ( $os_data{PRETTY_NAME} =~ /ascii\s*$/  ) {
+
+            # Devuan 2 ASCII logs Disconnects differently
+            #
+            # Normal: Disconnected from user root 192.168.1.101 port 48356
+            # Devuan: Disconnected from 192.168.1.101 port 48356
+
+            $matches_logout = '^(?<TS>\w+\s+\d+\s+\d+:\d+:\d+)'
+                            . '\s+(?<HOSTNAME>\S+)'
+                            . '\s+sshd\[(?<PID>\d+)\]:'
+                            . '\s+Disconnected'
+                            . '\s+from'
+                            . '\s+(?<HOST>\S+)'
+                            . '\s+port\s+(?<PORT>\d+)'
+                            ;
+
+            # Devuan 2 ASCII does not log Fingerprint in CERT Details
+
+            $matches_cert   = '^(?<KEY_TYPE>\S+-CERT)'
+                            . ' ID (?<AUTH_ID>\S+)'
+                            ;
+        }
+    }
+
+    if ( $os_data{ID} eq 'trisquel' ) {
+
+        # Misses grep support in journalctl
+        # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=890265
+
+        if ( $os_data{VERSION_CODENAME} && $os_data{VERSION_CODENAME} eq 'etiona' ) {
+            $log_cmd = $log_cmd_journal_grep;
+            $log_cmd = $log_cmd_files if $use_logfiles;
+        }
+
+    }
+
+    if ( $os_data{ID_LIKE} && $os_data{ID_LIKE} =~ /rhel|centos|fedora/ ) {
+
+        $log_cmd = $log_cmd_files_secure if $use_logfiles;
+
+    }
+
+    if ( $os_data{ID} eq 'void' ) {
+
+        $log_cmd        = $log_cmd_files_messages;
+
+        $matches_login  = '^(?<TS>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'
+                        . '\.(?<IGNORE>\S+)'
+                        . '\s+(?<HOSTNAME>\S+)'
+                        . '\s+sshd\[(?<PID>\d+)\]:'
+                        . '\s+Accepted\s+(?<AUTH_TYPE>\S+)'
+                        . '\s+for\s+(?<USER>\S+)'
+                        . '\s+from\s+(?<HOST>\S+)'
+                        . '\s+port\s+(?<PORT>\d+)\s+ssh2:?\s*(?<DETAILS>.*)'
+                        ;
+
+        $matches_logout = '^(?<TS>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'
+                        . '\.(?<IGNORE>\S+)'
+                        . '\s+(?<HOSTNAME>\S+)'
+                        . '\s+sshd\[(?<PID>\d+)\]:'
+                        . '\s+Disconnected'
+                        . '\s+from\s+user\s+(?<USER>\S+)'
+                        . '\s+(?<HOST>\S+)'
+                        . '\s+port\s+(?<PORT>\d+)'
+                        ;
+
+    }
+
+    if ( $os_data{ID} eq 'slackware' ) {
+
+        $log_cmd        = $log_cmd_files_messages;
+
+    }
+
+    if ( $os_data{ID} eq 'guix' ) {
+
+        $log_cmd        = $log_cmd_files_messages;
+
+    }
+
+}
+
+if ( $os_data{TYPE} eq 'openbsd' ) {
+
+    $log_cmd     = $log_cmd_files_openbsd;
+}
+
+if ( $os_data{TYPE} eq 'freebsd' ) {
+
+    $log_cmd     = $log_cmd_files_freebsd;
+
+    if ( $os_data{ID} && $os_data{ID} eq 'pfsense' ) {
+
+        # pfSense announces itself as freebsd
+        # but ships with an old zgrep version
+        # that ignores -h and still shows filenames
+
+        $log_cmd     = $log_cmd_files_pfsense;
+
+    }
+
+    if ( $os_data{ID} && $os_data{ID} eq 'opnsense' ) {
+
+        # pfSense announces itself as freebsd
+
+        $log_cmd        = $log_cmd_files_opnsense;
+
+        $matches_login  = '^<.*>\d+\s*(?<TS>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'
+                        . '\+(?<IGNORE>\S+)'
+                        . '\s+(?<HOSTNAME>\S+)'
+                        . '\s+sshd (?<PID>\d+)'
+                        . '\s+\-\s+\[meta.*\]'
+                        . '\s+Accepted\s+(?<AUTH_TYPE>\S+)'
+                        . '\s+for\s+(?<USER>\S+)'
+                        . '\s+from\s+(?<HOST>\S+)'
+                        . '\s+port\s+(?<PORT>\d+)\s+ssh2:?\s*(?<DETAILS>.*)'
+                        ;
+
+        $matches_logout = '^<.*>\d+\s*(?<TS>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2})'
+                        . '\+(?<IGNORE>\S+)'
+                        . '\s+(?<HOSTNAME>\S+)'
+                        . '\s+sshd (?<PID>\d+)'
+                        . '\s+\-\s+\[meta.*\]'
+                        . '\s+Disconnected'
+                        . '\s+from\s+user\s+(?<USER>\S+)'
+                        . '\s+(?<HOST>\S+)'
+                        . '\s+port\s+(?<PORT>\d+)'
+                        ;
+
+    }
+
+}
+
+if ( $os_data{TYPE} eq 'dragonfly' ) {
+
+    $log_cmd = $log_cmd_files_dragonfly;
+
+}
+
+my $logs_h;
+
+# If ssh-last was called from a terminal, get data via log_cmd.
+# If data comes via STDIN pipe, get it from there.
+
+if ( -t STDIN ) {
+    open( $logs_h, '-|', $log_cmd);
+}
+else {
+    $logs_h = *STDIN;
+}
+
+my $log_count = 0;
+
+while (my $log = <$logs_h>) {
+
+    print STDERR "Parsing log entries... ($log_count)\r";
+    $log_count = $log_count + 1;
+
+    chomp($log);
+
+    if ( $log =~ /$matches_login/ ) {
+
+        my $timestamp  = $+{TS}         ;
+        my $hostname   = $+{HOSTNAME}   ;
+        my $pid        = $+{PID}        ;
+        my $user       = $+{USER}       ;
+        my $host       = $+{HOST}       ;
+        my $port       = $+{PORT}       ;
+        my $auth_type  = $+{AUTH_TYPE}  ;
+        my $details    = $+{DETAILS}    ;
+
+        if ( $os_data{ID} eq 'opensuse-leap' && $use_logfiles ) {
+            $timestamp =~ s/T/ /g;
+        }
+
+        if ( $os_data{ID} eq 'void' ) {
+            $timestamp =~ s/T/ /g;
+        }
+
+        if ( $os_data{ID} eq 'opnsense' ) {
+            $timestamp =~ s/T/ /g;
+        }
+
+        $session_ids_counter{$port}{login_count}++;
+
+        my $session_id = $port . '-' . $session_ids_counter{$port}{login_count};
+
+        push @ssh_session_ids, $session_id;
+
+        $ssh_sessions{$session_id}{login}       = $timestamp ;
+        $ssh_sessions{$session_id}{logout}      = '-'        ;
+        $ssh_sessions{$session_id}{hostname}    = $hostname  ;
+        $ssh_sessions{$session_id}{pid}         = $pid       ;
+        $ssh_sessions{$session_id}{user}        = $user      ;
+        $ssh_sessions{$session_id}{host}        = $host      ;
+        $ssh_sessions{$session_id}{port}        = $port      ;
+        $ssh_sessions{$session_id}{auth_type}   = $auth_type ;
+        $ssh_sessions{$session_id}{details}     = $details   ;
+        $ssh_sessions{$session_id}{auth_id}     = '-'        ;
+        $ssh_sessions{$session_id}{session_id}  = $session_id;
+
+        unless ( $show_host_in_clear ) {
+
+            if ( $known{$host} ) {
+                $ssh_sessions{$session_id}{host} = $known{$host} ;
+
+            }
+
+        }
+
+        if ( $auth_type eq 'publickey' ) {
+            $ssh_sessions{$session_id}{auth_id}      = '(-) ' . $auth_type ;
+        }
+        else {
+            $ssh_sessions{$session_id}{auth_id}      = '(?) ' . $auth_type ;
+        }
+
+        if ( $debug ) {
+            print "\n";
+            print('> LOG: '        , "$log"        ,    "\n");
+            print('> TS: '         , "$timestamp"  ,    "\n");
+            print('> HOSTNAME: '   , "$hostname"   ,    "\n");
+            print('> PID: '        , "$pid"        ,    "\n");
+            print('> USER: '       , "$user"       ,    "\n");
+            print('> HOST: '       , "$host"       ,    "\n");
+            print('> PORT: '       , "$port"       ,    "\n");
+            print('> AUTH_TYPE: '  , "$auth_type"  ,    "\n");
+            print('> DETAILS: '    , "$details"    ,    "\n");
+            print('> SESSION_ID: ' , "$session_id" ,    "\n");
+        }
+
+        # Set flag to ignore unwanted hosts in output
+
+        if ( exists $ignored{$host}) {
+            $ssh_sessions{$session_id}{ignore}  = 'true';
+        }
+
+        my $known_host = $known{$host};
+
+        if ( $known_host && exists $ignored{$known_host}) {
+            $ssh_sessions{$session_id}{ignore}  = 'true';
+        }
+
+        # Set flag to ignore unwanted users in output
+
+        if ( exists $ignored{$user}) {
+            $ssh_sessions{$session_id}{ignore}  = 'true';
+        }
+
+        if ( $details ) {
+
+            if ( $details =~ /$matches_key/ ) {
+
+                my $key_type    = $+{KEY_TYPE}    ;
+                my $fingerprint = $+{FINGERPRINT} ;
+
+                # Set flag to ignore unwanted fingerprints in output
+
+                if ( exists $ignored{$fingerprint}) {
+                    $ssh_sessions{$session_id}{ignore}  = 'true';
+                }
+
+                $ssh_sessions{$session_id}{key_type}    = $key_type;
+
+                if ( $show_fingerprints ) {
+                    $ssh_sessions{$session_id}{auth_id} = '(K) ' . $fingerprint;
+                }
+                else {
+                    $ssh_sessions{$session_id}{auth_id} = '(K) ' . detail_from_fingerprint($user ,$fingerprint);
+                }
+
+                if ( $debug ) {
+                    print('> DETAILS: '     , 'KEY_FOUND'    ,  "\n");
+                    print('> KEY_TYPE: '    , "$key_type"    ,  "\n");
+                    print('> FINGERPRINT: ' , "$fingerprint" ,  "\n");
+                }
+
+            }
+
+            if ( $details =~ /$matches_cert/ ) {
+
+                my $key_type    = $+{KEY_TYPE}    ;
+                my $fingerprint = $+{FINGERPRINT} ;
+                my $auth_id     = $+{AUTH_ID}     ;
+
+                unless ( $fingerprint ) {
+                    $fingerprint = '-';
+                }
+
+                # Set flag to ignore unwanted fingerprints in output
+
+                if ( exists $ignored{$fingerprint}) {
+                    $ssh_sessions{$session_id}{ignore}  = 'true';
+                }
+
+                # Set flag to ignore unwanted cert ids in output
+
+                if ( exists $ignored{$auth_id}) {
+                    $ssh_sessions{$session_id}{ignore}  = 'true';
+                }
+
+                $ssh_sessions{$session_id}{key_type}    = $key_type;
+
+                if ( $show_fingerprints ) {
+                    $ssh_sessions{$session_id}{auth_id} = '(C) ' . $fingerprint;
+                }
+                else {
+
+                    if ( $known{$auth_id} ) {
+
+                        if ( $show_cert_ids ) {
+                            $ssh_sessions{$session_id}{auth_id} = '(C) ' . $auth_id;
+                        }
+                        else {
+
+                            $ssh_sessions{$session_id}{auth_id} = '(C) ' . $known{$auth_id} ;
+                        }
+                    }
+                    else {
+                        $ssh_sessions{$session_id}{auth_id} = '(C) ' . $auth_id;
+                    }
+                }
+
+                if ( $debug ) {
+                    print('> DETAILS: '     ,  'CERT_FOUND'   ,  "\n");
+                    print('> KEY_TYPE: '    ,  "$key_type"    ,  "\n");
+                    print('> FINGERPRINT: ' ,  "$fingerprint" ,  "\n");
+                    print('> AUTH_ID: '     ,  "$auth_id"     ,  "\n");
+                }
+
+            }
+
+        }
+    }
+
+    if ( $log =~ /$matches_logout/ ) {
+
+        my $timestamp  = $+{TS}         ;
+        my $hostname   = $+{HOSTNAME}   ;
+        my $user       = $+{USER}       ;
+        my $pid        = $+{PID}        ;
+        my $host       = $+{HOST}       ;
+        my $port       = $+{PORT}       ;
+
+        if ( $os_data{ID} eq 'opensuse-leap' && $use_logfiles ) {
+            $timestamp =~ s/T/ /g;
+        }
+
+        if ( $os_data{ID} eq 'void' ) {
+            $timestamp =~ s/T/ /g;
+        }
+
+        if ( $os_data{ID} eq 'opnsense' ) {
+            $timestamp =~ s/T/ /g;
+        }
+
+        my $session_id;
+
+        if ( $session_ids_counter{$port}{login_count} ) {
+
+            $session_id = $port . '-' . $session_ids_counter{$port}{login_count};
+        }
+        else {
+            # If there is no previous login
+            # to this port in log, skip this logline.
+            #
+            # Example: Login line was rolled over by logration
+            #          and "Disconnect" is still in log
+            #          but the "Accepted" entry was discarded.
+            next;
+        }
+
+        $ssh_sessions{$session_id}{logout} = $timestamp;
+
+        if ( $debug ) {
+
+            print "\n";
+            print("< $log", "\n");
+
+            unless ( $user ) {
+                $user = '-';
+            }
+
+            print('< TS: '         , "$timestamp"  ,    "\n");
+            print('< HOSTNAME: '   , "$hostname"   ,    "\n");
+            print('< PID: '        , "$pid"        ,    "\n");
+            print('< USER: '       , "$user"       ,    "\n");
+            print('< HOST: '       , "$host"       ,    "\n");
+            print('< PORT: '       , "$port"       ,    "\n");
+            print('< SESSION_ID: ' , "$session_id" ,    "\n");
+        }
+    }
+
+}
+
+# +----------------+
+# | PRINT SESSIONS |
+# +----------------+
+
+my $output_format = "%-15s  %-15s  %-10s  %-15s  %-15s  %-5s  %-15s\n";
+
+if ( $os_data{ID} && $os_data{ID} eq 'opensuse-leap' && $use_logfiles ) {
+
+    $output_format = "%-20s  %-20s  %-10s  %-15s  %-15s  %-5s  %-15s\n";
+}
+
+if ( $os_data{ID} && $os_data{ID} eq 'void' ) {
+
+    $output_format = "%-20s  %-20s  %-10s  %-15s  %-15s  %-5s  %-15s\n";
+}
+
+if ( $os_data{ID} && $os_data{ID} eq 'opnsense' ) {
+
+    $output_format = "%-20s  %-20s  %-10s  %-15s  %-15s  %-5s  %-15s\n";
+}
+
+print "\n";
+
+if ( $debug ) {
+    print Dumper \%ssh_sessions;
+}
+
+#
+# HEADER
+#
+
+if ( $colors ) {
+
+    print color 'bold white';
+
+    printf( $output_format,
+            'LOGIN',
+            'LOGOUT',
+            'DURATION',
+            'USER',
+            'HOST',
+            'PORT',
+            'AUTH_ID',
+          );
+
+    print color 'reset';
+
+}
+else {
+
+    printf( $output_format,
+            'LOGIN',
+            'LOGOUT',
+            'DURATION',
+            'USER',
+            'HOST',
+            'PORT',
+            'AUTH_ID',
+          );
+
+}
+
+#
+# SESSIONS
+#
+
+foreach my $session ( @ssh_session_ids ) {
+
+    #
+    # ignore unwanted data in output
+    #
+
+    if ( $ssh_sessions{$session}{ignore} ) {
+
+        #
+        # but not if user insists on seeing them (-a)
+        #
+
+        unless ( $show_all ) {
+            next;
+      }
+    }
+
+    my $port = $ssh_sessions{$session}{port};
+
+    if ( $ssh_sessions{$session}{logout} eq '-' ) {
+
+        $ssh_sessions{$session}{duration} = '-';
+
+        my $command = "LANG=C ss -tnp state ESTABLISHED | grep -q :\"${port}\\s*users.*sshd\"";
+
+        if ( $os_data{TYPE} eq 'openbsd' ) {
+            $command = "LANG=C fstat | grep -q \"sshd.*internet.*tcp.*:${port}\"";
+        }
+
+        if ( $os_data{TYPE} eq 'freebsd' ) {
+            $command = "LANG=C sockstat -c | grep -q \"sshd.*tcp.*:${port}\"";
+        }
+
+        if ( $os_data{TYPE} eq 'dragonfly' ) {
+            $command = "LANG=C sockstat -c | grep -q \"sshd.*tcp.*:${port}\"";
+        }
+
+        if ( $os_data{TYPE} eq 'linux' ) {
+            if ( $os_data{ID} eq 'alpine' ) {
+                $command = "LANG=C netstat -n -t | grep -qE \":${port} +ESTABLISHED\"";
+            }
+        }
+
+        my $error = system $command;
+
+        if ( $error ) {
+            # That is actually not an error,
+            # it just means that grep did not find
+            # a TCP Session with that port
+            # so we can assume the user is not logged in anymore
+        }
+        else {
+            $ssh_sessions{$session}{logout} = 'still logged in';
+
+            my $login_epoch;
+
+            if ( $os_data{ID} && $os_data{ID} eq 'opensuse-leap' && $use_logfiles ) {
+                $login_epoch  = str2epoch_opensuse($ssh_sessions{$session}{login});
+            }
+            elsif ( $os_data{ID} && $os_data{ID} eq 'void' ) {
+                $login_epoch  = str2epoch_opensuse($ssh_sessions{$session}{login});
+            }
+            elsif ( $os_data{ID} && $os_data{ID} eq 'opnsense' ) {
+                $login_epoch  = str2epoch_opensuse($ssh_sessions{$session}{login});
+            }
+            else {
+                $login_epoch  = str2epoch($ssh_sessions{$session}{login});
+            }
+
+            my $current_time = time();
+            my $duration     = $current_time - $login_epoch;
+
+            $ssh_sessions{$session}{duration} = format_seconds($duration);
+        }
+    }
+    else {
+        my $login_epoch;
+        my $logout_epoch;
+
+        if ( $os_data{ID} && $os_data{ID} eq 'opensuse-leap' && $use_logfiles ) {
+            $login_epoch  = str2epoch_opensuse($ssh_sessions{$session}{login});
+            $logout_epoch = str2epoch_opensuse($ssh_sessions{$session}{logout});
+        }
+        elsif ( $os_data{ID} eq 'void' ) {
+            $login_epoch  = str2epoch_opensuse($ssh_sessions{$session}{login});
+            $logout_epoch = str2epoch_opensuse($ssh_sessions{$session}{logout});
+        }
+        elsif ( $os_data{ID} eq 'opnsense' ) {
+            $login_epoch  = str2epoch_opensuse($ssh_sessions{$session}{login});
+            $logout_epoch = str2epoch_opensuse($ssh_sessions{$session}{logout});
+        }
+        else {
+            $login_epoch  = str2epoch($ssh_sessions{$session}{login});
+            $logout_epoch = str2epoch($ssh_sessions{$session}{logout});
+        }
+
+        my $duration     = $logout_epoch - $login_epoch;
+
+        $ssh_sessions{$session}{duration} = format_seconds($duration);
+    }
+
+    if ( $ssh_sessions{$session}{logout} =~ /still/ ) {
+
+        if ( $colors ) {
+            print color 'bright_cyan';
+
+            printf( $output_format,
+                    $ssh_sessions{$session}{login},
+                    $ssh_sessions{$session}{logout},
+                    $ssh_sessions{$session}{duration},
+                    $ssh_sessions{$session}{user},
+                    $ssh_sessions{$session}{host},
+                    $ssh_sessions{$session}{port},
+                    $ssh_sessions{$session}{auth_id},
+                  );
+
+            print color 'reset';
+
+        }
+        else {
+
+            printf( $output_format,
+                    $ssh_sessions{$session}{login},
+                    $ssh_sessions{$session}{logout},
+                    $ssh_sessions{$session}{duration},
+                    $ssh_sessions{$session}{user},
+                    $ssh_sessions{$session}{host},
+                    $ssh_sessions{$session}{port},
+                    $ssh_sessions{$session}{auth_id},
+                  );
+
+        }
+
+    }
+    else {
+
+        if ( $who_mode ) {
+            next;
+        }
+        else {
+            printf( $output_format,
+                $ssh_sessions{$session}{login},
+                $ssh_sessions{$session}{logout},
+                $ssh_sessions{$session}{duration},
+                $ssh_sessions{$session}{user},
+                $ssh_sessions{$session}{host},
+                $ssh_sessions{$session}{port},
+                $ssh_sessions{$session}{auth_id},
+            );
+        }
+
+    }
+
+}
+
+__END__
+
+=head1 NAME
+
+ssh-last - list last SSH sessions
+
+=head1 SYNOPSIS
+
+               ssh-last [OPTIONS]
+    ssh_logs | ssh-last [OPTIONS]
+
+=head2 Options
+
+    -a  show all sessions                           (show data which is hidden by the 'ignored' file)
+    -c  colored output                              (highlight active SSH sessions)
+    -d  debug
+    -f  force showing fingerprints
+    -h  show this help message
+    -i  force showing certificate ids               (not together with option -f)
+    -l  try to use logfiles instead of journalctl   (may be even faster on some systems)
+    -n  show host/ip in cleartext                   (no mapping from known_hosts)
+    -w  show only active SSH sessions
+    -?  show complete manual with more detailed information
+        (usually needs perl-doc installed to work properly)
+
+=head2 Examples
+
+    ssh-last
+    ssh-last -c | more
+    ssh-last -c | less -R   # keeps colored output in less
+    ssh-last -cw
+
+    # Logs from yesterday
+    LC_TIME=C journalctl _COMM=sshd -g 'Accepted|Disconnected' --since yesterday               | ssh-last
+
+    # Logs from three days ago
+    LC_TIME=C journalctl _COMM=sshd -g 'Accepted|Disconnected' --since -3d --until -2d         | ssh-last
+
+    # Logs from the last hour
+    LC_TIME=C journalctl _COMM=sshd -g 'Accepted|Disconnected' --since -1h                     | ssh-last
+
+    # Logs until a specific date
+    LC_TIME=C journalctl _COMM=sshd -g 'Accepted|Disconnected' --until "2022-03-12 07:00:00"   | ssh-last
+
+    # From logfiles (order must be from oldest to newest)
+    zgrep -hE 'Accepted|Disconnected' auth.log.2.gz  auth.log.1  auth.log                      | ssh-last
+    zgrep -hE 'Accepted|Disconnected' $(ls /var/log/auth.log* --sort=time --reverse)           | ssh-last
+    zgrep -hE 'Accepted|Disconnected' $(ls /var/log/messages* --sort=time --reverse)           | ssh-last
+    zgrep -hE 'Accepted|Disconnected' $(ls /var/log/secure*   --sort=time --reverse)           | ssh-last
+
+=head1 DESCRIPTION
+
+ssh-last is like last but for SSH sessions
+
+=head2 Output Flags
+
+    +--------------------------------------------------------------------------+
+    |                                                                          |
+    | AUTH_ID                                                                  |
+    |                                                                          |
+    | (C) sshd authorized login via (c)ertificate                              |
+    | (K) sshd authorized login via public (k)ey                               |
+    | (?) sshd authorized login via some other type (password, pam)            |
+    |                                                                          |
+    +--------------------------------------------------------------------------+
+
+=head2 Algorithm
+
+    Milling through sshd logs in chronological order:
+
+    1) Finding login (Accepted) and logout (Disconnected) lines.
+    2) Storing info from the lines like username, auth_type, fingerprint, ...
+    3) Using the used network port to check for active sessions
+       and piecing together old sessions by remembering logged network ports
+    4) Using mainly /etc/os-release to adapt for different systems
+       which differ in logfile names, logging patterns, etc...
+
+=head1 FILES
+
+=head2 Ignored
+
+     /etc/ssh-tools/ssh-last/ignored
+    ~/.config/ssh-tools/ssh-last/ignored
+    ./ignored
+
+    These data will be hidden in output unless forced with -a option
+
+    +--------------------------------------------------------------------------+
+    |# Fingerprints                                                            |
+    |                                                                          |
+    |SHA256:ElgyEn5xPe4VlK5jJkqauRdAKNRHdh2tGHfo0m9/IwW Jenkins                |
+    |SHA256:5xPe4JkqaElKNRHGHfxPe4RdAKdh2tlK5AKNRHn5xK5 foo          # comment |
+    |SHA256:nmKL5s7/fs45312nvjhFSRTREa44r2hfgJHJG54353R   bar@gmx.de           |
+    |                                                                          |
+    |# Hosts                                                                   |
+    |                                                                          |
+    |127.0.0.1       localhost   # local ssh logins                            |
+    |192.168.1.50    nas         # more comments                               |
+    |webserver                   # alias from the 'known' file                 |
+    |                                                                          |
+    |# Cert IDs                                                                |
+    |                                                                          |
+    |user1@company.com                                                         |
+    |user2@company.com with some info                                          |
+    |user3@company.com with some info # and a comment                          |
+    |                                                                          |
+    |# Users                                                                   |
+    |                                                                          |
+    |git # gitlab                                                              |
+    +--------------------------------------------------------------------------+
+
+=head2 Known
+
+     /etc/ssh-tools/ssh-last/known
+    ~/.config/ssh-tools/ssh-last/known
+    ./known
+
+    For these keys the mapped value will be shown instead of its key,
+    unless forced with -f (fingerprints) and -n (hosts)
+    or -i (certificate ids) option
+
+    +--------------------------------------------------------------------------+
+    |# Fingerprints                                                            |
+    |                                                                          |
+    |SHA256:WwI/9m0ofHGt2hdHRNKAdRuaqkJj5KlV4ePx5nEyglE Sven Wick              |
+    |SHA256:xyk5ZZZWZKnmKL5mYdk8Poy5eds7/CD/JEwqykMnlQQ root@n40l    # comment |
+    |SHA256:G7h9i5+NDU72Ae40gCkxyvDz/8BH+KETw7sXHCYr5w0   sven.wick@gmx.de     |
+    |                                                                          |
+    |# Hosts                                                                   |
+    |                                                                          |
+    |127.0.0.1       localhost   # local ssh logins                            |
+    |192.168.1.50    nas         # more comments                               |
+    |192.168.50.100  webserver                                                 |
+    |                                                                          |
+    |# Cert IDs                                                                |
+    |                                                                          |
+    |user1@company.com   vaporup                                               |
+    +--------------------------------------------------------------------------+
+
+=head1 BUGS AND LIMITATIONS
+
+=head2 JumpHosts
+
+    Using a JumpHost with ProxyCommand oder ProxyJump,
+    may often result in an unclean ssh disconnect,
+    so LOGOUT and DURATION is not logged and can not be displayed then.
+
+=head2 Unprivileged users
+
+    If possible, run ssh-last as root or via sudo
+
+    Logfiles and systemd's journal usually can not be read by a normal user
+
+    Also ssh-last -w works only reliably as root,
+    since ss and netstat do not show process info when run as normal user
+
+=head1 SEE ALSO
+
+ssh-keyinfo(1), ssh-certinfo(1)
+
+=head1 AUTHOR
+
+Sven Wick <sven.wick@gmx.de>
+
+=cut
