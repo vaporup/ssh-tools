@@ -25,44 +25,44 @@
 # Divergence to the original:
 # ---------------------------
 #
-# - Perl instead of Python
-# - Works on a broad set of operating systems not only the latest Ubuntu
-#   - Major GNU/Linux distributions
-#   - Niche GNU/Linux distributions like guix, void, etc...
-#   - Major BSD distributions like OpenBSD, FreeBSD, DragonFlyBSD,
-#     works even on Firewall appliances like pfSense and OPNSense
-# - Uses systemd's journal by default and logfiles only as a fallback
-#   when run on Non-Linux or Non-systemd Linux systems
-#   and you can even pipe in the logs.
-# - The algorithm to reconstruct SSH sessions works differently:
+# 1) Perl instead of Python
+# 2) Works on a broad set of operating systems not only the latest Ubuntu
+#    - Major GNU/Linux distributions
+#    - Niche GNU/Linux distributions like guix, void, etc...
+#    - Major BSD distributions like OpenBSD, FreeBSD, DragonFlyBSD,
+#      works even on Firewall appliances like pfSense and OPNSense
+# 3) Uses systemd's journal by default and logfiles only as a fallback
+#    when run on Non-Linux or Non-systemd Linux systems
+#    and you can even pipe in the logs.
+# 4) The algorithm to reconstruct SSH sessions works differently:
 #
-#     Some distributions, especially some BSDs, do different privilege separation
-#     which results in changing the PID during login phase for a normal user connection
+#    Some distributions, especially some BSDs, do different privilege separation
+#    which results in changing the PID during login phase for a normal user connection
 #
-#     https://security.stackexchange.com/questions/115896/can-someone-explain-how-sshd-does-privilege-separation
+#    https://security.stackexchange.com/questions/115896/can-someone-explain-how-sshd-does-privilege-separation
 #
-#     Relying upon PIDs is therefore not very robust
-#     because you can't map login and logout session afterwards anymore
-#     so a different algorithm using TCP ports was used instead
-#     (the port stays the same during the whole session including login phase)
+#    Relying upon PIDs is therefore not very robust
+#    because you can't map login and logout session afterwards anymore
+#    so a different algorithm using TCP ports was used instead
+#    (the port stays the same during the whole session including login phase)
 #
-#     Also, finding the logout timestamp is implemented in a more precise fashion:
+#    Also, finding the logout timestamp is implemented in a more precise fashion:
 #
-#     The original version fetches just the last log of a PID
-#     which sometimes creates a false positive when a SSH session was not closed cleanly.
+#    The original version fetches just the last log of a PID
+#    which sometimes creates a false positive when a SSH session was not closed cleanly.
 #
-#     This implementation therefore uses a counting algorithm
-#     to piece together a SSH session by its Accepted and Disconnected logline
+#    This implementation therefore uses a counting algorithm
+#    to piece together a SSH session by its Accepted and Disconnected logline
 #
-# - The "Known" and "Ignored" mechanics are implemented
-#   in a hierarchical filesystem manner instead of hardcoding them into the script
-# - The output includes some flags which give a hint about which auth type was used:
+# 5) The "Known" and "Ignored" mechanics are implemented
+#    in a hierarchical filesystem manner instead of hardcoding them into the script
+# 6) The output includes some flags which give a hint about which auth type was used:
 #
-#   e.g:
+#    e.g:
 #
-#   (C) sshd authorized login via (c)ertificate
-#   (K) sshd authorized login via public (k)ey
-#   (?) sshd authorized login via some other type (password, pam)
+#    (C) sshd authorized login via (c)ertificate
+#    (K) sshd authorized login via public (k)ey
+#    (?) sshd authorized login via some other type (password, pam)
 
 use strict;
 use warnings;
