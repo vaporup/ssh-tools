@@ -26,14 +26,17 @@
 # ---------------------------
 #
 # 1) Perl instead of Python
+#
 # 2) Works on a broad set of operating systems not only the latest Ubuntu
 #    - Major GNU/Linux distributions
 #    - Niche GNU/Linux distributions like guix, void, etc...
 #    - Major BSD distributions like OpenBSD, FreeBSD, DragonFlyBSD,
 #      works even on Firewall appliances like pfSense and OPNSense
+#
 # 3) Uses systemd's journal by default and logfiles only as a fallback
 #    when run on Non-Linux or Non-systemd Linux systems
 #    and you can even pipe in the logs.
+#
 # 4) The algorithm to reconstruct SSH sessions works differently:
 #
 #    Some distributions, especially some BSDs, do different privilege separation
@@ -57,6 +60,7 @@
 #
 # 5) The "Known" and "Ignored" mechanics are implemented
 #    in a hierarchical filesystem manner instead of hardcoding them into the script
+#
 # 6) The output includes some flags which give a hint about which auth type was used:
 #
 #    e.g:
