@@ -30,7 +30,7 @@ Check if host is reachable using ```ssh_config```
   ~~~~
 
 ## ssh-last
-like ```last``` but for SSH sessions
+Like ```last``` but for SSH sessions
 
 ```
 LOGIN            LOGOUT           DURATION   USER   HOST         PORT   AUTH_ID
