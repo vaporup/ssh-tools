@@ -37,7 +37,7 @@ LOGIN            LOGOUT           DURATION   USER   HOST         PORT   AUTH_ID
 Aug 14 03:45:34  Aug 14 03:48:06  00:02:32   swick  JumpHost     40548  (C) swick@company
 Aug 26 22:20:02  Aug 26 22:20:02  00:00:00   swick  192.168.1.5  48856  (?) password
 Oct 14 13:43:49  Oct 14 13:44:29  00:00:40   root   192.168.1.5  45828  (K) sven.wick@gmx.de
-Nov 02 12:16:58  still logged in  241:22:12  swick  192.168.1.5  59198  (K) sven.wick@gmx.de
+Nov 02 12:16:58  still logged in  241:22:12  swick  192.168.1.5  59198  (K) SSHFS Mount
 ```
 
 More info at the [docs](doc/ssh-last)
