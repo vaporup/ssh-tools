@@ -1456,9 +1456,9 @@ ssh-last is like last but for SSH sessions
 
     If you do an in-place upgrade like dist-upgrade on Debian/Ubuntu,
     depending on the version difference,
-    it can happen that sshd logs differently and from that point on
-    you may have a mix of logs in new and old format
-    so ssh-last may only show the latest ones correctly
+    it can happen that sshd logs differently from that point on
+    and you may have a mix of logs in new and old format
+    which results in ssh-last showing only the latest ones correctly
 
 =head1 SEE ALSO
 
