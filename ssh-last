@@ -1449,7 +1449,7 @@ ssh-last is like last but for SSH sessions
     1) Logfiles and systemd's journal usually can not be read by a normal user
     2) ssh-last -w works only reliably as root,
        since ss and netstat do not show process info when run as normal user
-    3) ssh-last tries to map the fingerprint from the users authorized_keys file
+    3) ssh-last tries to map the fingerprint from the user's authorized_keys file
        but users usually can't look into other users files
 
 =head2 OS Upgrades
