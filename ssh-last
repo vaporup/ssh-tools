@@ -1454,10 +1454,10 @@ ssh-last is like last but for SSH sessions
 
 =head2 OS Upgrades
 
-    If you do an in-place upgrade like dist-upgrade on Debian/Ubuntu
+    If you do an in-place upgrade like dist-upgrade on Debian/Ubuntu,
     depending on the version difference,
-    it can happen that sshd logs differently from that point on
-    and you have a mix of logs in new and old format
+    it can happen that sshd logs differently and from that point on
+    you may have a mix of logs in new and old format
     so ssh-last may only show the latest ones correctly
 
 =head1 SEE ALSO
