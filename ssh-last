@@ -57,7 +57,7 @@
 #
 #    The original version fetches just the last log of a PID
 #    which sometimes creates a false positive
-#    when a SSH session was not closed cleanly and the PID was recycled.
+#    when a SSH session was not closed cleanly and the PID was recycled for another SSH session.
 #
 #    This implementation therefore uses a counting algorithm
 #    to piece together a SSH session by its Accepted and Disconnected logline
