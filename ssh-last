@@ -609,6 +609,16 @@ if ( $os_data{TYPE} eq 'linux' ) {
 
     }
 
+    if ( $os_data{ID} eq 'mageia' ) {
+
+        # Mageia 8 misses grep support in journalctl
+
+        if ( $os_data{VERSION_ID} eq '8' ) {
+            $log_cmd = $log_cmd_journal_grep;
+        }
+
+    }
+
     if ( $os_data{ID} eq 'opensuse-leap' ) {
 
         # OpenSUSE Leap 15.2 misses grep support in journalctl

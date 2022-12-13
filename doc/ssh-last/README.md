@@ -27,6 +27,8 @@
   - systemd Edition
   - ~~openRC Edition~~
 - Manjaro
+- Mageia
+  - 8
 - Arch
 - Alpine
 - Fedora
