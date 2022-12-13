@@ -36,6 +36,11 @@
   - journal not persistent
   - ```dnf install perl-Time-Piece```
   - ```dnf install perl-Memoize```
+- Oracle Linux
+  - 9.1
+    - journal not persistent
+    - no Perl installed
+    - ```dnf install perl```
 - Rocky Linux
   - 8.6
     - journal not persistent
