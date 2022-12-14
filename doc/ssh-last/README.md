@@ -39,9 +39,17 @@
   - ```dnf install perl-Time-Piece```
   - ```dnf install perl-Memoize```
 - Oracle Linux
+  - 8.7
+    - journal not persistent
+    - no Perl installed
+    - ```dnf install oracle-epel-release-el8```
+    - ```dnf install perl```
+    - ```dnf install perl-Time-Piece```
+    - ```dnf install perl-Memoize```
   - 9.1
     - journal not persistent
     - no Perl installed
+    - ```dnf install oracle-epel-release-el9```
     - ```dnf install perl```
 - Rocky Linux
   - 8.6
