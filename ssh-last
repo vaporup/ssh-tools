@@ -1449,8 +1449,8 @@ ssh-last is like last but for SSH sessions
 =head2 JumpHosts
 
     Using a JumpHost with ProxyCommand oder ProxyJump,
-    may often result in an unclean ssh disconnect,
-    so LOGOUT and DURATION is not logged and can not be displayed then.
+    may often result in an unclean disconnect with nothing logged,
+    so LOGOUT and DURATION can not be displayed.
 
 =head2 Unprivileged users
 
