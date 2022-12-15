@@ -627,6 +627,12 @@ if ( $os_data{TYPE} eq 'linux' ) {
             $log_cmd = $log_cmd_journal_grep;
         }
 
+        # OpenSUSE Leap 15.4 grep support in journalctl does not work
+
+        if ( $os_data{VERSION_ID} eq '15.4' ) {
+            $log_cmd = $log_cmd_journal_grep;
+        }
+
         if ( $use_logfiles ) {
 
             $log_cmd = $log_cmd_files_messages;
