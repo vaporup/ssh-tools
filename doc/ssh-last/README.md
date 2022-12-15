@@ -34,6 +34,9 @@
 - Fedora
   - 34
     - ```dnf install perl-Time-Piece```
+  - 35
+  - 36
+  - 37
 - CentOS Stream
   - 8
     - journal not persistent
@@ -59,6 +62,8 @@
     - journal not persistent
     - ```dnf install perl-Time-Piece```
     - ```dnf install perl-Memoize```
+  - 9.1
+    - journal not persistent
 - Devuan
   - 2
   - 3
