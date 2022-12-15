@@ -62,6 +62,8 @@
 #    This implementation therefore uses a counting algorithm
 #    to piece together a SSH session by its Accepted and Disconnected logline
 #
+#    More info: https://utcc.utoronto.ca/~cks/space/blog/linux/OpenSSHDisconnectLogging
+#
 # 5) The "Known" and "Ignored" mechanics are implemented
 #    in a hierarchical filesystem manner instead of hardcoding them into the script
 #
