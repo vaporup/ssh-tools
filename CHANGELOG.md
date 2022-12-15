@@ -1,3 +1,30 @@
+# 1.8 (unreleased)
+
+## Added
+
+- **ssh-last**: like last but for SSH sessions
+
+## Changed
+
+- ssh-facts:
+  - Bugfix for newer FreeBSDs
+- ssh-ping:
+  - Bugfix for Debian Bug #998219 making the package build reproducible
+- all
+  - Shrink header comments
+
+## Removed
+
+- all
+  - Removed HashKnownHosts=no option
+
+    Some Distros set several options as standard in /etc/ssh/ssh_config.
+
+    Debian uses HashKnownHosts=yes by default so entries in ~/.ssh/known_hosts
+    get mixed with hashed and unhashed entries.
+
+    Removing this option, so ssh's default gets used
+
 # 1.7 (2021-10-31)
 
 ## Added
