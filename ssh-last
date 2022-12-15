@@ -1329,11 +1329,11 @@ ssh-last - list last SSH sessions
     -a  show all sessions                           (show data which is hidden by the 'ignored' file)
     -c  colored output                              (highlight active SSH sessions)
     -d  debug
-    -f  force showing fingerprints
+    -f  force showing fingerprints                  (no mapping from 'known' file)
     -h  show this help message
-    -i  force showing certificate ids               (not together with option -f)
+    -i  force showing certificate ids               (no mapping from 'known' file, not together with -f)
     -l  try to use logfiles instead of journalctl   (may be even faster on some systems)
-    -n  show host/ip in cleartext                   (no mapping from known_hosts)
+    -n  show host/ip in cleartext                   (no mapping from 'known' file)
     -w  show only active SSH sessions
     -?  show complete manual with more detailed information
         (usually needs perl-doc installed to work properly)
