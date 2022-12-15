@@ -35,9 +35,12 @@
   - 34
     - ```dnf install perl-Time-Piece```
 - CentOS Stream
-  - journal not persistent
-  - ```dnf install perl-Time-Piece```
-  - ```dnf install perl-Memoize```
+  - 8
+    - journal not persistent
+    - ```dnf install perl-Time-Piece```
+    - ```dnf install perl-Memoize```
+  - 9
+    - journal not persistent
 - Oracle Linux
   - 8.7
     - journal not persistent
