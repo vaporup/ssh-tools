@@ -1478,6 +1478,23 @@ ssh-last is like last but for SSH sessions
     and you may have a mix of logs in new and old format
     which results in ssh-last showing only the latest ones correctly
 
+=head1 NOTES
+
+=head2 Helper Scripts
+
+    For convenience you can create little wrapper scripts like the following
+    which avoids parsing too many logs by limiting the data only to the last week
+
+    my-ssh-last
+    +--------------------------------------------------------------------------+
+    | #!/usr/bin/env bash                                                      |
+    |                                                                          |
+    | LC_TIME=C journalctl _COMM=sshd --since -1week \                         |
+    | | grep -E 'Accepted|Disconnected'              \                         |
+    | | ssh-last "$@"                                                          |
+    |                                                                          |
+    +--------------------------------------------------------------------------+
+
 =head1 SEE ALSO
 
 ssh-keyinfo(1), ssh-certinfo(1)
