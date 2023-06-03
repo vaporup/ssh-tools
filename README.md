@@ -32,13 +32,15 @@ Check if host is reachable using ```ssh_config```
 ## ssh-last
 Like ```last``` but for SSH sessions
 
-```
-LOGIN            LOGOUT           DURATION   USER   HOST         PORT   AUTH_ID
-Aug 14 03:45:34  Aug 14 03:48:06  00:02:32   swick  JumpHost     40548  (C) swick@company
-Aug 26 22:20:02  Aug 26 22:20:02  00:00:00   swick  192.168.1.5  48856  (?) password
-Oct 14 13:43:49  Oct 14 13:44:29  00:00:40   root   192.168.1.5  45828  (K) sven.wick@gmx.de
-Nov 02 12:16:58  still logged in  241:22:12  swick  192.168.1.5  59198  (K) SSHFS Mount
-```
+  ~~~~
+  # ssh-last
+
+  LOGIN            LOGOUT           DURATION   USER   HOST         PORT   AUTH_ID
+  Aug 14 03:45:34  Aug 14 03:48:06  00:02:32   swick  JumpHost     40548  (C) swick@company
+  Aug 26 22:20:02  Aug 26 22:20:02  00:00:00   swick  192.168.1.5  48856  (?) password
+  Oct 14 13:43:49  Oct 14 13:44:29  00:00:40   root   192.168.1.5  45828  (K) sven.wick@gmx.de
+  Nov 02 12:16:58  still logged in  241:22:12  swick  192.168.1.5  59198  (K) SSHFS Mount
+  ~~~~
 
 More info at the [docs](doc/ssh-last)
 
@@ -91,12 +93,11 @@ Get some facts about the remote system
   LSB_RELEASE=16.04
   ~~~~
 
-
 ## ssh-hostkeys
 Prints server host keys in several formats
 
   ~~~~
-   $ ssh-hostkeys kim
+  $ ssh-hostkeys kim
 
     (ECDSA)   256     MD5 3d:8e:49:6e:40:34:c6:e4:c8:5f:60:d9:ad:bf:1f:b9
     (ECDSA)   256  SHA256 txYpmPENBWolKBaA5EkCM/y1Hm2DP81jtABFrWUBf/c
@@ -106,12 +107,11 @@ Prints server host keys in several formats
       (RSA)  2048  SHA256 WkOzD8BaeljejgTTAwECkByyb4kHdI0pnJB2/gcS1Lk
   ~~~~
 
-
 ## ssh-keyinfo
 Prints keys in several formats
 
   ~~~~
-   $ ssh-keyinfo ~/.ssh/*.pub
+  $ ssh-keyinfo ~/.ssh/*.pub
 
   (RSA)  2048     MD5 40:52:aa:14:a5:9a:fe:b5:96:c0:d2:dc:99:f1:a5:77    /home/vaporup/.ssh/id_rsa.pub
   (RSA)  2048  SHA256 V4F6ipY4gG83sQGM0eRk0+g1RWE9K4asDUj1jFpCa48        /home/vaporup/.ssh/id_rsa.pub
@@ -126,8 +126,9 @@ Shows validity and information of SSH certificates
   /home/vaporup/.ssh/id_rsa-cert.pub    SSH_CERT_VALID      forever             ->  forever
   /home/vaporup/.ssh/test1-cert.pub     SSH_CERT_INVALID    2038-01-19T04:14:07 ->  2038-01-19T04:14:07
   /home/vaporup/.ssh/test2-cert.pub     SSH_CERT_EXPIRED    1988-11-14T13:36:40 ->  1991-08-11T14:36:40
+  ~~~~
 
-
+  ~~~~
   $ ssh-certinfo -v ~/.ssh/*.pub
 
   /home/vaporup/.ssh/id_rsa-cert.pub:
