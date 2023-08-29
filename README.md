@@ -29,6 +29,28 @@ Check if host is reachable using ```ssh_config```
   3 requests transmitted, 3 requests received, 0% request loss
   ~~~~
 
+### TAB Completions
+
+Ubuntu (and maybe other distros) ship completions for ssh which can be re-used:
+
+#### Bash
+
+```
+complete -F _known_hosts ssh-ping
+```
+
+#### Zsh
+
+```
+compdef _ssh_hosts ssh-ping
+```
+
+#### Fish
+
+```
+complete -c ssh-ping -a "(__fish_print_hostnames)"
+```
+
 ## ssh-last
 Like ```last``` but for SSH sessions
 
